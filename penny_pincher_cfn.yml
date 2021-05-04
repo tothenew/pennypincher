@@ -1,0 +1,134 @@
+AWSTemplateFormatVersion: '2010-09-09'
+
+Parameters:
+  S3BucketName:
+    Description: 'Takes S3 bucket name which contains lambda layer and code zip files'
+    Type: 'String'
+  AccountName:
+    Description: 'Takes account name as input'
+    Type: 'String'
+  CloudwatchConfig:
+    Description: 'Takes number of days to be considered for calculating cloudwatch metric value. Can be null or given in the format resource=number of days e.g. ebs=20, lb=15, rds=30'
+    Type: 'String'
+    Default: 'Null'
+  ReportingPlatform:
+    Description: 'Takes reporting platform as input'
+    Type: 'String'
+    AllowedValues:
+      - 'Email'
+      - 'Slack'
+      - 'Email and Slack'
+    Default: 'Email'
+  SlackChannelName:
+    Description: 'Takes slack channel name as input. Keep the defaults in case slack notifications are not required'
+    Type: 'String'
+    Default: '-'
+  SlackToken:
+    Description: 'Takes slack token as input . Keep the defaults in case slack notifications are not required'
+    Type: 'String'
+    Default: '-'
+  SESFromEmailAddress:
+    Type: 'String'
+    Description: 'Takes the email id from which the mail containing cost report will be sent. Keep the defaults in case email notifications are not required'
+    Default: '-'
+  SESToEmailAddress:
+    Description: 'Takes email ids (in comma separated format) to which the mail containing cost report will be sent. Keep the defaults in case email notifications are not required'
+    Type: 'String'
+    Default: '-'
+  SESRegion:
+    Description: 'Takes the AWS region abbreviation (e.g. ap-south-1 for Mumbai) in which SES is configured'
+    Type: 'String'
+    Default: 'us-east-1'
+
+Resources:
+  ServiceRoleForLambda:
+    Type: 'AWS::IAM::Role'
+    Description: 'IAM role for Penny Pincher'
+    Properties:
+      RoleName: 'Penny-Pincher-Lambda-Role'
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: 'Allow'
+            Principal:
+              Service:
+                - 'lambda.amazonaws.com'
+            Action:
+              - 'sts:AssumeRole'
+      Policies:
+        - PolicyName: 'Penny-Pincher-Lambda-Inline-Policy'
+          PolicyDocument: !Sub
+            - '{
+                   "Version": "2012-10-17",
+                   "Statement": [
+                       {
+                           "Sid": "VisualEditor0",
+                           "Effect": "Allow",
+                           "Action": [
+                               "ec2:DescribeImages",
+                               "ec2:DescribeInstances",
+                               "ec2:DescribeRegions",
+                               "ec2:DescribeVolumes",
+                               "ec2:DescribeAddresses",
+                               "pricing:GetProducts",
+                               "elasticache:DescribeCacheClusters",
+                               "es:ListDomainNames",
+                               "es:DescribeElasticsearchDomain",
+                               "elasticloadbalancing:DescribeLoadBalancers",
+                               "rds:DescribeDBInstances",
+                               "redshift:DescribeClusters",
+                               "ses:SendEmail",
+                               "logs:CreateLogStream",
+                               "logs:CreateLogGroup",
+                               "logs:PutLogEvents",
+                               "cloudwatch:GetMetricStatistics"
+                           ],
+                           "Resource": "*"
+                       },
+                       {
+                                  "Sid": "VisualEditor1",
+                                  "Effect": "Allow",
+                                  "Action": "s3:GetObject",
+                                  "Resource": "arn:aws:s3:::${S3BucketName}/*"
+                      }
+                   ]
+               }'
+            - { S3BucketName: !Ref S3BucketName }
+
+  LambdaLayer:
+    Type: 'AWS::Lambda::LayerVersion'
+    Description: 'Contains packages used in Penny Pincher Lambda'
+    Properties:
+      CompatibleRuntimes:
+        - 'python3.6'
+      Content:
+        S3Bucket: !Ref S3BucketName
+        S3Key: 'packages.zip'
+      LayerName: 'Penny-Pincher-Lambda-Packages-Layer'
+
+  LambdaFunction:
+    Type: 'AWS::Lambda::Function'
+    Description: 'Generates Cost report with all the idle resources information and sends it to email or slack or both'
+    Properties:
+      FunctionName: 'Penny-Pincher'
+      Runtime: 'python3.6'
+      Role: !GetAtt ServiceRoleForLambda.Arn
+      Handler: 'lambda_function.lambda_handler'
+      Code:
+        S3Bucket: !Ref S3BucketName
+        S3Key: 'code.zip'
+      PackageType: 'Zip'
+      Timeout: 900
+      MemorySize: 1024
+      Layers:
+        - !Ref LambdaLayer
+      Environment:
+        Variables:
+          account_name: !Ref AccountName
+          config: !Ref CloudwatchConfig
+          reporting_platform: !Ref ReportingPlatform
+          channel_name: !Ref SlackChannelName
+          slack_token: !Ref SlackToken
+          from_address: !Ref SESFromEmailAddress
+          to_address: !Ref SESToEmailAddress
+          ses_region: !Ref SESRegion
