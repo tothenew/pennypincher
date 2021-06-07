@@ -35,15 +35,15 @@ def lambda_handler(event, context):
 
         if reporting_platform.lower() == 'email':
             ses_obj.ses_sendmail(
-                sub='Cost Optimization Report | ' + account_name + ' | Total Savings: $'+ str(round(total_savings), 2),
+                sub='Cost Optimization Report | ' + account_name + ' | Total Savings: $'+ str(round(total_savings, 2)),
                 html=html)
         elif reporting_platform.lower() == 'slack':
-            slack_obj.slack_alert(resource_info, account_name, str(round(total_savings), 2))
+            slack_obj.slack_alert(resource_info, account_name, str(round(total_savings, 2)))
         elif reporting_platform.lower() == 'email and slack':
             ses_obj.ses_sendmail(
-                sub='Cost Optimization Report | ' + account_name + ' | Total Savings: $' + str(round(total_savings), 2),
+                sub='Cost Optimization Report | ' + account_name + ' | Total Savings: $' + str(round(total_savings, 2)),
                 html=html)
-            slack_obj.slack_alert(resource_info, account_name, str(round(total_savings), 2))
+            slack_obj.slack_alert(resource_info, account_name, str(round(total_savings, 2)))
 
     except Exception as e:
         logger.error("Error on line {} in lambda_function.py".format(sys.exc_info()[-1].tb_lineno) +
