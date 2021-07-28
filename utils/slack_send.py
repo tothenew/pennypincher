@@ -5,8 +5,8 @@ import logging
 import slack
 
 
-class SLACKALERT:
-    '''To send cost report on slack'''
+class Slackalert:
+    """To send cost report on slack."""
     def __init__(self, channel=None, slack_token=None):
         self.channel = channel
         self.slack_token = slack_token
@@ -14,7 +14,7 @@ class SLACKALERT:
         self.logger = logging.getLogger()
 
     def get_resource_list(self, resource_name, resource_info, resource_header, resource_list, resource_savings):
-        # Returns all the idle resource information in a dictionary format
+        """Returns all the idle resource information in a dictionary format."""
         resource_list.insert(0, resource_header)
         resource_info[resource_name] = {}
         resource_info[resource_name]['Resources'] = resource_list
@@ -22,13 +22,14 @@ class SLACKALERT:
         return resource_info
 
     def slack_alert(self, resource_info, account_name, total_savings):
-        # Creates a txt file which contains the cost report  and sends to the slack channel
+        """Creates a txt file which contains the cost report  and sends to the slack channel."""
         try:
             client = slack.WebClient(token=self.slack_token)
 
             f = open("/tmp/cost_optimization_report.txt", "w+")
 
-            for res in resource_info.keys():         # Converts resource info dictionary to tabular format
+            for res in resource_info.keys():       
+                #Converts resource info dictionary to tabular format.
                 f.write('\n' + 'Resource: ' + res + '\n')
                 resource_table = tabulate(resource_info[res]['Resources'][1:],
                                           headers=resource_info[res]['Resources'][0], tablefmt="grid",
@@ -42,9 +43,10 @@ class SLACKALERT:
             )
 
         except SlackApiError as e:
-            # You will get a SlackApiError if "ok" is False
+            """You will get a SlackApiError if "ok" is False."""
             assert e.response["ok"] is False
-            assert e.response["error"]  # str like 'invalid_auth', 'channel_not_found'
+            assert e.response["error"]  
+            """str like 'invalid_auth', 'channel_not_found'."""
             self.logger.error("Slack api error: {e.response['error']} | Error in slack_send.py")
             sys.exit(1)
 

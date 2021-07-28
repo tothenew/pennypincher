@@ -4,15 +4,15 @@ import logging
 from botocore import exceptions
 
 
-class CLOUDWATCH_UTILS:
-    '''Contains functions for fetching cloudwatch metrics for resources'''
+class CloudwatchUtils:
+    """Contains functions for fetching cloudwatch metrics for resources."""
     def __init__(self, client):
         self.client = client
         logging.basicConfig(level=logging.WARNING)
         self.logger = logging.getLogger()
 
     def ec2_get_avg_max_metric(self, namespace, metric_name, dimension_name, dimension_value, config):
-        # Returns Average, Maximum of the metric specified for ec2
+        """Returns Average, Maximum of the metric specified for ec2."""
         try:
             now = datetime.datetime.utcnow()
             start_time = (now - datetime.timedelta(days=int(config['cloudwatch_metrics_days']))).strftime('%Y-%m-%d')
@@ -68,7 +68,7 @@ class CLOUDWATCH_UTILS:
             sys.exit(1)
 
     def get_sum_metric(self, namespace, metric_name, dimension_name, dimension_value, config):
-        # Returns sum of the metric specified with 1 dimension as input
+        """Returns sum of the metric specified with 1 dimension as input."""
         try:
             now = datetime.datetime.utcnow()
             start_time = (now - datetime.timedelta(days=int(config['cloudwatch_metrics_days']))).strftime('%Y-%m-%d')
@@ -105,7 +105,7 @@ class CLOUDWATCH_UTILS:
 
     def get_sum_metric2(self, namespace, metric_name, dimension_name1, dimension_value1, dimension_name2,
                         dimension_value2, config):
-        # Returns sum of the metric specified with 2 dimensions as input
+        """Returns sum of the metric specified with 2 dimensions as input."""
         try:
             now = datetime.datetime.utcnow()
             start_time = (now - datetime.timedelta(days=int(config['cloudwatch_metrics_days']))).strftime('%Y-%m-%d')
@@ -145,7 +145,7 @@ class CLOUDWATCH_UTILS:
             sys.exit(1)
 
     def get_avg_metric(self, namespace, metric_name, dimension_name, dimension_value, config):
-        # Returns average of the metric specified with 1 dimension as input
+        """Returns average of the metric specified with 1 dimension as input."""
         try:
             now = datetime.datetime.utcnow()
             start_time = (now - datetime.timedelta(days=int(config['cloudwatch_metrics_days']))).strftime('%Y-%m-%d')
@@ -182,7 +182,7 @@ class CLOUDWATCH_UTILS:
             sys.exit(1)
 
     def get_avg_max_metric(self, namespace, metric_name, dimension_name, dimension_value, config):
-        # Returns average and maximum of the metric specified with 1 dimension as input
+        """Returns average and maximum of the metric specified with 1 dimension as input."""
         try:
             now = datetime.datetime.utcnow()
             start_time = (now - datetime.timedelta(days=int(config['cloudwatch_metrics_days']))).strftime('%Y-%m-%d')
@@ -224,7 +224,7 @@ class CLOUDWATCH_UTILS:
 
     def get_avg_metric2(self, namespace, metric_name, dimension_name1, dimension_value1, dimension_name2,
                         dimension_value2, config):
-        # Returns average of the metric specified with 2 dimensions as input
+        """Returns average of the metric specified with 2 dimensions as input."""
         try:
             now = datetime.datetime.utcnow()
             start_time = (now - datetime.timedelta(days=int(config['cloudwatch_metrics_days']))).strftime('%Y-%m-%d')

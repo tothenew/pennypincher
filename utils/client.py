@@ -4,26 +4,31 @@ from botocore import exceptions
 import sys
 
 
-class CLIENT:
-    '''Returns boto3 session, cloudwatch client and pricing client'''
+class Client:
+    """Returns boto3 session, cloudwatch client and pricing client."""
+    
     def __init__(self, region=None):
         self.region = region
         logging.basicConfig(level=logging.WARNING)
         self.logger = logging.getLogger()
 
-    def _get_session(self):    # Returns boto3 session
+    def _get_session(self):    
+        """Returns boto3 session."""
         self.session = boto3.Session(region_name=self.region)
         return self.session
 
-    def _get_cloudwatch_client(self):   # Returns cloudwatch client
+    def _get_cloudwatch_client(self):   
+        """Returns cloudwatch client."""
         cloudwatch_client = self.session.client('cloudwatch')
         return cloudwatch_client
 
-    def _get_pricing_client(self):   # Returns pricing client
+    def _get_pricing_client(self):   
+        """Returns pricing client."""
         pricing_client = self.session.client('pricing', region_name='us-east-1')
         return pricing_client
 
-    def get_client(self):  # Returns session, cloudwatch client and pricing client all together
+    def get_client(self):  
+        """Returns session, cloudwatch client and pricing client all together."""
         try:
             session = self._get_session()
             cloudwatch_client = self._get_cloudwatch_client()

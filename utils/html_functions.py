@@ -3,7 +3,7 @@ import sys
 
 
 class HTML:
-    '''Generates html page to send as email'''
+    """Generates html page to send as email."""
     def __init__(self, resource_name=None, headers=None, ebs_list=None, savings=None):
         self.headers = headers
         self.ebs_list = ebs_list
@@ -12,7 +12,8 @@ class HTML:
         logging.basicConfig(level=logging.WARNING)
         self.logger = logging.getLogger()
 
-    def get_HTML_prefix(self):      # Returns html page header
+    def get_HTML_prefix(self):      
+        """Returns html page header."""
         html_prefix = """ <html>
                     <head>
                         <style>
@@ -28,7 +29,8 @@ class HTML:
                     <body>"""
         return html_prefix
 
-    def get_HTML_infix(self):   # To display resource name in page
+    def get_HTML_infix(self):   
+        """To display resource name in page."""
         html_infix = "<br><br><h4> Resource - "
         return html_infix
 
@@ -43,7 +45,8 @@ class HTML:
         html = html + "</tr>"
         return html
 
-    def body_to_html(self, body, savings):   # generates html table with list of lists
+    def body_to_html(self, body, savings):   
+        """Generates html table with list of lists."""
         html = ''
         for result in body:
             html = html + '<tr>'
@@ -54,7 +57,8 @@ class HTML:
         html = html + "<br><b> Total Savings = $%s </b>" % (round(savings, 2))
         return html
 
-    def get_html_page(self, resource_name, headers, ebs_list, savings):  # generates html page
+    def get_html_page(self, resource_name, headers, ebs_list, savings): 
+        """Generates html page."""
         try:
             msg_list = []
             html = self.header_to_html(headers)  # Table Header

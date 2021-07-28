@@ -3,16 +3,17 @@ from configparser import ConfigParser
 import json
 import logging
 
-
 class CONFIGPARSER:
-    '''To read/update the cloudwatch configuration from config.cfg file'''
+    """To read/update the cloudwatch configuration from config.cfg file."""
+  
     def __init__(self, config='null'):
         self.config = config
         self.config_file_path = './utils/config.cfg'
         logging.basicConfig(level=logging.WARNING)
         self.logger = logging.getLogger()
 
-    def get_config(self):    # config can be either null or given in format ebs=15, lb=20, rds=30
+    def get_config(self):    
+        """Config can be either null or given in format ebs=15, lb=20, rds=30."""
         try:
             parser = ConfigParser()
             parser.read(self.config_file_path)

@@ -3,8 +3,8 @@ import logging
 import sys
 from utils.html_functions import HTML
 from utils.ses import SES
-from aws.resources import RESOURCES
-from utils.slack_send import SLACKALERT
+from aws.resources import Resources
+from utils.slack_send import Slackalert
 
 
 def lambda_handler(event, context):
@@ -26,10 +26,10 @@ def lambda_handler(event, context):
     logging.basicConfig(level=logging.WARNING)
     logger = logging.getLogger()
     try:
-        resource = RESOURCES(config)    #Object for generating report
+        resource = Resources(config)    #Object for generating report
         html_obj = HTML()               #Object for generating html page
         ses_obj = SES(from_address=from_address, to_address=to_address, ses_region=ses_region)    #Object to send email
-        slack_obj = SLACKALERT(channel=channel_name, slack_token=slack_token)           #object to send report to slack
+        slack_obj = Slackalert(channel=channel_name, slack_token=slack_token)           #object to send report to slack
 
         html, resource_info, total_savings = resource.get_report(html_obj, slack_obj)
 
