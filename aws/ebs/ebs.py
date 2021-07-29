@@ -62,7 +62,7 @@ class ElasticBlockStore:
         if 'Iops' in vol:
             iops = int(vol['Iops'])
 
-        """ Check if EBS is in available state """
+        #Check if EBS is in available state
         if vol["State"] == 'available':
             finding = 'Available'  
 
@@ -72,7 +72,7 @@ class ElasticBlockStore:
                                                     'VolumeId', vol["VolumeId"], self.config)
             DiskWriteOps = cloudwatch.get_sum_metric('AWS/EBS', 'VolumeWriteOps',
                                                         'VolumeId', vol["VolumeId"], self.config)
-            """Check if EBS is unused"""
+            #Check if EBS is unused
             if (DiskReadOps + DiskWriteOps) == 0:  
                 finding = 'Unused'
 
@@ -81,7 +81,7 @@ class ElasticBlockStore:
         iops_price = pricing.get_ebs_iops_price(vol["VolumeType"])
         savings = storage_price * float(vol["Size"]) + iops_price * iops
         if finding == 'Unused' or finding == 'Available':
-            """An EBS is considered idle if it's finding comes out to be 'Unused' or 'Available'."""
+            #An EBS is considered idle if it's finding comes out to be 'Unused' or 'Available'.
             ebs = [
                 vol["VolumeId"],
                 vol["State"],
@@ -109,7 +109,7 @@ class ElasticBlockStore:
                 for vol in self._describe_ebs(client):
                     ebs_list = self._get_parameters(vol, reg, cloudwatch, pricing, ebs_list)
             
-            """ To fetch top 10 resources with maximum saving """
+            #To fetch top 10 resources with maximum saving.
             ebs_sorted_list = sorted(ebs_list, key=lambda x: x[9], reverse=True)
             total_savings = self._get_savings(ebs_sorted_list[:10])
             return { 'resource_list': ebs_sorted_list[:10], 'headers': headers, 'savings': total_savings }

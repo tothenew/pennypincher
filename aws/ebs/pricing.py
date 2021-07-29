@@ -7,7 +7,7 @@ from utils.utils import get_region_name, get_price, handle_limit_exceeded_except
 class Pricing:
     """For getting and returning the price of the EBS volumes."""
     
-    """Filters for get_products pricing api call used to fetch EBS price."""
+    #Filters for get_products pricing api call used to fetch EBS price.
     ebs_storage_filter = '[{{"Field": "volumeType", "Value": "{vn}", "Type": "TERM_MATCH"}},' \
                          '{{"Field": "productFamily", "Value": "Storage", "Type": "TERM_MATCH"}},' \
                          '{{"Field": "volumeApiName", "Value": "{v}", "Type": "TERM_MATCH"}},' \

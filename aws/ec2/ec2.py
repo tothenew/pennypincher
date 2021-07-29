@@ -132,7 +132,7 @@ class ElasticComputeCloud:
                         for instance in r['Instances']:
                             ec2_list = self._get_parameters(instance,reg, client, cloudwatch, pricing, ec2_list)
             
-            """To fetch top 10 resources with maximum saving."""
+            #To fetch top 10 resources with maximum saving.
             ec2_sorted_list = sorted(ec2_list, key=lambda x: x[7], reverse=True)
             total_savings = self._get_savings(ec2_sorted_list)
             return {'resource_list': ec2_sorted_list, 'headers': headers, 'savings': total_savings}
