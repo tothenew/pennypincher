@@ -46,6 +46,7 @@ class Elasticsearch:
         return round(savings, 2)
 
     def _get_clients(self, reg):
+        """Fetches and returns clients."""
         client_obj = Client(reg)
         session, cloudwatch_client, pricing_client = client_obj.get_client()
         client = session.client('es')
@@ -55,7 +56,6 @@ class Elasticsearch:
 
     def _get_parameters(self, es, reg, cloudwatch, pricing, es_list):    
         """Returns list containing idle Elasticsearch instance information."""               
-
         elasticsearch = []
         monthly_cost_master = 0                 
         iops = volume_size = 0

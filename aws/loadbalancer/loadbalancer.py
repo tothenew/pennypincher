@@ -44,6 +44,7 @@ class Loadbalancer:
         return round(savings, 2)
 
     def _get_clients(self, reg):
+        """Fetches and returns clients."""
         client_obj = Client(reg)
         session, cloudwatch_client, pricing_client = client_obj.get_client()
         client = session.client('elb')

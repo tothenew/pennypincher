@@ -20,7 +20,6 @@ class ElasticBlockStore:
         self.regions = regions
         logging.basicConfig(level=logging.WARNING)
         self.logger = logging.getLogger()
-        print(self.config)
 
     def _describe_ebs(self, client): 
         """Returns information of all existing ebs volumes in json format."""
@@ -42,7 +41,7 @@ class ElasticBlockStore:
         return round(savings, 2)
 
     def _get_clients(self, reg):
-        """Fetches the clients and returns """
+        """Fetches and returns clients."""
         client_obj = Client(reg)
         session, cloudwatch_client, pricing_client = client_obj.get_client()
         client = session.client('ec2')
