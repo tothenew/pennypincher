@@ -2,110 +2,132 @@ import logging
 from botocore import exceptions
 import sys
 from aws.elasticsearch.pricing import Pricing
-from utils.client import CLIENT
-from utils.cloudwatch_utils import CLOUDWATCH_UTILS
+from utils.client import Client
+from utils.cloudwatch_utils import CloudwatchUtils
+from utils.utils import handle_limit_exceeded_exception
 
 
-class ELASTICSEARCH:
-    '''To fetch information of all idle elasticsearch instances'''
+class Elasticsearch:
+    """To fetch information of all idle elasticsearch instances."""
 
     def __init__(self, config=None, regions=None):
-        self.config = config['ELASTICSEARCH']
+        try:
+         self.config = config.get('ELASTISEARCH')
+        except KeyError as e:
+            self.logger.error(
+                "Config for ELASTISEARCH missing from config.cfg | Message: " + str(e))       
         self.regions = regions
         logging.basicConfig(level=logging.WARNING)
         self.logger = logging.getLogger()
 
-    def _list_elasticsearch(self, client):  # Returns list of elasticsearch domains
+    def _list_elasticsearch(self, client):  
+        """Returns list of elasticsearch domains."""
         domain_list = client.list_domain_names()
         return domain_list['DomainNames']
 
-    def _describe_elasticsearch(self, client, domain_name):  # Returns information regarding an elasticsearch in json
+    def _describe_elasticsearch(self, client, domain_name):  
+        """Returns information regarding an elasticsearch in json."""
         es_data = client.describe_elasticsearch_domain(DomainName=domain_name)
         return es_data['DomainStatus']
 
-    def _get_es_finding(self, idle_instance_check):  # Returns finding if an elasticsearch instance is Idle or not
+    def _get_es_finding(self, idle_instance_check):  
+        """Returns finding if an elasticsearch instance is Idle or not."""
         finding = ''
-        if idle_instance_check == 0:  # Idle instance check
+        if idle_instance_check == 0:  
+            #Idle instance check.
             finding = 'Idle'
         return finding
 
-    def _get_savings(self, es_list):  # Returns total possible savings
+    def _get_savings(self, es_list):  
+        """Returns total possible savings."""
         savings = 0
         for es in es_list:
             savings = savings + es[8]
         return round(savings, 2)
 
-    def get_result(self):  # Returns a list of lists which contains headings and idle Elasticsearch instance information
+    def _get_clients(self, reg):
+        """Fetches and returns clients."""
+        client_obj = Client(reg)
+        session, cloudwatch_client, pricing_client = client_obj.get_client()
+        client = session.client('es')
+        cloudwatch = CloudwatchUtils(cloudwatch_client)
+        pricing = Pricing(pricing_client, reg)
+        return client, cloudwatch, pricing
+
+    def _get_parameters(self, es, reg, cloudwatch, pricing, es_list):    
+        """Returns list containing idle Elasticsearch instance information."""               
+        elasticsearch = []
+        monthly_cost_master = 0                 
+        iops = volume_size = 0
+        if es['EBSOptions']['EBSEnabled']:
+            storage_type = es['EBSOptions']['VolumeType']
+            volume_size = es['EBSOptions']['VolumeSize']
+            if 'Iops' in es['EBSOptions']:
+                iops = es['EBSOptions']['Iops']
+        else:
+            storage_type = 'Managed'
+
+        client_id = es['ARN'].split(':')[4]
+        instance_type = es["ElasticsearchClusterConfig"]["InstanceType"]
+        instance_count = es["ElasticsearchClusterConfig"]["InstanceCount"]
+        monthly_cost_data = pricing.get_es_price(instance_type, storage_type, volume_size,
+                                                    iops) * instance_count
+
+        dedicated_master_type = 'N/A'
+        dedicated_master_count = 'N/A'
+
+        if es["ElasticsearchClusterConfig"]["DedicatedMasterEnabled"] == True:
+            dedicated_master_type = es["ElasticsearchClusterConfig"]["DedicatedMasterType"]
+            dedicated_master_count = es["ElasticsearchClusterConfig"]["DedicatedMasterCount"]
+            monthly_cost_master = pricing.get_es_price(dedicated_master_type, storage_type, volume_size,
+                                                        iops) * dedicated_master_count
+
+        sum_instance_indexing_rate = cloudwatch.get_sum_metric2('AWS/ES', 'IndexingRate', 'ClientId',
+                                                                client_id,
+                                                                'DomainName', es["DomainName"], self.config)
+
+        sum_instance_search_rate = cloudwatch.get_sum_metric2('AWS/ES', 'SearchRate', 'ClientId', client_id,
+                                                                'DomainName', es["DomainName"], self.config)
+        idle_instance_count = sum_instance_search_rate + sum_instance_indexing_rate
+        finding = self._get_es_finding(idle_instance_count)
+        if finding == 'Idle':
+            #An elasticsearch instance is considered idle if sum of indexing rate and search rate = 0.
+            elasticsearch = [
+                es["DomainName"],
+                dedicated_master_type,
+                instance_type,
+                dedicated_master_count,
+                instance_count,
+                str(es["EBSOptions"]["VolumeSize"]) + ' GB',
+                reg,
+                finding,
+                round(monthly_cost_master + monthly_cost_data, 2)
+            ]
+            es_list.append(elasticsearch)
+        return es_list
+    
+    def get_result(self):  
+        """Returns a list of lists which contains headings and idle Elasticsearch instance information."""
         try:
             es_list = []
             headers = ["DomainName", 'DedicatedMasterType', 'InstanceType', 'MasterNodeCount', 'DataNodeCount',
                        'VolumeSize', 'AWSRegion', 'Finding', 'Savings($)']
+  
             for reg in self.regions:
-                client_obj = CLIENT(reg)
-                session, cloudwatch_client, pricing_client = client_obj.get_client()
-                client = session.client('es')
-                cloudwatch = CLOUDWATCH_UTILS(cloudwatch_client)
+                client, cloudwatch, pricing = self._get_clients(reg)
                 for domainName in self._list_elasticsearch(client):
-                    elasticsearch = []
-                    monthly_cost_master = 0
-                    pricing = Pricing(pricing_client, reg)
                     es = self._describe_elasticsearch(client, domainName["DomainName"])
-                    iops = volume_size = 0
-                    if es['EBSOptions']['EBSEnabled']:
-                        storage_type = es['EBSOptions']['VolumeType']
-                        volume_size = es['EBSOptions']['VolumeSize']
-                        if 'Iops' in es['EBSOptions']:
-                            iops = es['EBSOptions']['Iops']
-                    else:
-                        storage_type = 'Managed'
+                    es_list= self._get_parameters(es, reg, cloudwatch, pricing, es_list)
+                    
 
-                    client_id = es['ARN'].split(':')[4]
-                    instance_type = es["ElasticsearchClusterConfig"]["InstanceType"]
-                    instance_count = es["ElasticsearchClusterConfig"]["InstanceCount"]
-                    monthly_cost_data = pricing.get_es_price(instance_type, storage_type, volume_size,
-                                                             iops) * instance_count
-
-                    dedicated_master_type = 'N/A'
-                    dedicated_master_count = 'N/A'
-
-                    if es["ElasticsearchClusterConfig"]["DedicatedMasterEnabled"] == True:
-                        dedicated_master_type = es["ElasticsearchClusterConfig"]["DedicatedMasterType"]
-                        dedicated_master_count = es["ElasticsearchClusterConfig"]["DedicatedMasterCount"]
-                        monthly_cost_master = pricing.get_es_price(dedicated_master_type, storage_type, volume_size,
-                                                                   iops) * dedicated_master_count
-
-                    sum_instance_indexing_rate = cloudwatch.get_sum_metric2('AWS/ES', 'IndexingRate', 'ClientId',
-                                                                            client_id,
-                                                                            'DomainName', es["DomainName"], self.config)
-
-                    sum_instance_search_rate = cloudwatch.get_sum_metric2('AWS/ES', 'SearchRate', 'ClientId', client_id,
-                                                                          'DomainName', es["DomainName"], self.config)
-                    idle_instance_count = sum_instance_search_rate + sum_instance_indexing_rate
-                    finding = self._get_es_finding(idle_instance_count)
-                    if finding == 'Idle':
-                        # An elasticsearch instance is considered idle if sum of indexing rate and search rate = 0
-                        elasticsearch.append(es["DomainName"])
-                        elasticsearch.append(dedicated_master_type)
-                        elasticsearch.append(instance_type)
-                        elasticsearch.append(dedicated_master_count)
-                        elasticsearch.append(instance_count)
-                        elasticsearch.append(str(es["EBSOptions"]["VolumeSize"]) + ' GB')
-                        elasticsearch.append(reg)
-                        elasticsearch.append(finding)
-                        elasticsearch.append(round(monthly_cost_master + monthly_cost_data, 2))
-                        es_list.append(elasticsearch)
-            # To fetch top 10 resources with maximum saving
+            #To fetch top 10 resources with maximum saving.
             es_sorted_list = sorted(es_list, key=lambda x: x[8], reverse=True)
             total_savings = self._get_savings(es_sorted_list)
-            return es_sorted_list, headers, total_savings
+            return {'resource_list': es_sorted_list, 'headers': headers, 'savings': total_savings}
 
         except exceptions.ClientError as error:
-            if error.response['Error']['Code'] == 'LimitExceededException':
-                self.logger.warning('API call limit exceeded; backing off and retrying...')
-            else:
-                self.logger.error(error.response['Error']['Code'] + ': ' + error.response['Error']['Message'] +
-                                  ' | Line {} in elasticsearch.py'.format(sys.exc_info()[-1].tb_lineno))
-                sys.exit(1)
+            handle_limit_exceeded_exception(error, 'elasticsearch.py')
+            sys.exit(1)
 
         except Exception as e:
             self.logger.error(

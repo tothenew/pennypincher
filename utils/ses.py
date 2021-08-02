@@ -5,7 +5,7 @@ import sys
 
 
 class SES:
-    '''To send cost report using email'''
+    """To send cost report using email."""
     def __init__(self, from_address=None, to_address=None, ses_region=None):
         self.from_address = from_address
         self.to_address = to_address
@@ -13,7 +13,8 @@ class SES:
         logging.basicConfig(level=logging.WARNING)
         self.logger = logging.getLogger()
 
-    def ses_sendmail(self, sub, html=''):   # sends email
+    def ses_sendmail(self, sub, html=''):   
+        """Sends email."""
         try:
             ses = boto3.client('ses', region_name=self.ses_region)
             ses.send_email(Source=self.from_address,
