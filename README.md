@@ -2,14 +2,14 @@
 
 ### Aim 
 
-The aim is to setup a lambda function which sends information of all the resources which are provisioned but are not being used i.e. are idle along with potential savings over email and slack.
+Penny Pincher is a tool that identifies all the resources which are provisioned but are not being used i.e. are idle and notifies you about the potential savings over email and slack.
 
 ### Features
 
 1. Generates a report consisting of all the idle resources in the account and potential savings.
 2. Two platforms are supported for receiving the report, one is email and another is slack.
 3. The number of days for which resource metrics (usage) is to be monitored can be set by the end user.
-4. The solution is easily deployable as the whole setup is done using AWS Cloudformation.
+4. The solution is easily deployable as the whole setup can be done using AWS Cloudformation or Docker.
 
 ### Pre-requisites
 
