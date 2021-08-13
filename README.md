@@ -26,6 +26,11 @@ To start Penny Pincher, run the following command
 ```bash
 docker-compose up
 ```
+### Authentication
+Before launching Penny Pincher, you need to configure your AWS authentication method
+```bash
+AWS ACCESS KEY
+```
 ### Cloudformation
 1. Create an S3 bucket and upload the files code.zip and packages.zip in the bucket.
 2. Create a cloudformation stack using the penny_pincher_cfn.yml template file.
@@ -35,10 +40,6 @@ docker-compose up
 
 For detailed instructions, refer to [Setup through Cloudformation](docs/setup_through_cloudformation.md)
 
-### Authentication
-Before launching Penny Pincher you need to configure your AWS authentication method
-AWS_PROFILES
-ACCESS KEY
 
 ### Advanced settings
 Advanced configuration details can be found [here](docs/advanced_settings.md)
