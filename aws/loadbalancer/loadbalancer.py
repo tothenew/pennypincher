@@ -131,8 +131,9 @@ class Loadbalancer:
             #To fetch top 10 resources with maximum saving.
             lb_sorted_list = sorted(lb_list, key=lambda x: x[6], reverse=True)
             total_savings = self._get_savings(lb_sorted_list)
+            print(lb_sorted_list)
             return {'resource_list': lb_sorted_list, 'headers': headers, 'savings': total_savings}
-
+            
         except exceptions.ClientError as error:
             handle_limit_exceeded_exception(error, 'loadbalancer.py')
             sys.exit(1)

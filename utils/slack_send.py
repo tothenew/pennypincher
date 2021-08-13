@@ -41,6 +41,7 @@ class Slackalert:
                 initial_comment='Cost Optimization Report | ' + account_name + ' | Total Savings: $' + str(total_savings),
                 channels=self.channel
             )
+            print("Sending the Cost Optimization report to slack "+ self.channel)
 
         except SlackApiError as e:
             """You will get a SlackApiError if "ok" is False."""

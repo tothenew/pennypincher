@@ -15,7 +15,8 @@ def lambda_handler(event=None, context=None):
     ses_region = os.getenv('ses_region', '-')                    #Region where SES is configured
     reporting_platform = os.getenv('reporting_platform', '-')    #Email/Slack/Email and Slack
     account_name = os.getenv('account_name', '-')                #Account Name for which report is generated
-
+    
+    print("Starting PennyPincher")
     #For removing any existing loggers in lambda
     root = logging.getLogger()
     if root.handlers:
@@ -31,7 +32,8 @@ def lambda_handler(event=None, context=None):
         slack_obj = Slackalert(channel=channel_name, slack_token=slack_token)           #object to send report to slack
 
         html, resource_info, total_savings = resource.get_report(html_obj, slack_obj)
-
+        print("Total savings: $" + str(round(total_savings, 2)))
+        
         if reporting_platform.lower() == 'email':
             ses_obj.ses_sendmail(
                 sub='Cost Optimization Report | ' + account_name + ' | Total Savings: $'+ str(round(total_savings, 2)),
@@ -50,7 +52,6 @@ def lambda_handler(event=None, context=None):
             f = open(path, "w+")
             f.write(html)
             f.close
-            print("Total savings: " + str(round(total_savings, 2)))
             print("Findings file is at: findings.html")
 
     except Exception as e:
