@@ -18,7 +18,7 @@ Penny Pincher is a tool that identifies all the resources which are provisioned 
 3. A slack workspace. (Only if cost report is to be sent on any slack channel)
 4. A verified SES email Address. (Only if cost report is to be sent over email)
 
-### Quick Setup
+## Quick Setup
 
 ### Docker
 
@@ -27,9 +27,10 @@ To start Penny Pincher, run the following command
 docker-compose up
 ```
 ### Authentication
-Before launching Penny Pincher, you need to configure your AWS authentication method
+Before launching Penny Pincher, you need to configure your AWS authentication method in the `.env` file
 ```bash
-AWS ACCESS KEY
+AWS_ACCESS_KEY_ID=aws_access_key
+AWS_SECRET_ACCESS_KEY=aws_secret_Access_key
 ```
 ### Cloudformation
 1. Create an S3 bucket and upload the files code.zip and packages.zip in the bucket.
