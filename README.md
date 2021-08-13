@@ -44,4 +44,9 @@ For detailed instructions, refer to [Setup through Cloudformation](docs/setup_th
 ### Advanced settings
 Advanced configuration details can be found [here](docs/advanced_settings.md)
 
+### Recommendation Logic
+
+The following table lists the criteria kept to decide if the resource is idle or not and mentions the recommendations which can help in cost saving.
+
+![Alt](/images/main/recommendation_criteria.png)
 

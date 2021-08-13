@@ -3,11 +3,6 @@ By default, the lambda takes into account last 14 days usage of the resources. T
 
 ![Alt](/images/main/advanced_configuration.png)
 
-### Recommendation Logic
-
-The following table lists the criteria kept to decide if the resource is idle or not and mentions the recommendations which can help in cost saving.
-
-![Alt](/images/main/recommendation_criteria.png)
 
 ### Architecture Diagram 
 
