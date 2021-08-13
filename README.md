@@ -26,7 +26,9 @@ To start Penny Pincher, run the following command
 ```bash
 docker-compose up
 ```
-### Authentication
+It will generate a report in an HTML page, findings.html
+
+#### Authentication
 Before launching Penny Pincher, you need to configure your AWS authentication method in the `.env` file
 ```bash
 AWS_ACCESS_KEY_ID=aws_access_key
