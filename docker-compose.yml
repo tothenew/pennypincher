@@ -1,0 +1,23 @@
+version: '3'
+
+services:
+  pennypincher:
+    image: pennypincher:latest
+    env_file: 
+      - .env
+#    environment:
+#       - AWS_PROFILE=${AWS_PROFILE} 
+#       - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID} 
+#       - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+#       - AWS_DEFAULT_REGION=${AWS_DEFAULT_REGION}
+ #      - config=Null
+ #      - account_name=csm
+ #      - channel_name=channel_name
+ #      - slack_token=slack_token
+ #      - reporting_platform=reporting_platform
+ #      - ses_region=ses_region
+ #      - to_address=to_address
+       
+    volumes:
+      - ~/.aws/:/root/.aws:ro
+      - $PWD:/code
