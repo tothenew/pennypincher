@@ -24,16 +24,14 @@ Penny Pincher is a tool that identifies all the resources which are provisioned 
 
 To start Penny Pincher, run the following command
 ```bash
-docker-compose up
+docker build . -t pennypincher 
+
+docker run -it -e AWS_ACCESS_KEY_ID=<ACCESS_KEY> -e AWS_SECRET_ACCESS_KEY=<SECRET_KEY> AWS_DEFAULT_REGION=<DEFAULT_REGION> -v $(pwd):/code pennypincher
+
 ```
 After the setup is complete, it will generate the report in an HTML page, `findings.html`
 
-#### Authentication
-Before launching Penny Pincher, you need to configure your AWS authentication method in the `.env` file
-```bash
-AWS_ACCESS_KEY_ID=aws_access_key
-AWS_SECRET_ACCESS_KEY=aws_secret_access_key
-```
+
 ### Cloudformation
 1. Create an S3 bucket and upload the files code.zip and packages.zip in the bucket.
 2. Create a cloudformation stack using the penny_pincher_cfn.yml template file.
