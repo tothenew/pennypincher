@@ -25,9 +25,10 @@ Penny Pincher is a tool that identifies all the resources which are provisioned 
 To start Penny Pincher, run the following command
 ```bash
 docker build . -t pennypincher 
+```
 
-docker run -it -e AWS_ACCESS_KEY_ID=<ACCESS_KEY> -e AWS_SECRET_ACCESS_KEY=<SECRET_KEY> AWS_DEFAULT_REGION=<DEFAULT_REGION> -v $(pwd):/code pennypincher
-
+```bash
+docker run -it -e AWS_ACCESS_KEY_ID=<ACCESS_KEY> -e AWS_SECRET_ACCESS_KEY=<SECRET_KEY> -e AWS_DEFAULT_REGION=<DEFAULT_REGION> -v $(pwd):/code pennypincher
 ```
 After the setup is complete, it will generate the report in an HTML page, `findings.html`
 
