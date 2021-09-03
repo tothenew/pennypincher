@@ -114,7 +114,6 @@ class Resources:
            html_resource , resource_info = self.get_summary('LOADBALANCERS', summary, html_obj, slack_obj, resource_info)
            total_savings += summary['savings']
            html += html_resource
- 
            ####EBS####
            summary = self.ebs()
            html_resource , resource_info = self.get_summary('EBS', summary, html_obj, slack_obj, resource_info)
