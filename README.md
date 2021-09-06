@@ -13,8 +13,9 @@ Penny Pincher is a tool that identifies all the resources which are provisioned 
 
 ### Pre-requisites
 
-1. The IAM user used to setup the lambda should have access to AWS S3, AWS IAM, AWS Lambda, AWS SES and AWS Cloudformation.
-2. An AWS S3 bucket.
+1. The IAM user used for the setup should have access to AWS S3, AWS IAM, AWS Lambda, AWS SES and AWS Cloudformation.
+ * You can also use this custom [policy](docs/policy.json) to run Penny Pincher.
+2. An AWS S3 bucket. (Only if the setup is to be done using Cloudformation)
 3. A slack workspace. (Only if cost report is to be sent on any slack channel)
 4. A verified SES email Address. (Only if cost report is to be sent over email)
 
@@ -24,13 +25,14 @@ Penny Pincher is a tool that identifies all the resources which are provisioned 
 
 To start Penny Pincher, run the following command
 ```bash
-docker build . -t pennypincher 
+export AWS_ACCESS_KEY_ID=AWS_ACCESS_KEY
+export AWS_SECRET_ACCESS_KEY=AWS_SECRET_ACCESS_KEY
+export AWS_DEFAULT_REGION=AWS_REGION
 ```
-
 ```bash
-docker run -it -e AWS_ACCESS_KEY_ID=<ACCESS_KEY> -e AWS_SECRET_ACCESS_KEY=<SECRET_KEY> -e AWS_DEFAULT_REGION=<DEFAULT_REGION> -v $(pwd):/code pennypincher
+docker-compose up --build
 ```
-After the setup is complete, it will generate the report in an HTML page, `findings.html`
+After the setup is complete, it will generate the report in an HTML page, [findings.html](/images/main/sample_email_report.png)
 
 
 ### Cloudformation
