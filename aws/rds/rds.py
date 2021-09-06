@@ -84,6 +84,7 @@ class RelationalDatabaseService:
 
         if finding == 'Idle':
             #An RDS instance is classified as idle if the connection count = 0.
+            savings = round(db_cost + storage_cost, 2)
             rds =[
                 rds_instance["DBInstanceIdentifier"],
                 rds_instance["DBInstanceClass"],
@@ -92,10 +93,9 @@ class RelationalDatabaseService:
                 str(rds_instance['AllocatedStorage']) + ' GB',
                 str(rds_instance['InstanceCreateTime'].date()),
                 reg,
-                finding
+                finding,
+                savings
                ]
-            savings = round(db_cost + storage_cost, 2)
-            rds.append(savings)
             rds_list.append(rds)
         return rds_list
 
