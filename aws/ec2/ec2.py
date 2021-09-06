@@ -116,9 +116,8 @@ class ElasticComputeCloud:
                     finding,
                     round(savings * 732, 2)
                    ]
-                ec2_list.append(ec2)
-                
-            return ec2_list
+                ec2_list.append(ec2)            
+        return ec2_list
 
     def get_result(self):  
         """Returns a list of lists which contains headings and idle EC2 information."""
@@ -131,7 +130,7 @@ class ElasticComputeCloud:
                 for r in self._describe_ec2(client):
                         for instance in r['Instances']:
                             ec2_list = self._get_parameters(instance,reg, client, cloudwatch, pricing, ec2_list)
-            
+
             #To fetch top 10 resources with maximum saving.
             ec2_sorted_list = sorted(ec2_list, key=lambda x: x[7], reverse=True)
             total_savings = self._get_savings(ec2_sorted_list)
