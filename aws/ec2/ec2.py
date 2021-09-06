@@ -63,7 +63,6 @@ class ElasticComputeCloud:
 
     def _get_parameters(self, instance, reg, client, cloudwatch, pricing, ec2_list):
         """Returns a list containing idle EC2 information."""
-
         if 'SpotInstanceRequestId' not in instance:
             ec2 = []
             instance_name = vpc_id = instance_os_details = ''
