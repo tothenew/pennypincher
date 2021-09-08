@@ -32,7 +32,8 @@ export AWS_DEFAULT_REGION        =      AWS_REGION
 ```bash
 docker-compose up --build
 ```
-After the setup is complete, it will generate the report in an HTML page, [findings.html](/images/main/sample_email_report.png)
+After the setup is complete, it will generate the report in an HTML page.
+![Alt](/images/main/sample_email_report.png)
 
 For detailed instructions, refer to [Setup through Docker Compose](docs/setup_through_docker.md)
 
