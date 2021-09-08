@@ -14,7 +14,7 @@ def lambda_handler(event=None, context=None):
     to_address = os.getenv('to_address', '-').split(",")         #Email addresses of recipents (Comma Separated)
     ses_region = os.getenv('ses_region', '-')                    #Region where SES is configured
     reporting_platform = os.getenv('reporting_platform', '-')    #Email/Slack/Email and Slack
-    account_name = os.getenv('account_name', '-')                #Account Name for which report is generated
+    account_name = os.getenv('account_name', 'AWS Account')                #Account Name for which report is generated
     
     print("Starting PennyPincher")
     #For removing any existing loggers in lambda
