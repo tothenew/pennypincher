@@ -60,7 +60,6 @@ class RelationalDatabaseService:
         if 'iops' in rds_instance.keys():
             iops = rds_instance['Iops']
 
-
         db_cost, storage_cost = pricing.get_rds_price(rds_instance["Engine"],
                                                         rds_instance['DBInstanceClass'],
                                                         rds_instance['MultiAZ'], rds_instance['LicenseModel'],
