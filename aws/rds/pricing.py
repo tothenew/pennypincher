@@ -45,7 +45,7 @@ class Pricing:
                                 'oracle-se2': 'Oracle',
                                 'sqlserver-ee': 'SQL Server', 'sqlserver-se': 'SQL Server', 'sqlserver-ex': 'SQL Server',
                                 'sqlserver-web': 'SQL Server'}
-            return db_engine_mapping.get(engine)
+            return db_engine_mapping.get(engine, 'PostgreSQL')
         except Exception as e:
             self.logger.error("Error on line {} in rds pricing.py".format(sys.exc_info()[-1].tb_lineno) +
                               " Message: " + str(e))

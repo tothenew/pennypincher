@@ -1,0 +1,23 @@
+version: '3'
+
+services:
+  pennypincher:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: pennypincher
+    environment:  
+      - AWS_ACCESS_KEY_ID
+      - AWS_SECRET_ACCESS_KEY
+      - AWS_DEFAULT_REGION
+      - AWS_SESSION_TOKEN
+      # - config=Null
+      # - account_name=account_name
+      # - channel_name=channel_name
+      # - slack_token=slack_token
+      # - reporting_platform=reporting_platform
+      # - ses_region=ses_region
+      # - to_address=to_address
+
+    volumes:
+      - $PWD:/code

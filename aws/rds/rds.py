@@ -60,7 +60,6 @@ class RelationalDatabaseService:
         if 'iops' in rds_instance.keys():
             iops = rds_instance['Iops']
 
-
         db_cost, storage_cost = pricing.get_rds_price(rds_instance["Engine"],
                                                         rds_instance['DBInstanceClass'],
                                                         rds_instance['MultiAZ'], rds_instance['LicenseModel'],
@@ -84,6 +83,7 @@ class RelationalDatabaseService:
 
         if finding == 'Idle':
             #An RDS instance is classified as idle if the connection count = 0.
+            savings = round(db_cost + storage_cost, 2)
             rds =[
                 rds_instance["DBInstanceIdentifier"],
                 rds_instance["DBInstanceClass"],
@@ -92,10 +92,9 @@ class RelationalDatabaseService:
                 str(rds_instance['AllocatedStorage']) + ' GB',
                 str(rds_instance['InstanceCreateTime'].date()),
                 reg,
-                finding
+                finding,
+                savings
                ]
-            savings = round(db_cost + storage_cost, 2)
-            rds.append(savings)
             rds_list.append(rds)
         return rds_list
 

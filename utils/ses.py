@@ -30,6 +30,7 @@ class SES:
                                }
                            }
                            )
+            print("Sending the Cost Optimization report to "+ self.from_address)
         except exceptions.ClientError as error:
             if error.response['Error']['Code'] == 'LimitExceededException':
                 self.logger.warning('API call limit exceeded; backing off and retrying...')
