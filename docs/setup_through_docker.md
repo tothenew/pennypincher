@@ -21,7 +21,9 @@ docker-compose up
 
 ## Other Configuration
 
-You can edit the [docker-compose.yml] file to provide more configuration details like-
+You can edit the [docker-compose.yml](../docker-compose.yml) file to provide more configuration details.
+If you wish to receive the report on slack, update the values of
+channel_name, slack_token and set the reporting_platform = slack
     
 ```bash
     environment:  
