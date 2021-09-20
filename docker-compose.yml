@@ -18,6 +18,7 @@ services:
       # - reporting_platform=reporting_platform
       # - ses_region=ses_region
       # - to_address=to_address
+      # - from_address=from_address
 
     volumes:
       - $PWD:/code
