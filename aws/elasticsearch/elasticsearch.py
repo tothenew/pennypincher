@@ -12,10 +12,10 @@ class Elasticsearch:
 
     def __init__(self, config=None, regions=None):
         try:
-         self.config = config.get('ELASTISEARCH')
+         self.config = config.get('ELASTICSEARCH')
         except KeyError as e:
             self.logger.error(
-                "Config for ELASTISEARCH missing from config.cfg | Message: " + str(e))       
+                "Config for ELASTICSEARCH missing from config.cfg | Message: " + str(e))       
         self.regions = regions
         logging.basicConfig(level=logging.WARNING)
         self.logger = logging.getLogger()

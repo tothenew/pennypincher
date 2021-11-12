@@ -33,6 +33,7 @@ class Pricing:
         iops_price = 0
         try:
             storage_type = self._get_es_storage(storage_type)
+            instance_type = instance_type.replace("elasticsearch", "search")
             f = self.elasticsearch_filter.format(r=self.formatted_region, i=instance_type, )
             instance_data = self.pricing_client.get_products(ServiceCode='AmazonES', Filters=json.loads(f))
             instance_price = get_price1(instance_data)
