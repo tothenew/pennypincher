@@ -57,3 +57,23 @@ The following table lists the criteria kept to decide if the resource is idle or
 
 ![Alt](/images/main/recommendation_criteria.png)
 
+
+### FAQ
+1. How can Penny Pincher be deployed to one's account?
+
+The whole setup can be deployed either using [AWS Cloudformation](docs/setup_through_cloudformation.md) or [Docker](docs/setup_through_docker.md).
+
+2. What are the alert methods used by Penny Pincher?
+
+It supports both the slack and the email for notifying the user with the report.
+
+3. Can we use a custom CloudWatch metrics?
+
+As of now, custom CloudWatch metrics are not supported, but, you can configure the [advance settings](docs/advanced_settings.md).
+
+### Known Issues
+1. In rare circumstances, there might be an issue in pricing when the Europiean regions are included.
+
+### Features in Development
+1. Working on supporting the data output in JSON format. This will allow for the additional output formats like xlsx and csv.
+2. Aggregation of the recommendation criteria configuration to enable user inputs.
