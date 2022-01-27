@@ -77,4 +77,4 @@ As of now, custom CloudWatch metrics are not supported, but, you can configure t
 
 ### Features in Development
 1. Working on supporting the data output in JSON format. This will allow for the additional output formats like xlsx and csv.
-2. User inputs is not enabled for the configuration of the recommendation criteria.
+2. User's input is not enabled for the configuration of the recommendation criteria.
