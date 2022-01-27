@@ -77,7 +77,3 @@ The data output is not supported in JSON format. This will allow for the additio
 
 ### Known Issues
 1. In rare circumstances, there might be an issue in pricing when the Europiean regions are included.
-
-### Features in Development
-1. The data output is not supported in JSON format. This will allow for the additional output formats like xlsx and csv.
-2. Aggregation of the recommendation criteria configuration to enable user inputs.
