@@ -67,13 +67,14 @@ The whole setup can be deployed either using [AWS Cloudformation](docs/setup_thr
 
 It supports both the slack and the email for notifying the user with the report.
 
-3. Can I use a custom CloudWatch metrics changes to these?
+3. Can I use a custom CloudWatch metrics?
 
 As of now, custom CloudWatch metrics are not supported, but, you can configure the [advance settings](docs/advanced_settings.md).
 
-4. What features are in development?
-
-The data output is not supported in JSON format. This will allow for the additional output formats like xlsx and csv.
 
 ### Known Issues
 1. In rare circumstances, there might be an issue in pricing when the Europiean regions are included.
+
+### Features in Development
+1. Working on supporting the data output in JSON format. This will allow for the additional output formats like xlsx and csv.
+2. User inputs is not enabled for the configuration of the recommendation criteria.
