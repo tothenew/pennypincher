@@ -1,4 +1,4 @@
-## Penny Pincher - An alerting solution for Cloud Cost Optimization
+## Penny Pincher - Cloud Resource Optimization recommendation based on historical data to save cost.
 
 ### Aim 
 
