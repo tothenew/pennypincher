@@ -73,7 +73,7 @@ As of now, custom CloudWatch metrics are not supported, but, you can configure t
 
 
 ### Known Issues
-1. In rare circumstances, there might be an issue in pricing when the Europiean regions are included.
+1. In rare circumstances, there might be an issue in pricing when the Europiean regions are included. This is due to the response of the pricing API for the Europiean regions is in different format sometimes. 
 
 ### Features in Development
 1. Working on supporting the data output in JSON format. This will allow for the additional output formats like xlsx and csv.
