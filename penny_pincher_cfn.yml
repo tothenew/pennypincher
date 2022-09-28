@@ -111,7 +111,7 @@ Resources:
     Description: 'Generates Cost report with all the idle resources information and sends it to email or slack or both'
     Properties:
       FunctionName: 'Penny-Pincher'
-      Runtime: 'python3.6'
+      Runtime: 'python3.8'
       Role: !GetAtt ServiceRoleForLambda.Arn
       Handler: 'lambda_function.lambda_handler'
       Code:
