@@ -4,12 +4,13 @@ import sys
 import logging
 import slack
 
+import config as config
 
 class Slackalert:
     """To send cost report on slack."""
-    def __init__(self, channel=None, slack_token=None):
-        self.channel = channel
-        self.slack_token = slack_token
+    def __init__(self):
+        self.channel = config.channel_name
+        self.slack_token = config.slack_token
         logging.basicConfig(level=logging.WARNING)
         self.logger = logging.getLogger()
 

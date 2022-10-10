@@ -2,14 +2,15 @@ import boto3
 import logging
 from botocore import exceptions
 import sys
+import config as config
 
 
 class SES:
     """To send cost report using email."""
-    def __init__(self, from_address=None, to_address=None, ses_region=None):
-        self.from_address = from_address
-        self.to_address = to_address
-        self.ses_region = ses_region
+    def __init__(self):
+        self.from_address = config.from_address
+        self.to_address = config.to_address
+        self.ses_region = config.ses_region
         logging.basicConfig(level=logging.WARNING)
         self.logger = logging.getLogger()
 
