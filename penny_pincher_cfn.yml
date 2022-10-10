@@ -113,7 +113,7 @@ Resources:
       FunctionName: 'Penny-Pincher'
       Runtime: 'python3.8'
       Role: !GetAtt ServiceRoleForLambda.Arn
-      Handler: 'lambda_function.lambda_handler'
+      Handler: 'main.lambda_handler'
       Code:
         S3Bucket: !Ref S3BucketName
         S3Key: 'code.zip'

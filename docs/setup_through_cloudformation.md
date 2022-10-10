@@ -8,23 +8,23 @@ Note: Both email and slack can be selected as reporting platforms. However, sele
 
 5. Search for Cloudformation in the AWS Console search bar and click on Cloudformation. 
 
-![Alt](/images/main/navigate_to_cloudformation_5.png)
+![Alt](/docs/images/main/navigate_to_cloudformation_5.png)
 
 6. On the Cloudformation console, click on **Create Stack**. 
 
-![Alt](/images/main/cloudformation_create_stack_6.png)
+![Alt](/docs/images/main/cloudformation_create_stack_6.png)
 
 7. Select the **Template is ready** option in Prerequisite-Prepare template, select Template source as Upload a template file and Click on **Choose file**.
 
-![Alt](/images/main/cloudformation_choose_template_file_7.png)
+![Alt](/docs/images/main/cloudformation_choose_template_file_7.png)
 
 8. Upload the penny_pincher_cfn.yml file and click on **Next**.
 
-![Alt](/images/main/upload_template_click_next_8.png)
+![Alt](/docs/images/main/upload_template_click_next_8.png)
 
 9. Give a name to the stack. 
 
-![Alt](/images/main/stack_name_9.png)
+![Alt](/docs/images/main/stack_name_9.png)
 
 10. Fill the parameters and Click on **Next**. The parameters are as follows: 
     * **AccountName**: Takes Account name as input.
@@ -43,36 +43,36 @@ Note: Both email and slack can be selected as reporting platforms. However, sele
     * **SlackChannelName**: Give the name of the slack channel on which report is to be sent.
     * **SlackToken**: Give the OAuth token for your Slack App.
 
-![Alt](/images/main/parameters_10.png)
+![Alt](/docs/images/main/parameters_10.png)
 
 11. In the Configure Stack Options page, leave everything as defaults and click on **Next**.
 
-![Alt](/images/main/configure_stack_options_11.png)
+![Alt](/docs/images/main/configure_stack_options_11.png)
 
 12. In the Review page, recheck the values of the parameters, scroll down to the end of the page, check the checkbox which says "I acknowledge that AWS CloudFormation might create IAM resources with custom names" and click on **Create stack** .
 
-![Alt](/images/main/final_create_stack_12.png)
+![Alt](/docs/images/main/final_create_stack_12.png)
 
 13. On completion of the creation the stack screen would look as follows.
 
-![Alt](/images/main/creation_complete_13.png)
+![Alt](/docs/images/main/creation_complete_13.png)
 
 14. Search for Lambda in AWS Console search bar and click on Lambda.
 
-![Alt](/images/main/search_for_lambda_14.png)
+![Alt](/docs/images/main/search_for_lambda_14.png)
 
 15. On the Lambda console, it can be seen that a lambda named "Penny-Pincher" has been created. Click on the lambda "Penny-Pincher" .
 
-![Alt](/images/main/penny_pincher_lambda_created_15.png)
+![Alt](/docs/images/main/penny_pincher_lambda_created_15.png)
 
 16. Click on **Test** button to run the Lambda .
 
-![Alt](/images/main/testing_the_lambda_16.png)
+![Alt](/docs/images/main/testing_the_lambda_16.png)
 
 17. After a few minutes, the report will be generated and sent to your email id and/or slack channel in the following format.
 
     * Sample report on Email
-    ![Alt](/images/main/sample_email_report.png)
+    ![Alt](/docs/images/main/sample_email_report.png)
 
     * Sample report on Slack (A full view can be seen by clicking on the encircled button)
-    ![Alt](/images/main/sample_slack_report.png)
+    ![Alt](/docs/images/main/sample_slack_report.png)

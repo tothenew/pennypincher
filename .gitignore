@@ -3,3 +3,7 @@
 
 # Findings file
 findings.html
+
+*.zip
+
+penny/
