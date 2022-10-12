@@ -7,7 +7,7 @@ By default, Penny Pincher takes into account last 14 days usage of the resources
 
    * In the CloudwatchConfig parameter while creating the cloudformation stack as follows:
 
-   ![Alt](/images/main/advanced_configuration.png)
+   ![Alt](/docs/images/main/advanced_configuration.png)
 
    * In the [docker-compose.yml](../docker-compose.yml) file, the value of **config** can be   set in the format, *resource=number of days*. 
    For Example-
@@ -30,4 +30,4 @@ The *Slack* related variables are to be given if you want to receive report on y
 
 ### Architecture Diagram 
 
-![Alt](/images/main/penny_pincher_architecture_diagram.jpg)
+![Alt](/docs/images/main/penny_pincher_architecture_diagram.jpg)

@@ -34,7 +34,7 @@ docker-compose up --build
 ```
 After the setup is complete, it will generate the report in an HTML page, **findings.html**.
 
-![Alt](/images/main/sample_email_report.png)
+![Alt](/docs/images/main/sample_email_report.png)
 
 For detailed instructions, refer to [Setup through Docker Compose](docs/setup_through_docker.md)
 
@@ -55,7 +55,7 @@ Advanced configuration details can be found [here](docs/advanced_settings.md)
 
 The following table lists the criteria kept to decide if the resource is idle or not and mentions the recommendations which can help in cost saving.
 
-![Alt](/images/main/recommendation_criteria.png)
+![Alt](/docs/images/main/recommendation_criteria.png)
 
 
 ### FAQ
