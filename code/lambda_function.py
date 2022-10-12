@@ -5,11 +5,8 @@ from utils.html_functions import HTML
 from utils.ses import SES
 from aws.resources import Resources
 from utils.slack_send import Slackalert
-from utils.config import config
+import utils.config as config
 def lambda_handler(event=None, context=None):
-  
-    config = os.getenv('config', 'Null')                       
-    
     print("Starting PennyPincher")
     #For removing any existing loggers in lambda
     root = logging.getLogger()
@@ -20,7 +17,7 @@ def lambda_handler(event=None, context=None):
     logging.basicConfig(level=logging.WARNING)
     logger = logging.getLogger()
     try:
-        resource = Resources(config)    #Object for generating report
+        resource = Resources(config.config_input)    #Object for generating report
         html_obj = HTML()               #Object for generating html page
         ses_obj = SES()    #Object to send email
         slack_obj = Slackalert()           #object to send report to slack
