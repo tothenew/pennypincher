@@ -3,9 +3,7 @@ from slack.errors import SlackApiError
 import sys
 import logging
 import slack
-
-import config as config
-
+import utils.config as config
 class Slackalert:
     """To send cost report on slack."""
     def __init__(self):

@@ -2,7 +2,7 @@ import boto3
 import logging
 from botocore import exceptions
 import sys
-import config as config
+import utils.config as config
 
 
 class SES:
