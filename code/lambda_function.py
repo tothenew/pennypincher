@@ -5,7 +5,7 @@ from utils.html_functions import HTML
 from utils.ses import SES
 from aws.resources import Resources
 from utils.slack_send import Slackalert
-
+from utils.filemanager import FileManager
 def lambda_handler(event=None, context=None):
     channel_name = os.getenv('channel_name', '-')                #Slack Channel Name
     slack_token = os.getenv('slack_token', '-')                  #Slack Channel Token
@@ -49,9 +49,11 @@ def lambda_handler(event=None, context=None):
             header = '<h3><b>Cost Optimization Report |  ' + account_name + ' | Total Savings: $'+ str(round(total_savings, 2)) + '</h3></b>'
             html = header + html
             path = os.getcwd()+ '/findings.html'
-            f = open(path, "w+")
-            f.write(html)
-            f.close
+            # f = open(path, "w+")
+            # f.write(html)
+            # f.close
+            with FileManager(path, 'w') as f:
+                f.write(html)
             print("Findings file is at: findings.html")
 
     except Exception as e:
