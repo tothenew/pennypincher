@@ -55,7 +55,7 @@ def lambda_handler(event=None, context=None):
             print("Findings file is at: findings.html")
 
     except Exception as e:
-        logger.error("Error on line {} in lambda_function.py".format(sys.exc_info()[-1].tb_lineno) +
+        logger.error("Error on line {} in main.py.py".format(sys.exc_info()[-1].tb_lineno) +
                      " | Message: " + str(e))
         sys.exit(1)
 
