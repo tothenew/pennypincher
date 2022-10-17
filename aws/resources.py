@@ -103,51 +103,51 @@ class Resources:
            total_savings += summary['savings']
            html += html_resource
           
-           ####RDS####
-           summary = self.rds()
-           html_resource, resource_info = self.get_summary('RDS', summary, html_obj, slack_obj, resource_info)
-           total_savings += summary['savings']
-           html += html_resource
+        #    ####RDS####
+        #    summary = self.rds()
+        #    html_resource, resource_info = self.get_summary('RDS', summary, html_obj, slack_obj, resource_info)
+        #    total_savings += summary['savings']
+        #    html += html_resource
  
-           ####LOADBALANCERS####
-           summary = self.lb()
-           html_resource , resource_info = self.get_summary('LOADBALANCERS', summary, html_obj, slack_obj, resource_info)
-           total_savings += summary['savings']
-           html += html_resource
-           ####EBS####
-           summary = self.ebs()
-           html_resource , resource_info = self.get_summary('EBS', summary, html_obj, slack_obj, resource_info)
-           total_savings += summary['savings']
-           html += html_resource
+        #    ####LOADBALANCERS####
+        #    summary = self.lb()
+        #    html_resource , resource_info = self.get_summary('LOADBALANCERS', summary, html_obj, slack_obj, resource_info)
+        #    total_savings += summary['savings']
+        #    html += html_resource
+        #    ####EBS####
+        #    summary = self.ebs()
+        #    html_resource , resource_info = self.get_summary('EBS', summary, html_obj, slack_obj, resource_info)
+        #    total_savings += summary['savings']
+        #    html += html_resource
  
-           ####EIP####
-           summary = self.eip()
-           html_resource , resource_info = self.get_summary('EIP', summary, html_obj, slack_obj, resource_info)
-           total_savings += summary['savings']
-           html += html_resource
+        #    ####EIP####
+        #    summary = self.eip()
+        #    html_resource , resource_info = self.get_summary('EIP', summary, html_obj, slack_obj, resource_info)
+        #    total_savings += summary['savings']
+        #    html += html_resource
  
-           ####ELASTICACHE####
-           summary = self.ec()
-           html_resource , resource_info = self.get_summary('ELASTICACHE', summary, html_obj, slack_obj, resource_info)
-           total_savings += summary['savings']
-           html += html_resource
+        #    ####ELASTICACHE####
+        #    summary = self.ec()
+        #    html_resource , resource_info = self.get_summary('ELASTICACHE', summary, html_obj, slack_obj, resource_info)
+        #    total_savings += summary['savings']
+        #    html += html_resource
  
-           ####ELASTICSEARCH####
-           summary = self.es()
-           html_resource , resource_info = self.get_summary('ELASTICSEARCH', summary, html_obj, slack_obj, resource_info)
-           total_savings += summary['savings']
-           html += html_resource
+        #    ####ELASTICSEARCH####
+        #    summary = self.es()
+        #    html_resource , resource_info = self.get_summary('ELASTICSEARCH', summary, html_obj, slack_obj, resource_info)
+        #    total_savings += summary['savings']
+        #    html += html_resource
  
-           ####REDSHIFT####
-           summary = self.redshift()
-           html_resource , resource_info = self.get_summary('REDSHIFT', summary, html_obj, slack_obj, resource_info)
-           total_savings += summary['savings']
-           html += html_resource
+        #    ####REDSHIFT####
+        #    summary = self.redshift()
+        #    html_resource , resource_info = self.get_summary('REDSHIFT', summary, html_obj, slack_obj, resource_info)
+        #    total_savings += summary['savings']
+        #    html += html_resource
  
-           ####FINAL HTML PAGE GENERATION####
-           html_prefix = html_obj.get_HTML_prefix()
-           html_suffix = html_obj.get_HTML_suffix()
-           html = html_prefix + html + html_suffix
+        #    ####FINAL HTML PAGE GENERATION####
+        #    html_prefix = html_obj.get_HTML_prefix()
+        #    html_suffix = html_obj.get_HTML_suffix()
+        #    html = html_prefix + html + html_suffix
            return html, resource_info, total_savings
  
        except Exception as e:

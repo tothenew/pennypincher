@@ -27,7 +27,7 @@ class ElasticComputeCloud:
             savings = savings + ec2[7]
         return round(savings, 2)
 
-    def _get_findings(self, state, avg_cpu, max_cpu, net_in_out, status):
+    def _get_findings(self, state, avg_cpu, max_cpu, net_in_out, status,defaultConfig):
         """Returns finding after checking if EC2 is idle or not."""
         finding = ''
         if status.lower() == 'adhoc':
@@ -36,7 +36,7 @@ class ElasticComputeCloud:
             if state.lower() == 'stopped':
                 finding = 'Stopped'
             elif state.lower() == 'running':
-                if avg_cpu < 1 and max_cpu < 1 and net_in_out < 5000000: 
+                if avg_cpu < defaultConfig['avgCpu'] and max_cpu < defaultConfig['maxCpu'] and defaultConfig['netInOut'] < 5000000: 
                     """ EC2 idle condition check """
                     finding = 'Idle'
         return finding
@@ -96,9 +96,15 @@ class ElasticComputeCloud:
             network_out = cloudwatch.get_sum_metric('AWS/EC2', 'NetworkOut', 'InstanceId',
                                                     instance['InstanceId'], self.config)
             net_in_out = network_out + network_in
+            import yaml
 
-            finding = self._get_findings(instance['State']['Name'], avg_cpu, max_cpu, net_in_out,
-                                            status)
+            with open('../../utils/config.yaml') as file:
+                # The FullLoader parameter handles the conversion from YAML
+                # scalar values to Python the dictionary format
+                defaultConfig = yaml.load(file, Loader=yaml.FullLoader)
+                print(defaultConfig)
+                finding = self._get_findings(instance['State']['Name'], avg_cpu, max_cpu, net_in_out,
+                                            status,defaultConfig['resources']['ec2'])
             
             savings = pricing.get_ec2_price(instance['InstanceType'], instance_os_details)
 
