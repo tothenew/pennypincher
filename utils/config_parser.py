@@ -1,3 +1,4 @@
+from distutils.command.config import config
 import sys
 from configparser import ConfigParser
 import json
@@ -26,9 +27,11 @@ class CONFIGPARSER:
                     parser.set(resource, 'cloudwatch_metrics_days', str(cloudwatch_metrics_days))
                     parser.set(resource, 'cloudwatch_metrics_period', str(cloudwatch_metrics_period))
                 config_dict = json.loads(json.dumps(parser._sections))
+                print(config_dict)
                 return config_dict
             else:
                 config_dict = json.loads(json.dumps(parser._sections))
+                print(config_dict)
                 return config_dict
 
         except Exception as e:
