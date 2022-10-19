@@ -8,19 +8,20 @@ from aws.redshift.redshift import Redshift
 from aws.elasticache.elasticache import Elasticache
 from aws.loadbalancer.loadbalancer import Loadbalancer
 from aws.elasticsearch.elasticsearch import Elasticsearch
-from utils.config_parser import CONFIGPARSER
+from utils.config_parser import parse_config
 from utils.utils import get_region_list
- 
- 
+from utils.config_parser import merges
 class Resources:
    """For making api calls to AWS resources and generating cost report to send on email and slack."""
  
    def __init__(self, config):
        self.region_list = get_region_list() 
        """To get supported regions on an AWS account in list format."""
-       cfg_obj = CONFIGPARSER(config) 
+    #    cfg_obj = CONFIGPARSER(config) 
        #For fetching configuration for cloudwatch from .cfg file.
-       self.config = cfg_obj.get_config()
+       self.default_config = parse_config('./utils/default.yaml')
+       self.overwrite_config = parse_config('./utils/config.yaml')
+       self.config=merges(self.default_config,self.overwrite_config)['resources']
        logging.basicConfig(level=logging.WARNING)
        self.logger = logging.getLogger()
  

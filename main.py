@@ -5,7 +5,6 @@ from utils.html_functions import HTML
 from utils.ses import SES
 from aws.resources import Resources
 from utils.slack_send import Slackalert
-
 def lambda_handler(event=None, context=None):
     channel_name = os.getenv('channel_name', '-')                #Slack Channel Name
     slack_token = os.getenv('slack_token', '-')                  #Slack Channel Token
@@ -15,7 +14,6 @@ def lambda_handler(event=None, context=None):
     ses_region = os.getenv('ses_region', '-')                    #Region where SES is configured
     reporting_platform = os.getenv('reporting_platform', '-')    #Email/Slack/Email and Slack
     account_name = os.getenv('account_name', 'AWS Account')                #Account Name for which report is generated
-    
     print("Starting PennyPincher")
     #For removing any existing loggers in lambda
     root = logging.getLogger()

@@ -5,24 +5,9 @@
 #   profile:
   
 resources:
-  - ebs:
-      enable: true #by default true
-      cloudwatch_metrics_days: 
-      cloudwatch_metrics_period:
-
-  - lb:
-      enable: true #by default true
-      cloudwatch_metrics_days:
-      cloudwatch_metrics_period: 
-
-  - rds:
-      enable: true #by default true
-      cloudwatch_metrics_days:
-      cloudwatch_metrics_period:
-
-  - ec2:
-      enable: true #by default true
-      cloudwatch_metrics_days:
-      cloudwatch_metrics_period:
+    ebs:
+      cloudwatch_metrics_days: 100
 
 
+config:
+  channel_name: !ENV ${channel_name}             #Slack Channel Name

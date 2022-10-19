@@ -1,34 +1,50 @@
 ### Default metric value to identity a idle resource
+
+# aws:
+#   regions: []
+#   account_id:
+#   account_name:
+#   profile:
+
 resources:
-  - ebs:
+    ebs:
       unused: 0    #submission of DiskWriteOps and DiskReadOps
       cloudwatch_metrics_days: 14
       cloudwatch_metrics_period: 1209600
-
-  - ec2:
+    
+    ec2:
       avgCpu: 1
       maxCpu: 1
       netInOut: 5000
       cloudwatch_metrics_days: 14
       cloudwatch_metrics_period: 1209600
-
-  - elasticCache:
+    
+    elasticCache:
       sumCacheHitMiss: 0 #Submission of Cache Hit and Miss
       cloudwatch_metrics_days: 14
       cloudwatch_metrics_period: 1209600
-
-  - lb:
+      
+    lb:
       connectionCount: 1 
       cloudwatch_metrics_days: 14
       cloudwatch_metrics_period: 1209600
-
-  - rds:
+    
+    rds:
       connectionCount: 1
       cloudwatch_metrics_days: 14
       cloudwatch_metrics_period: 1209600
-
-  - redshift:
+    
+    redshift:
       dbConnectionCount: 1
       cloudwatch_metrics_days: 14
       cloudwatch_metrics_period: 1209600
     
+config:
+  channel_name: '-'             #Slack Channel Name
+  slack_token: '-'                   #Slack Channel Token
+  config: 'Null'                         #Configuration for Cloudwatch e.g. ebs=20, lb=15
+  from_address: '-'                #SES verified email address from which email is to be sent
+  to_address: '-'         #Email addresses of recipents (Comma Separated)
+  ses_region: '-'                    #Region where SES is configured
+  reporting_platform: '-'    #Email/Slack/Email and Slack
+  account_name: 'AWS Account'
