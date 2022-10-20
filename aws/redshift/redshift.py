@@ -68,8 +68,8 @@ class Redshift:
             "-",
             reg,
             finding,
-            14,
-            "Metric",
+            self.config['cloudwatch_metrics_period'],
+            "DatabaseConnections",
             savings
             ]
             rs_list.append(rs)
@@ -82,7 +82,7 @@ class Redshift:
             headers = ['ClusterID', 'DBName', 'NodeType', 'NumberOfNodes', 'CreationDate', 'AWSRegion', 'Finding',
                        'Savings($)']
             headers=[   'ResourceID','ResouceName','ServiceName','Type','VPC',
-                        'State','Region','Finding','EvaluationPeriod','Metric','Saving($)'
+                        'State','Region','Finding','EvaluationPeriod (seconds)','Metric','Saving($)'
                     ]
             for reg in self.regions:
                 client, cloudwatch, pricing = self._get_clients(reg)

@@ -67,8 +67,8 @@ class ElasticIP:
             "-",
             reg,
             finding,
-            14,
-            "Metric",
+            "-",
+            "-",
             round(price, 2)
             ]
             eip_list.append(eip)
@@ -79,7 +79,7 @@ class ElasticIP:
         try:
             eip_list = []
             headers=[   'ResourceID','ResouceName','ServiceName','Type','VPC',
-                        'State','Region','Finding','EvaluationPeriod','Metric','Saving($)'
+                        'State','Region','Finding','EvaluationPeriod (seconds)','Metric','Saving($)'
                     ]
 
             for reg in self.regions:

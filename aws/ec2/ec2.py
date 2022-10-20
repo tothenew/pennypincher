@@ -112,11 +112,11 @@ class ElasticComputeCloud:
                     "EC2",
                     instance['InstanceType'],
                     vpc_id,
-                    "-",
+                    instance['State']['Name'],
                     reg,
                     finding,
-                    14,
-                    "Metric",
+                    self.config['cloudwatch_metrics_period'],
+                    "CPUUtilization,NetworkIn,NetworkOut",
                     round(savings * 732, 2)
                    ]
                 ec2_list.append(ec2)            
@@ -127,7 +127,7 @@ class ElasticComputeCloud:
         try:
             ec2_list = []
             headers=[   'ResourceID','ResouceName','ServiceName','Type','VPC',
-                        'State','Region','Finding','EvaluationPeriod','Metric','Saving($)'
+                        'State','Region','Finding','EvaluationPeriod (seconds)','Metric','Saving($)'
                     ]
             for reg in self.regions:
                 client, cloudwatch, pricing = self._get_clients(reg)

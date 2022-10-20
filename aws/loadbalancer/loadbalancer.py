@@ -73,8 +73,8 @@ class Loadbalancer:
             "-",
             reg,
             finding,
-            14,
-            "Metric",
+            self.config['cloudwatch_metrics_period'],
+            "RequestCount",
             round(elb_price, 2),
             ]
         if finding == 'Idle':
@@ -115,8 +115,8 @@ class Loadbalancer:
             lb['State']['Code'],
             reg,
             finding,
-            14,
-            "Metric",
+            self.config['cloudwatch_metrics_period'],
+            metric_name,
             round(price, 2)
             ]
             lb_list.append(nlb_albs)
@@ -127,7 +127,7 @@ class Loadbalancer:
         try:
             lb_list = []
             headers=[   'ResourceID','ResouceName','ServiceName','Type','VPC',
-                        'State','Region','Finding','EvaluationPeriod','Metric','Saving($)'
+                        'State','Region','Finding','EvaluationPeriod (seconds)','Metric','Saving($)'
                     ]
             for reg in self.regions:
                 client, cloudwatch, elbv2_client, pricing_client = self._get_clients(reg)

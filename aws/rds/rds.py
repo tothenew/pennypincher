@@ -93,8 +93,8 @@ class RelationalDatabaseService:
                 rds_instance["DBInstanceStatus"],
                 reg,
                 finding,
-                14,
-                "Metric",
+                self.config['cloudwatch_metrics_period'],
+                "DatabaseConnections",
                 savings
                ]
             rds_list.append(rds)
@@ -106,7 +106,7 @@ class RelationalDatabaseService:
         try:
             rds_list = []
             headers=[   'ResourceID','ResouceName','ServiceName','Type','VPC',
-                        'State','Region','Finding','EvaluationPeriod','Metric','Saving($)'
+                        'State','Region','Finding','EvaluationPeriod (seconds)','Metric','Saving($)'
                     ]
 
             for reg in self.regions:

@@ -87,8 +87,8 @@ class Elasticache:
                 cache_engine,
                 reg,
                 finding,
-                14,
-                "Metric",
+                self.config['cloudwatch_metrics_period'],
+                f"{cache_hits},{cache_misses}",
                 savings
             ]
             ec_list.append(ec)
@@ -99,7 +99,7 @@ class Elasticache:
         try:
             ec_list = []
             headers=[   'ResourceID','ResouceName','ServiceName','Type','VPC',
-                        'State','Region','Finding','EvaluationPeriod','Metric','Saving($)'
+                        'State','Region','Finding','EvaluationPeriod (seconds)','Metric','Saving($)'
                     ]
             for reg in self.regions:
                 client, cloudwatch, pricing = self._get_clients(reg)

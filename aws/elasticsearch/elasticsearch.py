@@ -101,8 +101,8 @@ class Elasticsearch:
                 instance_count,
                 reg,
                 finding,
-                14,
-                "Metric",
+                self.config['cloudwatch_metrics_period'],
+                "IndexingRate,SearchRate,",
                 round(monthly_cost_master + monthly_cost_data, 2)
             ]
             es_list.append(elasticsearch)
@@ -113,7 +113,7 @@ class Elasticsearch:
         try:
             es_list = []
             headers=[   'ResourceID','ResouceName','ServiceName','Type','VPC',
-                        'State','Region','Finding','EvaluationPeriod','Metric','Saving($)'
+                        'State','Region','Finding','EvaluationPeriod (seconds)','Metric','Saving($)'
                     ]
   
             for reg in self.regions:

@@ -90,8 +90,8 @@ class ElasticBlockStore:
                 vol["State"],
                 vol["AvailabilityZone"],
                 finding,
-                14,
-                "Metric",
+                self.config['cloudwatch_metrics_period'],
+                "VolumeReadOps,VolumeWriteOps",
                 round(savings, 2)
                ]
             ebs_list.append(ebs)
@@ -103,7 +103,7 @@ class ElasticBlockStore:
         try:
             ebs_list = []
             headers=[   'ResourceID','ResouceName','ServiceName','Type','VPC',
-                        'State','Region','Finding','EvaluationPeriod','Metric','Saving($)'
+                        'State','Availability Zone','Finding','EvaluationPeriod (seconds)','Metric','Saving($)'
                     ]
             for reg in self.regions:
                 client, cloudwatch, pricing = self._get_clients(reg)
