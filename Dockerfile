@@ -1,7 +1,6 @@
-FROM alpine:3.16
+FROM python:3.10-alpine 
 
 RUN apk update && \
-    apk add python3  && \
     apk add py-pip
 
 RUN mkdir /code  
