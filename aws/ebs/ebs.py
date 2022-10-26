@@ -72,7 +72,7 @@ class ElasticBlockStore:
             DiskWriteOps = cloudwatch.get_sum_metric('AWS/EBS', 'VolumeWriteOps',
                                                         'VolumeId', vol["VolumeId"], self.config)
             #Check if EBS is unused
-            if (DiskReadOps + DiskWriteOps) == 0:  
+            if (DiskReadOps + DiskWriteOps) == self.config['unused']:  
                 finding = 'Unused'
 
         

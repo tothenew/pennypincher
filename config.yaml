@@ -1,0 +1,14 @@
+# aws:
+#   regions: []
+#   account_id:
+#   account_name:
+#   profile:
+  
+resources:
+    EBS:
+      cloudwatch_metrics_days: 10
+
+
+config:
+  env:
+    channel_name: 'test'  

@@ -20,8 +20,9 @@ class Resources:
     #    cfg_obj = CONFIGPARSER(config) 
        #For fetching configuration for cloudwatch from .cfg file.
        self.default_config = parse_config('./utils/default.yaml')
-       self.overwrite_config = parse_config('./utils/config.yaml')
+       self.overwrite_config = parse_config('./config.yaml')
        self.config=merges(self.default_config,self.overwrite_config)['resources']
+       print(f"Printing config: {self.config}")
        logging.basicConfig(level=logging.WARNING)
        self.logger = logging.getLogger()
  
@@ -99,10 +100,10 @@ class Resources:
           
            ####EC2####  
            # dictionary- resource_list, headers, savings
-           summary = self.ec2()    
-           html_resource , resource_info = self.get_summary('EC2', summary, html_obj, slack_obj, resource_info)
-           total_savings += summary['savings']
-           html += html_resource
+        #    summary = self.ec2()    
+        #    html_resource , resource_info = self.get_summary('EC2', summary, html_obj, slack_obj, resource_info)
+        #    total_savings += summary['savings']
+        #    html += html_resource
           
         #    ####RDS####
         #    summary = self.rds()
@@ -115,11 +116,11 @@ class Resources:
         #    html_resource , resource_info = self.get_summary('LOADBALANCERS', summary, html_obj, slack_obj, resource_info)
         #    total_savings += summary['savings']
         #    html += html_resource
-        #    ####EBS####
-        #    summary = self.ebs()
-        #    html_resource , resource_info = self.get_summary('EBS', summary, html_obj, slack_obj, resource_info)
-        #    total_savings += summary['savings']
-        #    html += html_resource
+           ####EBS####
+           summary = self.ebs()
+           html_resource , resource_info = self.get_summary('EBS', summary, html_obj, slack_obj, resource_info)
+           total_savings += summary['savings']
+           html += html_resource
  
         #    ####EIP####
         #    summary = self.eip()

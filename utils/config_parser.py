@@ -49,7 +49,7 @@ def merges(default, overwrite):
   for element in config:
     overwrite_keys=list(overwrite[element].keys())
     for resource_name in overwrite_keys:
-      config[element][resource_name]=overwrite[element][resource_name]
+      config[element][resource_name]={**config[element][resource_name], **overwrite[element][resource_name]}
   return(config)
 
 def parse_config(path=None, data=None, tag='!ENV'):
@@ -99,6 +99,3 @@ def parse_config(path=None, data=None, tag='!ENV'):
         return yaml.load(data, Loader=loader)
     else:
         raise ValueError('Either a path or data should be defined as input')
-
-conf = parse_config(path='config.yaml')
-print(conf)
