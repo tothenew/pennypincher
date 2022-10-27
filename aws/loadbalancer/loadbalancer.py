@@ -74,7 +74,7 @@ class Loadbalancer:
             reg,
             finding,
             self.config['cloudwatch_metrics_period'],
-            "RequestCount",
+            "RequestCount < 0",
             round(elb_price, 2),
             ]
         if finding == 'Idle':
@@ -116,7 +116,7 @@ class Loadbalancer:
             reg,
             finding,
             self.config['cloudwatch_metrics_period'],
-            metric_name,
+            f'{metric_name} < 1',
             round(price, 2)
             ]
             lb_list.append(nlb_albs)

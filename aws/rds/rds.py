@@ -94,7 +94,7 @@ class RelationalDatabaseService:
                 reg,
                 finding,
                 self.config['cloudwatch_metrics_period'],
-                "DatabaseConnections",
+                "DatabaseConnections == 0",
                 savings
                ]
             rds_list.append(rds)

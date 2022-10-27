@@ -69,7 +69,7 @@ class Redshift:
             reg,
             finding,
             self.config['cloudwatch_metrics_period'],
-            "DatabaseConnections",
+            "DatabaseConnections == 0",
             savings
             ]
             rs_list.append(rs)

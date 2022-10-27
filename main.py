@@ -3,6 +3,7 @@ import logging
 import sys
 from utils.html_functions import HTML
 from utils.ses import SES
+from utils.generate_sheet import XLSX
 from aws.resources import Resources
 from utils.slack_send import Slackalert
 
@@ -53,9 +54,12 @@ def lambda_handler(event=None, context=None):
             f.write(html)
             f.close
             print("Findings file is at: findings.html")
+            xlsx_obj = XLSX(resource_info, total_savings, f"{os.getcwd()}/findings.xlsx")
+            xlsx_obj.generate_xlsx_sheet()
+            print("Findings Sheet is at: findings.xlsx")
 
     except Exception as e:
-        logger.error("Error on line {} in main.py.py".format(sys.exc_info()[-1].tb_lineno) +
+        logger.error("Error on line {} in main.py".format(sys.exc_info()[-1].tb_lineno) +
                      " | Message: " + str(e))
         sys.exit(1)
 

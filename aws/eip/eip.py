@@ -68,7 +68,7 @@ class ElasticIP:
             reg,
             finding,
             "-",
-            "-",
+            "EIP is Unallocated or Associated to a Stopped Instance",
             round(price, 2)
             ]
             eip_list.append(eip)
