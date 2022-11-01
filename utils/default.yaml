@@ -19,23 +19,28 @@ resources:
       cloudwatch_metrics_days: 14
       cloudwatch_metrics_period: 1209600
     
-    elasticCache:
+    ELASTICSEARCH:
+      sumCacheHitMiss: 0 #Submission of Cache Hit and Miss
+      cloudwatch_metrics_days: 14
+      cloudwatch_metrics_period: 1209600
+
+    ELASTICACHE:
       sumCacheHitMiss: 0 #Submission of Cache Hit and Miss
       cloudwatch_metrics_days: 14
       cloudwatch_metrics_period: 1209600
       
-    lb:
+    LB:
       connectionCount: 1 
       cloudwatch_metrics_days: 14
       cloudwatch_metrics_period: 1209600
     
-    rds:
-      connectionCount: 1
+    RDS:
+      connectionCount: 0
       cloudwatch_metrics_days: 14
       cloudwatch_metrics_period: 1209600
     
-    redshift:
-      dbConnectionCount: 1
+    REDSHIFT:
+      dbConnectionCount: 0
       cloudwatch_metrics_days: 14
       cloudwatch_metrics_period: 1209600
     
@@ -49,8 +54,9 @@ config:
     ses_region: '-'                    #Region where SES is configured
     reporting_platform: '-'    #Email/Slack/Email and Slack
     account_name: 'AWS Account'
-  aws:
-    regions: []
-    account_id:
-    account_name:
-    profile:
+    
+  # aws:
+  #   regions: []
+  #   account_id:
+  #   account_name:
+  #   profile:

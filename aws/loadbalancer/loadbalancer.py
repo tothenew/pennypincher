@@ -60,7 +60,7 @@ class Loadbalancer:
                                                         'LoadBalancerName', elb['LoadBalancerName'],
                                                         self.config)
         #Idle loadbalancer check.
-        if connection_count < 1:      
+        if connection_count < self.config['connectionCount']:      
             finding = 'Idle'
         else:
             finding = 'ClassicLB'

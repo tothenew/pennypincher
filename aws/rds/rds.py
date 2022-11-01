@@ -33,7 +33,7 @@ class RelationalDatabaseService:
     def _get_rds_finding(self, connection_count):  
         """Returns finding if RDS instance is idle or not."""
         finding = ''
-        if connection_count == 0:
+        if connection_count == self.config['connectionCount']:
             finding = 'Idle'
         return finding
 

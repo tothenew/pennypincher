@@ -35,7 +35,7 @@ class Elasticache:
         """Returns finding after checking if Elasticache is idle or not."""
         finding = ''
         #Idle elasticache check.
-        if cache_hit_miss_sum == 0:  
+        if cache_hit_miss_sum == self.config['sumCacheHitMiss']:  
             finding = 'Idle'
         return finding
 

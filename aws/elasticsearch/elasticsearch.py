@@ -33,7 +33,7 @@ class Elasticsearch:
     def _get_es_finding(self, idle_instance_check):  
         """Returns finding if an elasticsearch instance is Idle or not."""
         finding = ''
-        if idle_instance_check == 0:  
+        if idle_instance_check == self.config['sumCacheHitMiss']:
             #Idle instance check.
             finding = 'Idle'
         return finding

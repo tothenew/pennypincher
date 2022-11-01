@@ -36,7 +36,7 @@ class ElasticComputeCloud:
             if state.lower() == 'stopped':
                 finding = 'Stopped'
             elif state.lower() == 'running':
-                if avg_cpu < 1 and max_cpu < 1 and net_in_out < 5000000: 
+                if avg_cpu < self.config['avgCpu'] and max_cpu < self.config['maxCpu'] and net_in_out < self.config['netInOut']: 
                     """ EC2 idle condition check """
                     finding = 'Idle'
         return finding

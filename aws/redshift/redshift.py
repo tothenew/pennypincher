@@ -35,7 +35,7 @@ class Redshift:
     def _get_rs_finding(self, db_connection_count):   
         """Returns finding if redshift instance is idle or not."""
         finding = ''
-        if db_connection_count == 0:
+        if db_connection_count == self.config['dbConnectionCount']:
             finding = 'Idle'
         return finding
 

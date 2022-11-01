@@ -7,8 +7,12 @@
 resources:
     EBS:
       cloudwatch_metrics_days: 10
+    EC2:
+      avgCpu: 80
+    LB:
+      connectionCount: 10000 
 
 
 config:
   env:
-    channel_name: 'test'  
+    channel_name: test  

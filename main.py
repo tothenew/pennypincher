@@ -5,16 +5,28 @@ from utils.html_functions import HTML
 from utils.ses import SES
 from aws.resources import Resources
 from utils.slack_send import Slackalert
+from utils.config_parser import parse_config
+from utils.config_parser import merges
+from utils.config_parser import check_env
 def lambda_handler(event=None, context=None):
-    channel_name = os.getenv('channel_name', '-')                #Slack Channel Name
-    slack_token = os.getenv('slack_token', '-')                  #Slack Channel Token
-    config = os.getenv('config', 'Null')                            #Configuration for Cloudwatch e.g. ebs=20, lb=15
-    from_address = os.getenv('from_address','-')                #SES verified email address from which email is to be sent
-    to_address = os.getenv('to_address', '-').split(",")         #Email addresses of recipents (Comma Separated)
-    ses_region = os.getenv('ses_region', '-')                    #Region where SES is configured
-    reporting_platform = os.getenv('reporting_platform', '-')    #Email/Slack/Email and Slack
-    account_name = os.getenv('account_name', 'AWS Account')                #Account Name for which report is generated
     print("Starting PennyPincher")
+
+    default_config = parse_config('./utils/default.yaml') 
+    overwrite_config = parse_config('./config.yaml') 
+    final_config=merges(default_config,overwrite_config)
+    resource_config=final_config['resources']
+    env_config=final_config['config']['env']
+    env_config=check_env(env_config)
+    # print(f"Printing Resource config: {resource_config}")
+    print(f"Printing env config: {env_config}")
+    channel_name =  env_config['channel_name']   #Slack Channel Name
+    slack_token = env_config['slack_token']                  #Slack Channel Token
+    config = env_config['config']                         #Configuration for Cloudwatch e.g. ebs=20, lb=15
+    from_address = env_config['from_address']               #SES verified email address from which email is to be sent
+    to_address = env_config['to_address']         #Email addresses of recipents (Comma Separated)
+    ses_region = env_config['ses_region']                   #Region where SES is configured
+    reporting_platform = env_config['reporting_platform']    #Email/Slack/Email and Slack
+    account_name = env_config['account_name'] 
     #For removing any existing loggers in lambda
     root = logging.getLogger()
     if root.handlers:
@@ -24,7 +36,7 @@ def lambda_handler(event=None, context=None):
     logging.basicConfig(level=logging.WARNING)
     logger = logging.getLogger()
     try:
-        resource = Resources(config)    #Object for generating report
+        resource = Resources(resource_config)    #Object for generating report
         html_obj = HTML()               #Object for generating html page
         ses_obj = SES(from_address=from_address, to_address=to_address, ses_region=ses_region)    #Object to send email
         slack_obj = Slackalert(channel=channel_name, slack_token=slack_token)           #object to send report to slack

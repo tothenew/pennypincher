@@ -10,6 +10,13 @@ def merges(default, overwrite):
       config[element][resource_name]={**config[element][resource_name], **overwrite[element][resource_name]}
   return(config)
 
+def check_env(config):
+    env_list = ["CHANNEL_NAME","SLACK_TOKEN","CONFIG","FROM_ADDRESS","TO_ADDRESS","SES_REGION","REPORTING_PLATFORM","ACCOUNT_NAME"] 
+    for key in env_list:
+        if key.lower() in config:
+            config[key.lower()] = os.getenv(key,config[key.lower()])
+    return config
+
 def parse_config(path=None, data=None, tag='!ENV'):
     """
     Load a yaml configuration file and resolve any environment variables
