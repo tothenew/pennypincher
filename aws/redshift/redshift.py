@@ -82,7 +82,7 @@ class Redshift:
             headers = ['ClusterID', 'DBName', 'NodeType', 'NumberOfNodes', 'CreationDate', 'AWSRegion', 'Finding',
                        'Savings($)']
             headers=[   'ResourceID','ResouceName','ServiceName','Type','VPC',
-                        'State','Region','Finding','EvaluationPeriod (seconds)','Metric','Saving($)'
+                        'State','Region','Finding','EvaluationPeriod (seconds)','Criteria','Saving($)'
                     ]
             for reg in self.regions:
                 client, cloudwatch, pricing = self._get_clients(reg)
