@@ -55,7 +55,7 @@ def lambda_handler(event=None, context=None):
             f.write(html)
             f.close
             print("Findings File is at: pennypincher_findings.html")
-            current_datetime=datetime.utcnow().isoformat("T","seconds")
+            current_datetime=datetime.utcnow().isoformat("T","minutes").replace(":", "-")
             dir_path=f"{os.getcwd()}/pennypincher_csv_report/{current_datetime}"
             os.makedirs(dir_path,exist_ok=True)
             if len(resource_info) > 0:

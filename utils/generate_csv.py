@@ -17,7 +17,7 @@ class GENCSV:
     def generate_csv(self):
         try:
             #Generating summary report
-            with open(f"{self.dir_path}/pennypincher_summary_report_{self.current_datetime}.csv", "w", newline="") as summary:
+            with open(f"{self.dir_path}/pennypincher_summary_report.csv", "w", newline="") as summary:
                 summary_writer = csv.writer(summary)
                 summary_writer.writerows([self.resource_info[list(self.resource_info.keys())[0]]['Resources'][0]])
                 for resource_type in self.resource_info.keys():
@@ -25,7 +25,7 @@ class GENCSV:
             
             #Generating individual resource report
             for resource_type in self.resource_info.keys():
-                with open(f"{self.dir_path}/pennypincher_{resource_type}_report_{self.current_datetime}.csv", "w", newline="") as f:
+                with open(f"{self.dir_path}/pennypincher_{resource_type}_report.csv", "w", newline="") as f:
                     writer = csv.writer(f)
                     writer.writerows(self.resource_info[resource_type]['Resources'])
         except Exception as e:
