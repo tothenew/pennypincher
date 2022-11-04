@@ -17,10 +17,6 @@ class Resources:
    def __init__(self, config):
        self.region_list = get_region_list() 
        """To get supported regions on an AWS account in list format."""
-    #    cfg_obj = CONFIGPARSER(config) 
-       #For fetching configuration for cloudwatch from .cfg file.
-    #    self.default_config = parse_config('./utils/default.yaml')
-    #    self.overwrite_config = parse_config('./config.yaml')
        self.config=config
        print(f"Printing config: {self.config}")
        logging.basicConfig(level=logging.WARNING)

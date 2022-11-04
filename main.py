@@ -13,10 +13,10 @@ def lambda_handler(event=None, context=None):
 
     default_config = parse_config('./utils/default.yaml') 
     overwrite_config = parse_config('./config.yaml') 
-    final_config=merges(default_config,overwrite_config)
-    resource_config=final_config['resources']
-    env_config=final_config['config']['env']
-    env_config=check_env(env_config)
+    final_config = merges(default_config,overwrite_config)
+    resource_config = final_config['resources']
+    env_config = final_config['config']['env']
+    env_config = check_env(env_config)
     # print(f"Printing Resource config: {resource_config}")
     print(f"Printing env config: {env_config}")
     channel_name =  env_config['channel_name']   #Slack Channel Name
