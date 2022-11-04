@@ -4,10 +4,12 @@ import yaml
 
 def merges(default, overwrite):
   config=default.copy()
-  for element in config:
-    overwrite_keys=list(overwrite[element].keys())
-    for resource_name in overwrite_keys:
-      config[element][resource_name]={**config[element][resource_name], **overwrite[element][resource_name]}
+  if overwrite != None:
+    for element in config:
+        if element in overwrite:
+            overwrite_keys=list(overwrite[element].keys())
+            for resource_name in overwrite_keys:
+                config[element][resource_name]={**config[element][resource_name], **overwrite[element][resource_name]}
   return(config)
 
 def check_env(config):
