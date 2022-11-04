@@ -42,7 +42,7 @@ class Elasticsearch:
         """Returns total possible savings."""
         savings = 0
         for es in es_list:
-            savings = savings + es[8]
+            savings = savings + es[10]
         return round(savings, 2)
 
     def _get_clients(self, reg):
@@ -94,13 +94,15 @@ class Elasticsearch:
             #An elasticsearch instance is considered idle if sum of indexing rate and search rate = 0.
             elasticsearch = [
                 es["DomainName"],
-                dedicated_master_type,
+                es["DomainName"],
+                "ELASTICSEARCH",
                 instance_type,
-                dedicated_master_count,
+                es['VPCOptions']['VPCId'],
                 instance_count,
-                str(es["EBSOptions"]["VolumeSize"]) + ' GB',
                 reg,
                 finding,
+                self.config['cloudwatch_metrics_period'],
+                "IndexingRate+SearchRate == 0",
                 round(monthly_cost_master + monthly_cost_data, 2)
             ]
             es_list.append(elasticsearch)
@@ -110,8 +112,9 @@ class Elasticsearch:
         """Returns a list of lists which contains headings and idle Elasticsearch instance information."""
         try:
             es_list = []
-            headers = ["DomainName", 'DedicatedMasterType', 'InstanceType', 'MasterNodeCount', 'DataNodeCount',
-                       'VolumeSize', 'AWSRegion', 'Finding', 'Savings($)']
+            headers=[   'ResourceID','ResouceName','ServiceName','Type','VPC',
+                        'State','Region','Finding','EvaluationPeriod (seconds)','Criteria','Saving($)'
+                    ]
   
             for reg in self.regions:
                 client, cloudwatch, pricing = self._get_clients(reg)
@@ -121,7 +124,7 @@ class Elasticsearch:
                     
 
             #To fetch top 10 resources with maximum saving.
-            es_sorted_list = sorted(es_list, key=lambda x: x[8], reverse=True)
+            es_sorted_list = sorted(es_list, key=lambda x: x[10], reverse=True)
             total_savings = self._get_savings(es_sorted_list)
             return {'resource_list': es_sorted_list, 'headers': headers, 'savings': total_savings}
 

@@ -41,7 +41,7 @@ class RelationalDatabaseService:
         """Returns total possible savings."""
         savings = 0
         for rds in rds_list:
-            savings = savings + rds[8]
+            savings = savings + rds[10]
         return round(savings, 2)
 
     def _get_clients(self, reg):
@@ -86,13 +86,15 @@ class RelationalDatabaseService:
             savings = round(db_cost + storage_cost, 2)
             rds =[
                 rds_instance["DBInstanceIdentifier"],
+                rds_instance["DBInstanceIdentifier"],
+                "RDS",
                 rds_instance["DBInstanceClass"],
+                rds_instance['DBSubnetGroup']['VpcId'],
                 rds_instance["DBInstanceStatus"],
-                rds_instance['StorageType'],
-                str(rds_instance['AllocatedStorage']) + ' GB',
-                str(rds_instance['InstanceCreateTime'].date()),
                 reg,
                 finding,
+                self.config['cloudwatch_metrics_period'],
+                "DatabaseConnections == 0",
                 savings
                ]
             rds_list.append(rds)
@@ -103,9 +105,9 @@ class RelationalDatabaseService:
         """Returns a list of lists which contains headings and idle RDS information."""
         try:
             rds_list = []
-            headers = ['InstanceIdentifier', 'InstanceClass', 'InstanceState',
-                       'StorageType', 'ProvisionStorage', 'CreationDate', 'AWSRegion',
-                       'Finding', 'Savings($)']
+            headers=[   'ResourceID','ResouceName','ServiceName','Type','VPC',
+                        'State','Region','Finding','EvaluationPeriod (seconds)','Criteria','Saving($)'
+                    ]
 
             for reg in self.regions:
                 client, cloudwatch, pricing = self._get_clients(reg)
@@ -113,7 +115,7 @@ class RelationalDatabaseService:
                         rds_list = self._get_parameters(rds_instance, reg, cloudwatch, pricing, rds_list)
                         
             #To fetch top 10 resources with maximum saving.
-            rds_sorted_list = sorted(rds_list, key=lambda x: x[8], reverse=True)
+            rds_sorted_list = sorted(rds_list, key=lambda x: x[10], reverse=True)
             total_savings = self._get_savings(rds_sorted_list)
             return {'resource_list': rds_sorted_list, 'headers': headers, 'savings': total_savings}
 

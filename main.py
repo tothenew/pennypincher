@@ -1,8 +1,10 @@
 import os
 import logging
 import sys
+from datetime import datetime
 from utils.html_functions import HTML
 from utils.ses import SES
+from utils.generate_csv import GENCSV
 from aws.resources import Resources
 from utils.slack_send import Slackalert
 from utils.config_parser import parse_config
@@ -58,14 +60,21 @@ def lambda_handler(event=None, context=None):
         else:
             header = '<h3><b>Cost Optimization Report |  ' + account_name + ' | Total Savings: $'+ str(round(total_savings, 2)) + '</h3></b>'
             html = header + html
-            path = os.getcwd()+ '/findings.html'
+            path = os.getcwd()+ '/pennypincher_findings.html'
             f = open(path, "w+")
             f.write(html)
             f.close
-            print("Findings file is at: findings.html")
+            print("Findings File is at: pennypincher_findings.html")
+            current_datetime=datetime.utcnow().isoformat("T","minutes").replace(":", "-")
+            dir_path=f"{os.getcwd()}/pennypincher_csv_report/{current_datetime}"
+            os.makedirs(dir_path,exist_ok=True)
+            if len(resource_info) > 0:
+                csv_obj = GENCSV(resource_info, total_savings, dir_path, current_datetime)
+                csv_obj.generate_csv()
+                print(f"CSV Report is at: {dir_path} directory")
 
     except Exception as e:
-        logger.error("Error on line {} in main.py.py".format(sys.exc_info()[-1].tb_lineno) +
+        logger.error("Error on line {} in main.py".format(sys.exc_info()[-1].tb_lineno) +
                      " | Message: " + str(e))
         sys.exit(1)
 
