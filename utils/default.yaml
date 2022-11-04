@@ -1,10 +1,7 @@
 ### Default metric value to identity a idle resource
+### DO NOT CHANGE THIS FILE, refer to config.yaml for modification below metrics.
 
-# aws:
-#   regions: []
-#   account_id:
-#   account_name:
-#   profile:
+
 
 resources:
     EBS:
@@ -55,8 +52,3 @@ config:
     reporting_platform: '-'    #Email/Slack/Email and Slack
     account_name: 'AWS Account'
     
-  # aws:
-  #   regions: []
-  #   account_id:
-  #   account_name:
-  #   profile:
