@@ -102,7 +102,7 @@ class Elasticsearch:
                 reg,
                 finding,
                 self.config['cloudwatch_metrics_period'],
-                "IndexingRate+SearchRate == 0",
+                f"IndexingRate+SearchRate == {self.config['sumCacheHitMiss']}",
                 round(monthly_cost_master + monthly_cost_data, 2)
             ]
             es_list.append(elasticsearch)

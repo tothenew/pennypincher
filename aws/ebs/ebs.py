@@ -91,7 +91,7 @@ class ElasticBlockStore:
                 vol["AvailabilityZone"][:-1],
                 finding,
                 self.config['cloudwatch_metrics_period'],
-                "VolumeReadOps+VolumeWriteOps == 0",
+                f"VolumeReadOps+VolumeWriteOps == {self.config['unused']}",
                 round(savings, 2)
                ]
             ebs_list.append(ebs)

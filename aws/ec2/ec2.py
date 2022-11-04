@@ -116,7 +116,7 @@ class ElasticComputeCloud:
                     reg,
                     finding,
                     self.config['cloudwatch_metrics_period'],
-                    "Average CPUUtilization and Maximum CPUUtilization < 1 and NetworkIn+NetworkOut < 5000000",
+                    f"Average CPUUtilization < {self.config['avgCpu']} Maximum CPUUtilization < {self.config['maxCpu']} and NetworkIn+NetworkOut < {self.config['netInOut']}",
                     round(savings * 732, 2)
                    ]
                 ec2_list.append(ec2)            

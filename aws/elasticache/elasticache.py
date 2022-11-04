@@ -88,7 +88,7 @@ class Elasticache:
                 reg,
                 finding,
                 self.config['cloudwatch_metrics_period'],
-                f"{cache_hits}+{cache_misses} == 0",
+                f"{cache_hits}+{cache_misses} == {self.config['sumCacheHitMiss']}",
                 savings
             ]
             ec_list.append(ec)

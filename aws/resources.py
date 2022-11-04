@@ -18,7 +18,6 @@ class Resources:
        self.region_list = get_region_list() 
        """To get supported regions on an AWS account in list format."""
        self.config=config
-       print(f"Printing config: {self.config}")
        logging.basicConfig(level=logging.WARNING)
        self.logger = logging.getLogger()
  
