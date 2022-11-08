@@ -41,7 +41,6 @@ To start Penny Pincher, run the following command
 export AWS_ACCESS_KEY_ID=YOUR_AWS_ACCESS_KEY
 export AWS_SECRET_ACCESS_KEY=YOUR_AWS_SECRET_ACCESS_KEY
 export AWS_DEFAULT_REGION=AWS_REGION
-export AWS_DEFAULT_REGION
 ```
 ```bash
 docker-compose up --build
