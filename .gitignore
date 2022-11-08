@@ -165,8 +165,8 @@ cython_debug/
 
 # Reports
 pennypincher_csv_report*
-findings.*
-pennypincher_findings.*
+findings*.*
+pennypincher_findings*.*
 #Zip Files
 *.zip
 
