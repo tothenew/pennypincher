@@ -74,9 +74,9 @@ Users just need to uncomment the resource and config block to change the default
 4. TO_ADDRESS* -> Receiver Email Address
 5. SES_REGION
 6. REPORTING_PLATFORM -> Where to send the report 
-    # email*
-    # email* and slack
-    # slack
+    1. email*
+    2. email* and slack
+    3. slack
 7. Generate on Local (Default)
 8. ACCOUNT_NAME -> AWS Account Name
 
