@@ -13,13 +13,13 @@ Penny Pincher is a tool that identifies all the resources which are provisioned 
 
 ### Supported Services & Regions
  The tool crawls all the regions to get the findings for the supported services 
-    1. EBS
-    2. EC2
-    3. EIP
-    4. Elasticache
-    5. Elasticsearch
-    6. Loadbalancer
-    7. RDS
+1. EBS
+2. EC2
+3. EIP
+4. Elasticache
+5. Elasticsearch
+6. Loadbalancer
+7. RDS
 
 
 ### How does it work?
