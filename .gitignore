@@ -5,3 +5,5 @@
 findings.html
 
 *.zip
+config
+docker_config
