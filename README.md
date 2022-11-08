@@ -11,45 +11,60 @@ Penny Pincher is a tool that identifies all the resources which are provisioned 
 3. The number of days for which resource metrics (usage) is to be monitored can be set by the end user.
 4. The solution is easily deployable as the whole setup can be done using AWS Cloudformation or Docker.
 
+### Supported Services & Regions
+ The tool crawls all the regions to get the findings for the supported services 
+    1. EBS
+    2. EC2
+    3. EIP
+    4. Elasticache
+    5. Elasticsearch
+    6. Loadbalancer
+    7. RDS
+
+
+### How does it work?
+ Boto3 API is used to scan the resources in the account according to the criteria defined in the configuration file and generate a report. 
+
+
 ### Pre-requisites
 
-1. The IAM user used for the setup should have access to AWS S3, AWS IAM, AWS Lambda, AWS SES and AWS Cloudformation.
- * You can also use this custom [policy](docs/policy.json) to run Penny Pincher.
-2. An AWS S3 bucket. (Only if the setup is to be done using Cloudformation)
-3. A slack workspace. (Only if cost report is to be sent on any slack channel)
-4. A verified SES email Address. (Only if cost report is to be sent over email)
+1. To scan the entire account, the IAM user or keys should have ReadOnlyAccess.
+2. Supported Python version v3 and above.
+3. Supported Boto3 version v1.17.66 and above
 
-## Quick Setup
 
-### Docker
+### Quick Setup With Docker
+
 
 To start Penny Pincher, run the following command
 ```bash
 export AWS_ACCESS_KEY_ID=YOUR_AWS_ACCESS_KEY
 export AWS_SECRET_ACCESS_KEY=YOUR_AWS_SECRET_ACCESS_KEY
 export AWS_DEFAULT_REGION=AWS_REGION
+export AWS_DEFAULT_REGION
 ```
 ```bash
 docker-compose up --build
 ```
-After the setup is complete, it will generate the report in an HTML page, **findings.html**.
+After the setup is complete, it will generate the report in an HTML and CSV format.
+ 
 
 ![Alt](/docs/images/main/sample_email_report.png)
 
 For detailed instructions, refer to [Setup through Docker Compose](docs/setup_through_docker.md)
 
-### Cloudformation
-1. Create an S3 bucket and upload the files code.zip and packages.zip in the bucket.
-2. Create a cloudformation stack using the penny_pincher_cfn.yml template file.
-3. Input the required parameters for receiving the report and create the stack
-4. Go to the AWS Lambda console, select the lambda "Penny-Pincher". Click on Test button to    run the Lambda .
-5. After a few minutes, you will receive the report on your email id and/or slack channel. 
+### Local
 
-For detailed instructions, refer to [Setup through Cloudformation](docs/setup_through_cloudformation.md)
+1. Set up AWS CLI or Generate the access tokens and set them as environment variables.
+2. pip3 install -r requirements.txt
+3. python3 main.py
 
 
-### Advanced settings
-Advanced configuration details can be found [here](docs/advanced_settings.md)
+### Configuration Files and Usage
+Pennnypincher finds the idle resources based on the default criteria mentioned in the below table.
+We have provided support for [config.yaml](https://github.com/tothenew/pennypincher/blob/release_1.0/config.yaml) file which allows the end user to override the default configuration values.
+Users just need to uncomment the resource and config block to change the default values.
+
 
 ### Recommendation Logic
 
