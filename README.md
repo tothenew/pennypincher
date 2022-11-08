@@ -66,30 +66,59 @@ We have provided support for [config.yaml](https://github.com/tothenew/pennypinc
 Users just need to uncomment the resource and config block to change the default values.
 
 
+### List of Global Environment variables
+
+# CHANNEL_NAME-> Slack Channel Name
+# SLACK_TOKEN-> Slack Access Token (Ref: [How to quickly get and use a Slack API token](https://api.slack.com/tutorials/tracks/getting-a-token))
+# FROM_ADDRESS* -> Sender Email Address
+# TO_ADDRESS* -> Receiver Email Address
+# SES_REGION
+# REPORTING_PLATFORM -> Where to send the report 
+        # email*
+        # email* and slack
+        # slack
+# Generate on Local (Default)
+# ACCOUNT_NAME -> AWS Account Name
+
+All of the above variables are Optional
+* Not Supported on Local
+Advanced configuration details can be found [here](https://github.com/tothenew/pennypincher/blob/release_1.0/config.yaml)
+
+
 ### Recommendation Logic
 
-The following table lists the criteria kept to decide if the resource is idle or not and mentions the recommendations which can help in cost saving.
-
-![Alt](/docs/images/main/recommendation_criteria.png)
+The following table lists the criteria kept to decide if the resource is idle or not and mentions the recommendations which can help in cost saving. This is configurable via [config.yaml](https://github.com/tothenew/pennypincher/blob/release_1.0/config.yaml)
 
 
 ### FAQ
+
 1. How can I deploy Penny Pincher to one's account?
 
-The whole setup can be deployed either using [AWS Cloudformation](docs/setup_through_cloudformation.md) or [Docker](docs/setup_through_docker.md).
+    The whole setup can be deployed either using  [Docker](https://github.com/IntelliGrape/pennypincher/blob/master/docs/setup_through_docker.md) or Can be run on a Local Machine
 
 2. What are the alert methods supported by Penny Pincher?
 
-It supports both the slack and the email for notifying the user with the report.
+    It supports both slack and email for notifying the user of the report.
 
 3. Can I use a custom CloudWatch metrics?
 
-As of now, custom CloudWatch metrics are not supported, but, you can configure the [advance settings](docs/advanced_settings.md).
+    As of now, custom CloudWatch metrics are not supported, but, you can configure the advanced [settings](https://github.com/tothenew/pennypincher/blob/release_1.0/config.yaml)
 
+4. Can I override the condition criteria?
+
+    Yes, it can be overridden via [config.yaml](https://github.com/tothenew/pennypincher/blob/release_1.0/config.yaml)
+
+5. Potential Cost saving is calculated monthly or Yearly
+
+    Monthly
+
+6. Can I get the report in CSV format
+    Yes, the Tool generates findings in HTML format as well as dumps the data in CSV format in the pennypincher_csv_report folder datetime-wise.
 
 ### Known Issues
-1. The European regions response for AWS API is not consistent with other regions. So European regions cause unexpected issues sometimes.
+1. The European region's response to AWS API is not consistent with other regions. So European regions cause unexpected issues sometimes.
 
-### Features in Development
-1. Working on supporting the data output in JSON format. This will allow for the additional output formats like xlsx and csv.
-2. User's input is not enabled for configuring the recommendation criteria.
+### Features Releasing in 1.0
+   1. Working on supporting the data output in JSON format. This will allow for additional output formats like xlsx and CSV.
+   2. The user's input is not enabled for configuring the recommendation criteria.
+   3. Send report via slack webhook 
