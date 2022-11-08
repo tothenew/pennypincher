@@ -1,6 +1,6 @@
 ## Penny Pincher - Cloud Resource Optimization recommendation based on historical data to save cost.
 
-### Aim 
+### Overview 
 
 Penny Pincher is a tool that identifies all the resources which are provisioned but are not being used i.e. are idle and notifies you about the potential savings over email and slack.
 
