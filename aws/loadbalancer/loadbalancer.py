@@ -40,7 +40,7 @@ class Loadbalancer:
         """Returns total possible savings."""
         savings = 0
         for lb in lb_list:
-            savings = savings + lb[6]
+            savings = savings + lb[10]
         return round(savings, 2)
 
     def _get_clients(self, reg):
@@ -60,17 +60,22 @@ class Loadbalancer:
                                                         'LoadBalancerName', elb['LoadBalancerName'],
                                                         self.config)
         #Idle loadbalancer check.
-        if connection_count < 1:      
+        if connection_count < self.config['connectionCount']:      
             finding = 'Idle'
         else:
             finding = 'ClassicLB'
         classic_lb = [
             elb['LoadBalancerName'],
+            elb['LoadBalancerName'],
+            "LOADBALANCER",
             'Classic',
-            elb['CreatedTime'].date(),
+            elb['VpcId'],
+            "-",
             reg,
+            finding,
+            self.config['cloudwatch_metrics_period'],
+            f"RequestCount < {self.config['connectionCount']}",
             round(elb_price, 2),
-            finding
             ]
         if finding == 'Idle':
             classic_lb.append(round(elb_price, 2))
@@ -97,17 +102,21 @@ class Loadbalancer:
         connection_count = cloudwatch.get_sum_metric(namespace, metric_name,
                                                     'LoadBalancer', lb_arn, self.config)
         #Idle loadbalancer check.
-        if connection_count < 1:  
+        if connection_count < self.config['connectionCount']:  
             finding = 'Idle'
 
         if finding == 'Idle':
             nlb_albs =[
             lb['LoadBalancerName'],
+            lb['LoadBalancerName'],
+            "LOADBALANCER",
             lb['Type'],
-            lb['CreatedTime'].date(),
+            lb['VpcId'],
+            lb['State']['Code'],
             reg,
-            round(price, 2),
             finding,
+            self.config['cloudwatch_metrics_period'],
+            f"{metric_name} < {self.config['connectionCount']}",
             round(price, 2)
             ]
             lb_list.append(nlb_albs)
@@ -117,8 +126,9 @@ class Loadbalancer:
         """Returns a list of lists which contains headings and idle loadbalancers information."""
         try:
             lb_list = []
-            headers = ['LoadBalancerName', 'Type', 'CreationDate', 'AWSRegion', 'MonthlyCost($)', 'Finding',
-                       'Savings($)']
+            headers=[   'ResourceID','ResouceName','ServiceName','Type','VPC',
+                        'State','Region','Finding','EvaluationPeriod (seconds)','Criteria','Saving($)'
+                    ]
             for reg in self.regions:
                 client, cloudwatch, elbv2_client, pricing_client = self._get_clients(reg)
                 elb_price, alb_price, nlb_price = self._get_lb_price(pricing_client, reg)
@@ -129,7 +139,7 @@ class Loadbalancer:
                     lb_list = self._get_lb_parameters(lb, reg, cloudwatch, alb_price, nlb_price, lb_list)
 
             #To fetch top 10 resources with maximum saving.
-            lb_sorted_list = sorted(lb_list, key=lambda x: x[6], reverse=True)
+            lb_sorted_list = sorted(lb_list, key=lambda x: x[10], reverse=True)
             total_savings = self._get_savings(lb_sorted_list)
             return {'resource_list': lb_sorted_list, 'headers': headers, 'savings': total_savings}
             

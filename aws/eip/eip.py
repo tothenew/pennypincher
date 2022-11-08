@@ -23,7 +23,7 @@ class ElasticIP:
         """Returns total possible savings."""
         savings = 0
         for eip in eip_list:
-            savings = savings + eip[3]
+            savings = savings + eip[10]
         return round(savings, 2)
     
     def _get_clients(self, reg):
@@ -60,8 +60,15 @@ class ElasticIP:
             price = pricing.get_eip_price()
             eip = [
             address["PublicIp"],
+            address["PublicIp"],
+            "EIP",
+            "-",
+            "-",
+            "-",
             reg,
             finding,
+            "-",
+            "EIP is Unallocated or Associated to a Stopped Instance",
             round(price, 2)
             ]
             eip_list.append(eip)
@@ -71,7 +78,9 @@ class ElasticIP:
         """Returns a list of lists which contains headings and unused EIP information."""
         try:
             eip_list = []
-            headers = ['Elastic_Ip', 'AWS_Region', 'Finding', 'Savings($)']
+            headers=[   'ResourceID','ResouceName','ServiceName','Type','VPC',
+                        'State','Region','Finding','EvaluationPeriod (seconds)','Criteria','Saving($)'
+                    ]
 
             for reg in self.regions:
                 client, pricing = self._get_clients(reg)
@@ -79,8 +88,8 @@ class ElasticIP:
                         eip_list = self._get_parameters(address, reg, client, pricing, eip_list)
                         
             #To fetch top 10 resources with maximum saving.
-            eip_sorted_list = sorted(eip_list, key=lambda x: x[3], reverse=True)
-            total_savings = self._get_savings(eip_sorted_list[:10])
+            eip_sorted_list = sorted(eip_list, key=lambda x: x[10], reverse=True)
+            total_savings = self._get_savings(eip_sorted_list[:11])
             return {'resource_list': eip_sorted_list[:10], 'headers': headers, 'savings': total_savings}
 
         except exceptions.ClientError as error:

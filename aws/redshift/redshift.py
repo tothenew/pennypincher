@@ -29,13 +29,13 @@ class Redshift:
         """Returns total savings."""
         savings = 0
         for rs in rs_list:
-            savings = savings + rs[7]
+            savings = savings + rs[10]
         return round(savings, 2)
 
     def _get_rs_finding(self, db_connection_count):   
         """Returns finding if redshift instance is idle or not."""
         finding = ''
-        if db_connection_count == 0:
+        if db_connection_count == self.config['dbConnectionCount']:
             finding = 'Idle'
         return finding
 
@@ -62,11 +62,14 @@ class Redshift:
             rs = [
             cluster['ClusterIdentifier'],
             cluster['DBName'],
+            "REDSHIFT",
             cluster['NodeType'],
-            cluster['NumberOfNodes'],
-            cluster['ClusterCreateTime'].strftime("%Y-%m-%d"),
+            cluster['VpcId'],
+            "-",
             reg,
             finding,
+            self.config['cloudwatch_metrics_period'],
+            f"DatabaseConnections == {self.config['dbConnectionCount']}",
             savings
             ]
             rs_list.append(rs)
@@ -78,6 +81,9 @@ class Redshift:
             rs_list = []
             headers = ['ClusterID', 'DBName', 'NodeType', 'NumberOfNodes', 'CreationDate', 'AWSRegion', 'Finding',
                        'Savings($)']
+            headers=[   'ResourceID','ResouceName','ServiceName','Type','VPC',
+                        'State','Region','Finding','EvaluationPeriod (seconds)','Criteria','Saving($)'
+                    ]
             for reg in self.regions:
                 client, cloudwatch, pricing = self._get_clients(reg)
                 for cluster in self._describe_redshift_clusters(client):
@@ -85,7 +91,7 @@ class Redshift:
                     
                     
             #To fetch top 10 resources with maximum saving.
-            rs_sorted_list = sorted(rs_list, key=lambda x: x[7], reverse=True)
+            rs_sorted_list = sorted(rs_list, key=lambda x: x[10], reverse=True)
             total_savings = self._get_savings(rs_sorted_list)
             return {'resource_list': rs_sorted_list, 'headers': headers, 'savings': total_savings}
 

@@ -20,6 +20,3 @@ services:
     image: pannypincher/alpine:latest
     volumes:
       - $PWD:/code
-
-
-
