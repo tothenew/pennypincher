@@ -68,17 +68,17 @@ Users just need to uncomment the resource and config block to change the default
 
 ### List of Global Environment variables
 
-# CHANNEL_NAME-> Slack Channel Name
-# SLACK_TOKEN-> Slack Access Token (Ref: [How to quickly get and use a Slack API token](https://api.slack.com/tutorials/tracks/getting-a-token))
-# FROM_ADDRESS* -> Sender Email Address
-# TO_ADDRESS* -> Receiver Email Address
-# SES_REGION
-# REPORTING_PLATFORM -> Where to send the report 
+#### CHANNEL_NAME-> Slack Channel Name
+#### SLACK_TOKEN-> Slack Access Token (Ref: [How to quickly get and use a Slack API token](https://api.slack.com/tutorials/tracks/getting-a-token))
+#### FROM_ADDRESS* -> Sender Email Address
+#### TO_ADDRESS* -> Receiver Email Address
+#### SES_REGION
+#### REPORTING_PLATFORM -> Where to send the report 
         # email*
         # email* and slack
         # slack
-# Generate on Local (Default)
-# ACCOUNT_NAME -> AWS Account Name
+#### Generate on Local (Default)
+#### ACCOUNT_NAME -> AWS Account Name
 
 All of the above variables are Optional
 * Not Supported on Local
