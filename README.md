@@ -80,8 +80,9 @@ Users just need to uncomment the resource and config block to change the default
 7. Generate on Local (Default)
 8. ACCOUNT_NAME -> AWS Account Name
 
-All of the above variables are Optional
-* Not Supported on Local
+`All of the above variables are Optional`
+
+*Not Supported on Local
 Advanced configuration details can be found [here](https://github.com/tothenew/pennypincher/blob/release_1.0/config.yaml)
 
 
