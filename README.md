@@ -56,8 +56,8 @@ For detailed instructions, refer to [Setup through Docker Compose](docs/setup_th
 ### Local
 
 1. Set up AWS CLI or Generate the access tokens and set them as environment variables.
-2. pip3 install -r requirements.txt
-3. python3 main.py
+2. `pip3 install -r requirements.txt`
+3. `python3 main.py`
 
 
 ### Configuration Files and Usage
