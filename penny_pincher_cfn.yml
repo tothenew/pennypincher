@@ -124,11 +124,11 @@ Resources:
         - !Ref LambdaLayer
       Environment:
         Variables:
-          account_name: !Ref AccountName
-          config: !Ref CloudwatchConfig
-          reporting_platform: !Ref ReportingPlatform
-          channel_name: !Ref SlackChannelName
-          slack_token: !Ref SlackToken
-          from_address: !Ref SESFromEmailAddress
-          to_address: !Ref SESToEmailAddress
-          ses_region: !Ref SESRegion
+          ACCOUNT_NAME: !Ref AccountName
+          CONFIG: !Ref CloudwatchConfig
+          REPORTING_PLATFORM: !Ref ReportingPlatform
+          CHANNEL_NAME: !Ref SlackChannelName
+          SLACK_TOKEN: !Ref SlackToken
+          FROM_ADDRESS: !Ref SESFromEmailAddress
+          TO_ADDRESS: !Ref SESToEmailAddress
+          SES_REGION: !Ref SESRegion
