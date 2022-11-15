@@ -24,7 +24,7 @@ class ElasticComputeCloud:
         """Returns total possible savings."""
         savings = 0
         for ec2 in ec2_list:
-            savings = savings + ec2[7]
+            savings = savings + ec2[10]
         return round(savings, 2)
 
     def _get_findings(self, state, avg_cpu, max_cpu, net_in_out, status):
@@ -36,7 +36,7 @@ class ElasticComputeCloud:
             if state.lower() == 'stopped':
                 finding = 'Stopped'
             elif state.lower() == 'running':
-                if avg_cpu < 1 and max_cpu < 1 and net_in_out < 5000000: 
+                if avg_cpu < self.config['avgCpu'] and max_cpu < self.config['maxCpu'] and net_in_out < self.config['netInOut']: 
                     """ EC2 idle condition check """
                     finding = 'Idle'
         return finding
@@ -109,11 +109,14 @@ class ElasticComputeCloud:
                 ec2 = [
                     instance['InstanceId'],
                     instance_name,
+                    "EC2",
                     instance['InstanceType'],
                     vpc_id,
-                    str(instance['LaunchTime'].date()),
+                    instance['State']['Name'],
                     reg,
                     finding,
+                    self.config['cloudwatch_metrics_period'],
+                    f"Average CPUUtilization < {self.config['avgCpu']} Maximum CPUUtilization < {self.config['maxCpu']} and NetworkIn+NetworkOut < {self.config['netInOut']}",
                     round(savings * 732, 2)
                    ]
                 ec2_list.append(ec2)            
@@ -123,8 +126,9 @@ class ElasticComputeCloud:
         """Returns a list of lists which contains headings and idle EC2 information."""
         try:
             ec2_list = []
-            headers = ['InstanceID', 'InstanceName', 'InstanceType', 'VPCID', 'CreationDate',
-                       'AWSRegion', 'Finding', 'Savings($)']
+            headers=[   'ResourceID','ResouceName','ServiceName','Type','VPC',
+                        'State','Region','Finding','EvaluationPeriod (seconds)','Criteria','Saving($)'
+                    ]
             for reg in self.regions:
                 client, cloudwatch, pricing = self._get_clients(reg)
                 for r in self._describe_ec2(client):
@@ -132,7 +136,7 @@ class ElasticComputeCloud:
                             ec2_list = self._get_parameters(instance,reg, client, cloudwatch, pricing, ec2_list)
 
             #To fetch top 10 resources with maximum saving.
-            ec2_sorted_list = sorted(ec2_list, key=lambda x: x[7], reverse=True)
+            ec2_sorted_list = sorted(ec2_list, key=lambda x: x[10], reverse=True)
             total_savings = self._get_savings(ec2_sorted_list)
             return {'resource_list': ec2_sorted_list, 'headers': headers, 'savings': total_savings}
 

@@ -4,3 +4,5 @@ tabulate==0.8.9
 requests==2.25.1
 slack==0.0.2
 slackclient==2.9.3
+XlsxWriter==3.0.3
+PyYAML==5.4.1

@@ -28,14 +28,14 @@ class Elasticache:
         """Returns total possible savings."""
         savings = 0
         for ec in ec_list:
-            savings = savings + ec[7]
+            savings = savings + ec[10]
         return round(savings, 2)
 
     def _get_finding(self, cache_hit_miss_sum): 
         """Returns finding after checking if Elasticache is idle or not."""
         finding = ''
         #Idle elasticache check.
-        if cache_hit_miss_sum == 0:  
+        if cache_hit_miss_sum == self.config['sumCacheHitMiss']:  
             finding = 'Idle'
         return finding
 
@@ -81,13 +81,16 @@ class Elasticache:
             ec = [
                 cache_id,
                 cluster_name,
+                "ELASTICACHE",
                 cache_node_type,
+                "-",
                 cache_engine,
-                cache['CacheClusterCreateTime'].date(),
                 reg,
                 finding,
+                self.config['cloudwatch_metrics_period'],
+                f"{cache_hits}+{cache_misses} == {self.config['sumCacheHitMiss']}",
                 savings
-                 ]
+            ]
             ec_list.append(ec)
         return ec_list
 
@@ -95,9 +98,9 @@ class Elasticache:
         """Returns a list of lists which contains headings and idle Elasticache instance information."""
         try:
             ec_list = []
-            headers = ['NodeId', 'ClusterName', 'CacheNodeType', 'Engine', 'CreationDate', 'AWSRegion',
-                       'Finding', 'Savings($)']
-            
+            headers=[   'ResourceID','ResouceName','ServiceName','Type','VPC',
+                        'State','Region','Finding','EvaluationPeriod (seconds)','Criteria','Saving($)'
+                    ]
             for reg in self.regions:
                 client, cloudwatch, pricing = self._get_clients(reg)
                 elasticache_clusters = self._describe_elasticache(client)
@@ -105,7 +108,7 @@ class Elasticache:
                     ec_list = self._get_parameters(cache, reg, cloudwatch, pricing, ec_list)
                     
             #To fetch top 10 resources with maximum saving.
-            ec_sorted_list = sorted(ec_list, key=lambda x: x[7], reverse=True)
+            ec_sorted_list = sorted(ec_list, key=lambda x: x[10], reverse=True)
             total_savings = self._get_savings(ec_sorted_list)
             return {'resource_list': ec_sorted_list, 'headers': headers, 'savings': total_savings}
 
