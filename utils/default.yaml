@@ -51,4 +51,5 @@ config:
     ses_region: '-'                    #Region where SES is configured
     reporting_platform: '-'    #Email/Slack/Email and Slack
     account_name: 'AWS Account'
+    webhook_url: '-'
     
