@@ -78,7 +78,7 @@ def lambda_handler(event=None, context=None):
                 return lis[length-1]
             string = "{os.getcwd()}/pennypincher_csv_report/{current_datetime}"
             print(lastWord(string))    
-            #print("splitting_path"+str(splitting_path))
+          
             os.makedirs(dir_path,exist_ok=True)
             if len(resource_info) > 0:
                 csv_obj = GENCSV(resource_info, total_savings, dir_path, current_datetime)
@@ -86,10 +86,7 @@ def lambda_handler(event=None, context=None):
                 print(f"CSV Report is at: {dir_path} directory")
         print(dir_path)
         print(path,report_bucket)
-        #print(env_config)
-        
-        #s3_upload_html(path, report_bucket,None)
-        #uploadDirectory(dir_path,report_bucket,current_datetime)
+    
     except Exception as e:
         logger.error("Error on line {} in main.py".format(sys.exc_info()[-1].tb_lineno) +
                      " | Message: " + str(e))
