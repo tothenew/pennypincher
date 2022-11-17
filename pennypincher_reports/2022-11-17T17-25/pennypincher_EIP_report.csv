@@ -1,0 +1,11 @@
+ResourceID,ResouceName,ServiceName,Type,VPC,State,Region,Finding,EvaluationPeriod (seconds),Criteria,Saving($)
+54.255.149.198,54.255.149.198,EIP,-,-,-,ap-southeast-1,Unallocated,-,EIP is Unallocated or Associated to a Stopped Instance,3.66
+3.234.38.9,3.234.38.9,EIP,-,-,-,us-east-1,Unallocated,-,EIP is Unallocated or Associated to a Stopped Instance,0.0
+34.193.42.152,34.193.42.152,EIP,-,-,-,us-east-1,Unallocated,-,EIP is Unallocated or Associated to a Stopped Instance,0.0
+34.197.209.193,34.197.209.193,EIP,-,-,-,us-east-1,Unallocated,-,EIP is Unallocated or Associated to a Stopped Instance,0.0
+34.231.7.204,34.231.7.204,EIP,-,-,-,us-east-1,Unallocated,-,EIP is Unallocated or Associated to a Stopped Instance,0.0
+35.169.111.26,35.169.111.26,EIP,-,-,-,us-east-1,Unallocated,-,EIP is Unallocated or Associated to a Stopped Instance,0.0
+44.209.160.25,44.209.160.25,EIP,-,-,-,us-east-1,Unallocated,-,EIP is Unallocated or Associated to a Stopped Instance,0.0
+52.1.0.183,52.1.0.183,EIP,-,-,-,us-east-1,Unallocated,-,EIP is Unallocated or Associated to a Stopped Instance,0.0
+52.22.150.119,52.22.150.119,EIP,-,-,-,us-east-1,Unallocated,-,EIP is Unallocated or Associated to a Stopped Instance,0.0
+52.4.134.135,52.4.134.135,EIP,-,-,-,us-east-1,Unallocated,-,EIP is Unallocated or Associated to a Stopped Instance,0.0

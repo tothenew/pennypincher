@@ -10,6 +10,7 @@ from utils.slack_send import Slackalert
 from utils.config_parser import parse_config
 from utils.config_parser import merges
 from utils.config_parser import check_env
+from utils.s3_send import uploadDirectory
 def lambda_handler(event=None, context=None):
     print("Starting PennyPincher")
 
@@ -29,7 +30,7 @@ def lambda_handler(event=None, context=None):
     reporting_platform = env_config['reporting_platform']    #Email/Slack/Email and Slack
     account_name = env_config['account_name'] 
     webhook_url = env_config['webhook_url']
-    
+    report_bucket = env_config['report_bucket']
     #For removing any existing loggers in lambda
     root = logging.getLogger()
     if root.handlers:
@@ -47,13 +48,13 @@ def lambda_handler(event=None, context=None):
         html, resource_info, total_savings = resource.get_report(html_obj, slack_obj)
         print("Total savings: $" + str(round(total_savings, 2)))
         
-        if reporting_platform.lower() == 'email':
+        if reporting_platform.lower().split(',') == ['email']:
             ses_obj.ses_sendmail(
                 sub='Cost Optimization Report | ' + account_name + ' | Total Savings: $'+ str(round(total_savings, 2)),
                 html=html)
-        elif reporting_platform.lower() == 'slack':
+        elif reporting_platform.lower().split(',') == ['slack']:
             slack_obj.slack_alert(resource_info, account_name, str(round(total_savings, 2)), webhook_url)
-        elif reporting_platform.lower() == 'email and slack':
+        elif (( 'email' in reporting_platform.lower().split(',')) and ('slack' in reporting_platform.lower().split(','))):
             ses_obj.ses_sendmail(
                 sub='Cost Optimization Report | ' + account_name + ' | Total Savings: $' + str(round(total_savings, 2)),
                 html=html)
@@ -61,18 +62,21 @@ def lambda_handler(event=None, context=None):
         else:
             header = '<h3><b>Cost Optimization Report |  ' + account_name + ' | Total Savings: $'+ str(round(total_savings, 2)) + '</h3></b>'
             html = header + html
-            path = os.getcwd()+ '/pennypincher_findings.html'
-            f = open(path, "w+")
+            current_datetime=datetime.utcnow().isoformat("T","minutes").replace(":", "-")
+            dir_path=f"{os.getcwd()}/pennypincher_reports/{current_datetime}"
+            os.makedirs(dir_path,exist_ok=True)
+            html_path = dir_path+ '/pennypincher_findings.html'
+            f = open(html_path, "w+")
             f.write(html)
             f.close
             print("Findings File is at: pennypincher_findings.html")
-            current_datetime=datetime.utcnow().isoformat("T","minutes").replace(":", "-")
-            dir_path=f"{os.getcwd()}/pennypincher_csv_report/{current_datetime}"
-            os.makedirs(dir_path,exist_ok=True)
             if len(resource_info) > 0:
                 csv_obj = GENCSV(resource_info, total_savings, dir_path, current_datetime)
                 csv_obj.generate_csv()
                 print(f"CSV Report is at: {dir_path} directory")
+        ## Sending report in s3   
+        if 's3' in  reporting_platform.lower().split(','):
+            uploadDirectory(dir_path,report_bucket,current_datetime)
 
     except Exception as e:
         logger.error("Error on line {} in main.py".format(sys.exc_info()[-1].tb_lineno) +
