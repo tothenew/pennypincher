@@ -10,6 +10,8 @@ from utils.slack_send import Slackalert
 from utils.config_parser import parse_config
 from utils.config_parser import merges
 from utils.config_parser import check_env
+from utils.s3_send import s3_upload_html
+from utils.s3_send import uploadDirectory
 def lambda_handler(event=None, context=None):
     print("Starting PennyPincher")
 
@@ -28,6 +30,7 @@ def lambda_handler(event=None, context=None):
     ses_region = env_config['ses_region']                   #Region where SES is configured
     reporting_platform = env_config['reporting_platform']    #Email/Slack/Email and Slack
     account_name = env_config['account_name'] 
+    report_bucket = env_config['report_bucket']
     #For removing any existing loggers in lambda
     root = logging.getLogger()
     if root.handlers:
@@ -44,6 +47,7 @@ def lambda_handler(event=None, context=None):
 
         html, resource_info, total_savings = resource.get_report(html_obj, slack_obj)
         print("Total savings: $" + str(round(total_savings, 2)))
+
         
         if reporting_platform.lower() == 'email':
             ses_obj.ses_sendmail(
@@ -71,11 +75,16 @@ def lambda_handler(event=None, context=None):
                 csv_obj = GENCSV(resource_info, total_savings, dir_path, current_datetime)
                 csv_obj.generate_csv()
                 print(f"CSV Report is at: {dir_path} directory")
-
+        print(dir_path,path)
+        print(path,report_bucket)
+        print(env_config)
+        s3_upload_html(path, report_bucket,None)
+        uploadDirectory(dir_path,report_bucket,current_datetime)
     except Exception as e:
         logger.error("Error on line {} in main.py".format(sys.exc_info()[-1].tb_lineno) +
                      " | Message: " + str(e))
         sys.exit(1)
+
 
 if __name__ == "__main__":
     lambda_handler()
