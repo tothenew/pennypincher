@@ -30,12 +30,11 @@ def s3_upload_html(file_name, bucket, object_name=None):
 s3_client = boto3.client('s3')    
 
 def uploadDirectory(path,bucketname,current_datetime):
-        print("csv"+path)
-        print("csv_bucket"+bucketname)
-        path="/home/riya/pennypicher/pennypincher/pennypincher_csv_report"
+        path ="/home/riya/Documents/pennypincher/pennypincher_csv_report"
+        print(path)
         for root,dirs,files in os.walk(path):
             for file in files:
-                s3_client.upload_file(os.path.join(root,file),bucketname,f"{current_datetime}/{file}")
-
-#uploadDirectory(path,bucketname)
+                print("test")
+                response =    s3_client.upload_file(os.path.join(root,file),bucketname,f"{current_datetime}/{file}")
+                print(response)
 
