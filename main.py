@@ -19,6 +19,7 @@ def lambda_handler(event=None, context=None):
     resource_config = final_config['resources']
     env_config = final_config['config']['env']
     env_config = check_env(env_config)
+    print(env_config)
     
     channel_name =  env_config['channel_name']   #Slack Channel Name
     slack_token = env_config['slack_token']                  #Slack Channel Token
@@ -28,6 +29,8 @@ def lambda_handler(event=None, context=None):
     ses_region = env_config['ses_region']                   #Region where SES is configured
     reporting_platform = env_config['reporting_platform']    #Email/Slack/Email and Slack
     account_name = env_config['account_name'] 
+    webhook_url = env_config['webhook_url']
+    
     #For removing any existing loggers in lambda
     root = logging.getLogger()
     if root.handlers:
@@ -40,7 +43,7 @@ def lambda_handler(event=None, context=None):
         resource = Resources(resource_config)    #Object for generating report
         html_obj = HTML()               #Object for generating html page
         ses_obj = SES(from_address=from_address, to_address=to_address, ses_region=ses_region)    #Object to send email
-        slack_obj = Slackalert(channel=channel_name, slack_token=slack_token)           #object to send report to slack
+        slack_obj = Slackalert(channel=channel_name, slack_token=slack_token, webhook=webhook_url)           #object to send report to slack
 
         html, resource_info, total_savings = resource.get_report(html_obj, slack_obj)
         print("Total savings: $" + str(round(total_savings, 2)))
@@ -50,12 +53,12 @@ def lambda_handler(event=None, context=None):
                 sub='Cost Optimization Report | ' + account_name + ' | Total Savings: $'+ str(round(total_savings, 2)),
                 html=html)
         elif reporting_platform.lower() == 'slack':
-            slack_obj.slack_alert(resource_info, account_name, str(round(total_savings, 2)))
+            slack_obj.slack_alert(resource_info, account_name, str(round(total_savings, 2)), webhook_url)
         elif reporting_platform.lower() == 'email and slack':
             ses_obj.ses_sendmail(
                 sub='Cost Optimization Report | ' + account_name + ' | Total Savings: $' + str(round(total_savings, 2)),
                 html=html)
-            slack_obj.slack_alert(resource_info, account_name, str(round(total_savings, 2)))
+            slack_obj.slack_alert(resource_info, account_name,webhook_url, str(round(total_savings, 2)))
         else:
             header = '<h3><b>Cost Optimization Report |  ' + account_name + ' | Total Savings: $'+ str(round(total_savings, 2)) + '</h3></b>'
             html = header + html
