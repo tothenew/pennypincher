@@ -19,7 +19,6 @@ def lambda_handler(event=None, context=None):
     resource_config = final_config['resources']
     env_config = final_config['config']['env']
     env_config = check_env(env_config)
-    print(env_config)
     
     channel_name =  env_config['channel_name']   #Slack Channel Name
     slack_token = env_config['slack_token']                  #Slack Channel Token

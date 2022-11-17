@@ -43,13 +43,13 @@ resources:
     
 config:
   env:
-    channel_name: 'test-report'             #Slack Channel Name
+    channel_name: '-'             #Slack Channel Name
     slack_token: '-'                   #Slack Channel Token
     config: 'Null'                         #Configuration for Cloudwatch e.g. ebs=20, lb=15
     from_address: '-'                #SES verified email address from which email is to be sent
     to_address: '-'         #Email addresses of recipents (Comma Separated)
     ses_region: '-'                    #Region where SES is configured
-    reporting_platform: 'slack'    #Email/Slack/Email and Slack
+    reporting_platform: '-'    #Email/Slack/Email and Slack
     account_name: 'AWS Account'
-    webhook_url: 'https://hooks.slack.com/services/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'
+    webhook_url: '-'
     

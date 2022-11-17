@@ -44,7 +44,7 @@ class Slackalert:
                 field.append(val)
             total_saving={
                         "type": "plain_text",
-                        "text": "Total Savings",
+                        "text": "Total Monthly Savings",
             }
             amount ={
                         "type": "plain_text",
@@ -74,6 +74,7 @@ class Slackalert:
                         }
             #posting message into slack channel
             requests.post(webhook_url,data=json.dumps(slack_msg))
+            print("Sending the Cost Optimization report to slack "+ self.channel)
             
         except Exception as e:
             self.logger.error(
@@ -84,39 +85,5 @@ class Slackalert:
 
         
             
-        # try:
-        #     client = slack.WebClient(token=self.slack_token)
-
-        #     f = open("/tmp/cost_optimization_report.txt", "w+")
-
-        #     for res in resource_info.keys():       
-        #         #Converts resource info dictionary to tabular format.
-        #         f.write('\n' + 'Resource: ' + res + '\n')
-        #         resource_table = tabulate(resource_info[res]['Resources'][1:],
-        #                                   headers=resource_info[res]['Resources'][0], tablefmt="grid",
-        #                                   disable_numparse=True)
-        #         f.write('\n' + resource_table + '\n \n' + 'Savings: $' + str(resource_info[res]['Savings']) + '\n')
-        #     f.close()
-        #     response = client.files_upload(
-        #         file='/tmp/cost_optimization_report.txt',
-        #         initial_comment='Cost Optimization Report | ' + account_name + ' | Total Savings: $' + str(total_savings),
-        #         channels=self.channel
-        #     )
-            
-
-        #     print("Sending the Cost Optimization report to slack "+ self.channel)
-            
-            
-            
-            
-            
-
-        # except SlackApiError as e:
-        #     """You will get a SlackApiError if "ok" is False."""
-        #     assert e.response["ok"] is False
-        #     assert e.response["error"]  
-        #     """str like 'invalid_auth', 'channel_not_found'."""
-        #     self.logger.error("Slack api error: {e.response['error']} | Error in slack_send.py")
-        #     sys.exit(1)
-
+        
         
