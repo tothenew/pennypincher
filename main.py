@@ -23,7 +23,6 @@ def lambda_handler(event=None, context=None):
     
     channel_name =  env_config['channel_name']   #Slack Channel Name
     slack_token = env_config['slack_token']                  #Slack Channel Token
-    config = env_config['config']                         #Configuration for Cloudwatch e.g. ebs=20, lb=15
     from_address = env_config['from_address']               #SES verified email address from which email is to be sent
     to_address = env_config['to_address']         #Email addresses of recipents (Comma Separated)
     ses_region = env_config['ses_region']                   #Region where SES is configured
