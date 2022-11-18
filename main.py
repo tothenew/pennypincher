@@ -41,7 +41,7 @@ def lambda_handler(event=None, context=None):
         resource = Resources(resource_config)    #Object for generating report
         html_obj = HTML()               #Object for generating html page
         ses_obj = SES(from_address=from_address, to_address=to_address, ses_region=ses_region)    #Object to send email
-        slack_obj = Slackalert(channel=channel_name, webhook=webhook_url)           #object to send report to slack
+        slack_obj = Slackalert(channel=channel_name, webhook_url=webhook_url)           #object to send report to slack
 
         html, resource_info, total_savings = resource.get_report(html_obj, slack_obj)
         print("Total savings: $" + str(round(total_savings, 2)))
