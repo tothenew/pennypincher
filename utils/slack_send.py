@@ -10,9 +10,9 @@ from datetime import date
 
 class Slackalert:
     """To send cost report on slack."""
-    def __init__(self, channel=None, slack_token=None, webhook=None):
+    def __init__(self, channel=None, webhook_url=None):
         self.channel = channel
-        self.slack_token = slack_token
+        self.webhook_url = webhook_url
         logging.basicConfig(level=logging.WARNING)
         self.logger = logging.getLogger()
 
@@ -24,7 +24,7 @@ class Slackalert:
         resource_info[resource_name]['Savings'] = resource_savings
         return resource_info
 
-    def slack_alert(self, resource_info, account_name, total_savings, webhook_url ):
+    def slack_alert(self, resource_info, account_name, total_savings):
         try:   
             date_obj = date.today()
             date_obj_format = date_obj.strftime("%d %b %Y")
@@ -73,7 +73,7 @@ class Slackalert:
                             ]
                         }
             #posting message into slack channel
-            requests.post(webhook_url,data=json.dumps(slack_msg))
+            requests.post(self.webhook_url,data=json.dumps(slack_msg))
             print("Sending the Cost Optimization report to slack "+ self.channel)
             
         except Exception as e:
