@@ -1,9 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 
 Parameters:
-  S3BucketName:
-    Description: 'Takes S3 bucket name which contains lambda layer and code zip files'
-  
   AccountName:
     Description: 'Takes account name as input'
     Type: 'String'
@@ -12,19 +9,15 @@ Parameters:
     Type: 'String'
     Default: 'Null'
   ReportingPlatform:
-    Description: 'Takes reporting platform as input'
+    Description: 'Takes comma seperated reporting values, allowed values are S3, Slack, Email'
     Type: 'String'
-    AllowedValues:
-      - 'Email'
-      - 'Slack'
-      - 'Email and Slack'
     Default: 'Email'
   SlackChannelName:
     Description: 'Takes slack channel name as input. Keep the defaults in case slack notifications are not required'
     Type: 'String'
     Default: '-'
-  SlackToken:
-    Description: 'Takes slack token as input . Keep the defaults in case slack notifications are not required'
+  WebhookUrl:
+    Description: 'Takes slack webhook url as input . Keep the defaults in case slack notifications are not required'
     Type: 'String'
     Default: '-'
   SESFromEmailAddress:
@@ -39,23 +32,25 @@ Parameters:
     Description: 'Takes the AWS region abbreviation (e.g. ap-south-1 for Mumbai) in which SES is configured'
     Type: 'String'
     Default: 'us-east-1'
-  ReportBucketName:
-    Description: 'creating for bucket for s3 report'
-    Type: 'String'
-    Default: 'pincher-bucket'
+  ReportBucket:
+    Description: 'A S3 bucket to store reports'
+    Type: "String"
+  ImageUri:
+    Description: "Docker Image URI"
+    Type: "String"
+
+
 
 Resources:
-  Bucket:
-    Type: AWS::S3::Bucket
+  S3Bucket:
+    Type: 'AWS::S3::Bucket'
     Properties:
-      BucketName: !Ref ReportBucketName  
-
-Resources:
+      BucketName: !Ref ReportBucket
   ServiceRoleForLambda:
     Type: 'AWS::IAM::Role'
     Description: 'IAM role for Penny Pincher'
     Properties:
-      RoleName: 'Penny-Pincher-Lambda-Role'
+      RoleName: 'Penny-Pincher-Docker-Lambda-Role'
       AssumeRolePolicyDocument:
         Version: '2012-10-17'
         Statement:
@@ -65,6 +60,8 @@ Resources:
                 - 'lambda.amazonaws.com'
             Action:
               - 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AmazonSESFullAccess
       Policies:
         - PolicyName: 'Penny-Pincher-Lambda-Inline-Policy'
           PolicyDocument: !Sub
@@ -98,60 +95,35 @@ Resources:
                        {
                                   "Sid": "VisualEditor1",
                                   "Effect": "Allow",
-                                  "Action": "s3:GetObject",
-                                  "Resource": "arn:aws:s3:::${S3BucketName}/*"
+                                  "Action": "*",
+                                  "Resource":"arn:aws:s3:::${ReportBucket}/*"
                       }
                    ]
                }'
-            - { S3BucketName: !Ref S3BucketName }
+            - { ReportBucket: !Ref ReportBucket }
 
-  # LambdaLayer:
-  #   Type: 'AWS::Lambda::LayerVersion'
-  #   Description: 'Contains packages used in Penny Pincher Lambda'
-  #   Properties:
-  #     CompatibleRuntimes:
-  #       - 'python3.8'
-  #     Content:
-  #       S3Bucket: !Ref S3BucketName
-  #       S3Key: 'packages.zip'
-  #     LayerName: 'Penny-Pincher-Lambda-Packages-Layer'
 
   LambdaFunction:
     Type: 'AWS::Lambda::Function'
     Description: 'Generates Cost report with all the idle resources information and sends it to email or slack or both'
     Properties:
-      FunctionName: 'Penny-Pincher'
-      Runtime: 'python3.8'
+      FunctionName: 'Penny-Pincher-Docker-Lambda'
+      Architectures:
+        - x86_64
       Role: !GetAtt ServiceRoleForLambda.Arn
-      Handler: 'main.lambda_handler'
       Code:
-        S3Bucket: !Ref S3BucketName
-        S3Key: 'code.zip'
-      PackageType: 'Zip'
+        ImageUri: !Ref ImageUri
+      PackageType: 'Image'
       Timeout: 900
       MemorySize: 1024
-  
-      
-      # Layers:
-      #   - !Ref LambdaLayer
-
-    
       Environment:
         Variables:
           ACCOUNT_NAME: !Ref AccountName
           CONFIG: !Ref CloudwatchConfig
           REPORTING_PLATFORM: !Ref ReportingPlatform
           CHANNEL_NAME: !Ref SlackChannelName
-          SLACK_TOKEN: !Ref SlackToken
           FROM_ADDRESS: !Ref SESFromEmailAddress
           TO_ADDRESS: !Ref SESToEmailAddress
           SES_REGION: !Ref SESRegion
-          REPORT_BUCKET: !Ref ReportBucketName
-
-
-     
-  
-  
-  
-          
-      
+          REPORT_BUCKET: !Ref ReportBucket
+          WEBHOOK_URL: !Ref WebhookUrl

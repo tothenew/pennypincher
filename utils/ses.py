@@ -15,22 +15,25 @@ class SES:
 
     def ses_sendmail(self, sub, html=''):   
         """Sends email."""
+        
         try:
+            self.to_address.split(',')
             ses = boto3.client('ses', region_name=self.ses_region)
-            ses.send_email(Source=self.from_address,
-                           Destination={
-                               'ToAddresses': self.to_address,
-                               'CcAddresses': [],
-                               'BccAddresses': []
-                           },
-                           Message={
-                               'Subject': {'Data': sub},
-                               'Body': {
-                                   'Html': {'Data': html}
-                               }
-                           }
-                           )
-            print("Sending the Cost Optimization report to "+ self.from_address)
+            ses.send_email(
+        Destination={
+            "ToAddresses": self.to_address.split(','),
+            'CcAddresses': [],
+            'BccAddresses': []
+        },
+        Message={
+                        'Subject': {'Data': sub},
+                        'Body': {
+                            'Html': {'Data': html}
+                        }
+                    },
+        Source=self.from_address,
+    )
+            print("Sending the Cost Optimization report to "+ self.to_address)
         except exceptions.ClientError as error:
             if error.response['Error']['Code'] == 'LimitExceededException':
                 self.logger.warning('API call limit exceeded; backing off and retrying...')
@@ -42,4 +45,3 @@ class SES:
         except Exception as e:
             self.logger.error("Error on line {} in ses.py".format(sys.exc_info()[-1].tb_lineno) + " | Message: " + str(e))
             sys.exit(1)
-

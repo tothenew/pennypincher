@@ -94,7 +94,7 @@ class Resources:
            resource_info = {} #Dictionary which will contain all the information of resources. 
           
            ####EC2####  
-           # dictionary- resource_list, headers, savings
+           #dictionary- resource_list, headers, savings
            summary = self.ec2()    
            html_resource , resource_info = self.get_summary('EC2', summary, html_obj, slack_obj, resource_info)
            total_savings += summary['savings']

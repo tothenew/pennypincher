@@ -41,7 +41,7 @@ Note: Both email and slack can be selected as reporting platforms. However, sele
     The slack related parameters are to be given if you want to receive report on your slack channel.
 
     * **SlackChannelName**: Give the name of the slack channel on which report is to be sent.
-    * **SlackToken**: Give the OAuth token for your Slack App.
+    * **WebhookUrl**: Give the WebhookUrl for Slack Channel.
 
 ![Alt](/docs/images/main/parameters_10.png)
 
