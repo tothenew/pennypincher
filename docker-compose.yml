@@ -19,4 +19,4 @@ services:
       - FROM_ADDRESS=${FROM_ADDRESS}
     image: pannypincher/alpine:latest
     volumes:
-      - $PWD:/code
+      - $PWD:/tmp
