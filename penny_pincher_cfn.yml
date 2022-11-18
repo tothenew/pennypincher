@@ -32,7 +32,7 @@ Parameters:
     Description: 'Takes the AWS region abbreviation (e.g. ap-south-1 for Mumbai) in which SES is configured'
     Type: 'String'
     Default: 'us-east-1'
-  ReportBucekt:
+  ReportBucket:
     Description: 'A S3 bucket to store reports'
     Type: "String"
   ImageUri:
@@ -40,13 +40,12 @@ Parameters:
     Type: "String"
 
 
+
 Resources:
   S3Bucket:
     Type: 'AWS::S3::Bucket'
     Properties:
       BucketName: !Ref ReportBucket
-
-Resources:
   ServiceRoleForLambda:
     Type: 'AWS::IAM::Role'
     Description: 'IAM role for Penny Pincher'
@@ -107,16 +106,14 @@ Resources:
     Description: 'Generates Cost report with all the idle resources information and sends it to email or slack or both'
     Properties:
       FunctionName: 'Penny-Pincher-Docker-Lambda'
-      Runtime: 'python3.8'
+      Architectures:
+        - x86_64
       Role: !GetAtt ServiceRoleForLambda.Arn
-      Handler: 'main.lambda_handler'
       Code:
         ImageUri: !Ref ImageUri
       PackageType: 'Image'
       Timeout: 900
       MemorySize: 1024
-      Layers:
-        - !Ref LambdaLayer
       Environment:
         Variables:
           ACCOUNT_NAME: !Ref AccountName

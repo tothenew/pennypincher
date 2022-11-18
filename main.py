@@ -20,7 +20,6 @@ def lambda_handler(event=None, context=None):
     resource_config = final_config['resources']
     env_config = final_config['config']['env']
     env_config = check_env(env_config)
-    
     channel_name =  env_config['channel_name']   #Slack Channel Name
     from_address = env_config['from_address']               #SES verified email address from which email is to be sent
     to_address = env_config['to_address']         #Email addresses of recipents (Comma Separated)
@@ -38,40 +37,35 @@ def lambda_handler(event=None, context=None):
     logging.basicConfig(level=logging.WARNING)
     logger = logging.getLogger()
     try:
+        print(reporting_platform.lower().split(','))
         resource = Resources(resource_config)    #Object for generating report
         html_obj = HTML()               #Object for generating html page
         ses_obj = SES(from_address=from_address, to_address=to_address, ses_region=ses_region)    #Object to send email
-        slack_obj = Slackalert(channel=channel_name, webhook=webhook_url)           #object to send report to slack
+        slack_obj = Slackalert(channel=channel_name, webhook_url=webhook_url)           #object to send report to slack
 
         html, resource_info, total_savings = resource.get_report(html_obj, slack_obj)
         print("Total savings: $" + str(round(total_savings, 2)))
-        
-        if reporting_platform.lower().split(',') == ['email']:
+        current_datetime=datetime.utcnow().isoformat("T","minutes").replace(":", "-")
+        dir_path=f"/tmp/pennypincher_reports/{current_datetime}"
+        os.makedirs(dir_path,exist_ok=True)
+        html_path = dir_path+ '/pennypincher_findings.html'
+        header = '<h3><b>Cost Optimization Report |  ' + account_name + ' | Total Savings: $'+ str(round(total_savings, 2)) + '</h3></b>'
+        html = header + html
+        f = open(html_path, "w+")
+        f.write(html)
+        f.close
+        print("Findings File is at: pennypincher_findings.html")
+        if len(resource_info) > 0:
+            csv_obj = GENCSV(resource_info, total_savings, dir_path, current_datetime)
+            csv_obj.generate_csv()
+            print(f"CSV Report is at: {dir_path} directory")
+        if 'email' in  reporting_platform.lower().split(','):
             ses_obj.ses_sendmail(
                 sub='Cost Optimization Report | ' + account_name + ' | Total Savings: $'+ str(round(total_savings, 2)),
                 html=html)
-        elif reporting_platform.lower().split(',') == ['slack']:
-            slack_obj.slack_alert(resource_info, account_name, str(round(total_savings, 2)))
-        elif (( 'email' in reporting_platform.lower().split(',')) and ('slack' in reporting_platform.lower().split(','))):
-            ses_obj.ses_sendmail(
-                sub='Cost Optimization Report | ' + account_name + ' | Total Savings: $' + str(round(total_savings, 2)),
-                html=html)
-            slack_obj.slack_alert(resource_info, account_name, str(round(total_savings, 2)))
-        else:
-            header = '<h3><b>Cost Optimization Report |  ' + account_name + ' | Total Savings: $'+ str(round(total_savings, 2)) + '</h3></b>'
-            html = header + html
-            current_datetime=datetime.utcnow().isoformat("T","minutes").replace(":", "-")
-            dir_path=f"{os.getcwd()}/pennypincher_reports/{current_datetime}"
-            os.makedirs(dir_path,exist_ok=True)
-            html_path = dir_path+ '/pennypincher_findings.html'
-            f = open(html_path, "w+")
-            f.write(html)
-            f.close
-            print("Findings File is at: pennypincher_findings.html")
-            if len(resource_info) > 0:
-                csv_obj = GENCSV(resource_info, total_savings, dir_path, current_datetime)
-                csv_obj.generate_csv()
-                print(f"CSV Report is at: {dir_path} directory")
+        if 'slack' in  reporting_platform.lower().split(','):
+            print("Sending report to slack .....")
+            slack_obj.slack_alert(resource_info, account_name, str(round(total_savings, 2)))            
         ## Sending report in s3   
         if 's3' in  reporting_platform.lower().split(','):
             uploadDirectory(dir_path,report_bucket,current_datetime)
