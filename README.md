@@ -72,7 +72,7 @@ Users just need to uncomment the resource and config block to change the default
 
 ```
 1. CHANNEL_NAME:- Slack Channel Name
-2. SLACK_TOKEN:- Slack Access Token (Ref: [How to quickly get and use a Slack API token](https://api.slack.com/tutorials/tracks/getting-a-token))
+2. WEBHOOK_URL:- Slack Channel Webhook URL (Ref: [Sending Message Using Incoming Webhooks](https://api.slack.com/messaging/webhooks))
 3. FROM_ADDRESS* :- Sender Email Address
 4. TO_ADDRESS* :- Receiver Email Address
 5. SES_REGION

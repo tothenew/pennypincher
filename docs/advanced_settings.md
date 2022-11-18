@@ -25,7 +25,7 @@ The *SES* related variables are to be given if you want to receive report over e
 
 The *Slack* related variables are to be given if you want to receive report on your slack channel.
 *    **channel_name**: Give the name of the slack channel on which report is to be sent.
-*    **slack_token**: Give the OAuth token for your Slack App.
+*    **webhook_url**: Give the webhook url of your slack channel.
 
 
 ### Architecture Diagram 

@@ -22,7 +22,6 @@ def lambda_handler(event=None, context=None):
     env_config = check_env(env_config)
     
     channel_name =  env_config['channel_name']   #Slack Channel Name
-    slack_token = env_config['slack_token']                  #Slack Channel Token
     from_address = env_config['from_address']               #SES verified email address from which email is to be sent
     to_address = env_config['to_address']         #Email addresses of recipents (Comma Separated)
     ses_region = env_config['ses_region']                   #Region where SES is configured
@@ -42,7 +41,7 @@ def lambda_handler(event=None, context=None):
         resource = Resources(resource_config)    #Object for generating report
         html_obj = HTML()               #Object for generating html page
         ses_obj = SES(from_address=from_address, to_address=to_address, ses_region=ses_region)    #Object to send email
-        slack_obj = Slackalert(channel=channel_name, slack_token=slack_token, webhook=webhook_url)           #object to send report to slack
+        slack_obj = Slackalert(channel=channel_name, webhook=webhook_url)           #object to send report to slack
 
         html, resource_info, total_savings = resource.get_report(html_obj, slack_obj)
         print("Total savings: $" + str(round(total_savings, 2)))
@@ -52,12 +51,12 @@ def lambda_handler(event=None, context=None):
                 sub='Cost Optimization Report | ' + account_name + ' | Total Savings: $'+ str(round(total_savings, 2)),
                 html=html)
         elif reporting_platform.lower().split(',') == ['slack']:
-            slack_obj.slack_alert(resource_info, account_name, str(round(total_savings, 2)), webhook_url)
+            slack_obj.slack_alert(resource_info, account_name, str(round(total_savings, 2)))
         elif (( 'email' in reporting_platform.lower().split(',')) and ('slack' in reporting_platform.lower().split(','))):
             ses_obj.ses_sendmail(
                 sub='Cost Optimization Report | ' + account_name + ' | Total Savings: $' + str(round(total_savings, 2)),
                 html=html)
-            slack_obj.slack_alert(resource_info, account_name,webhook_url, str(round(total_savings, 2)))
+            slack_obj.slack_alert(resource_info, account_name, str(round(total_savings, 2)))
         else:
             header = '<h3><b>Cost Optimization Report |  ' + account_name + ' | Total Savings: $'+ str(round(total_savings, 2)) + '</h3></b>'
             html = header + html

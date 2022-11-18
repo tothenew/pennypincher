@@ -16,8 +16,8 @@ Parameters:
     Description: 'Takes slack channel name as input. Keep the defaults in case slack notifications are not required'
     Type: 'String'
     Default: '-'
-  SlackToken:
-    Description: 'Takes slack token as input . Keep the defaults in case slack notifications are not required'
+  WebhookUrl:
+    Description: 'Takes slack webhook url as input . Keep the defaults in case slack notifications are not required'
     Type: 'String'
     Default: '-'
   SESFromEmailAddress:
@@ -123,8 +123,8 @@ Resources:
           CONFIG: !Ref CloudwatchConfig
           REPORTING_PLATFORM: !Ref ReportingPlatform
           CHANNEL_NAME: !Ref SlackChannelName
-          SLACK_TOKEN: !Ref SlackToken
           FROM_ADDRESS: !Ref SESFromEmailAddress
           TO_ADDRESS: !Ref SESToEmailAddress
           SES_REGION: !Ref SESRegion
           REPORT_BUCKET: !Ref ReportBucket
+          WEBHOOK_URL: !Ref WebhookUrl
