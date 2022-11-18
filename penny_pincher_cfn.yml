@@ -51,7 +51,7 @@ Resources:
     Type: 'AWS::IAM::Role'
     Description: 'IAM role for Penny Pincher'
     Properties:
-      RoleName: 'Penny-Pincher-Lambda-Role'
+      RoleName: 'Penny-Pincher-Docker-Lambda-Role'
       AssumeRolePolicyDocument:
         Version: '2012-10-17'
         Statement:
@@ -106,7 +106,7 @@ Resources:
     Type: 'AWS::Lambda::Function'
     Description: 'Generates Cost report with all the idle resources information and sends it to email or slack or both'
     Properties:
-      FunctionName: 'Penny-Pincher'
+      FunctionName: 'Penny-Pincher-Docker-Lambda'
       Runtime: 'python3.8'
       Role: !GetAtt ServiceRoleForLambda.Arn
       Handler: 'main.lambda_handler'
