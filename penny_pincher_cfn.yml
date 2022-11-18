@@ -1,9 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 
 Parameters:
-  S3BucketName:
-    Description: 'Takes S3 bucket name which contains lambda layer and code zip files'
-    Type: 'String'
   AccountName:
     Description: 'Takes account name as input'
     Type: 'String'
@@ -38,6 +35,10 @@ Parameters:
   ReportBucekt:
     Description: 'A S3 bucket to store reports'
     Type: "String"
+  ImageUri:
+    Description: "Docker Image URI"
+    Type: "String"
+
 
 Resources:
   S3Bucket:
@@ -93,12 +94,12 @@ Resources:
                        {
                                   "Sid": "VisualEditor1",
                                   "Effect": "Allow",
-                                  "Action": "s3:GetObject",
-                                  "Resource": "arn:aws:s3:::${S3BucketName}/*"
+                                  "Action": "*",
+                                  "Resource":"arn:aws:s3:::${ReportBucket}/*"
                       }
                    ]
                }'
-            - { S3BucketName: !Ref S3BucketName }
+            - { ReportBucket: !Ref ReportBucket }
 
 
   LambdaFunction:
@@ -110,9 +111,8 @@ Resources:
       Role: !GetAtt ServiceRoleForLambda.Arn
       Handler: 'main.lambda_handler'
       Code:
-        S3Bucket: !Ref S3BucketName
-        S3Key: 'code.zip'
-      PackageType: 'Zip'
+        ImageUri: !Ref ImageUri
+      PackageType: 'Image'
       Timeout: 900
       MemorySize: 1024
       Layers:
