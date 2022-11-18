@@ -60,6 +60,8 @@ Resources:
                 - 'lambda.amazonaws.com'
             Action:
               - 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AmazonSESFullAccess
       Policies:
         - PolicyName: 'Penny-Pincher-Lambda-Inline-Policy'
           PolicyDocument: !Sub
