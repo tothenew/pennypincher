@@ -6,7 +6,7 @@ import slack
 import requests
 import json
 from datetime import date
-
+import boto3
 
 class Slackalert:
     """To send cost report on slack."""
@@ -28,6 +28,7 @@ class Slackalert:
         try:   
             date_obj = date.today()
             date_obj_format = date_obj.strftime("%d %b %Y")
+            
             print("total saving is"+total_savings)
             #list to store fields
             field = []

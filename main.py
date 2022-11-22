@@ -65,7 +65,8 @@ def lambda_handler(event=None, context=None):
                 html=html)
         if 'slack' in  reporting_platform.lower().split(','):
             print("Sending report to slack .....")
-            slack_obj.slack_alert(resource_info, account_name, str(round(total_savings, 2)))            
+            #slack_obj.slack_alert(resource_info, account_name, str(round(total_savings, 2)))  
+            slack_obj.slack_alert(resource_info, account_name, str(round(total_savings, 2)))           
         ## Sending report in s3   
         if 's3' in  reporting_platform.lower().split(','):
             uploadDirectory(dir_path,report_bucket,current_datetime)
