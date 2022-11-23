@@ -11,6 +11,7 @@ from utils.config_parser import parse_config
 from utils.config_parser import merges
 from utils.config_parser import check_env
 from utils.s3_send import uploadDirectory
+
 def lambda_handler(event=None, context=None):
     print("Starting PennyPincher")
 
@@ -50,7 +51,7 @@ def lambda_handler(event=None, context=None):
         os.makedirs(dir_path,exist_ok=True)
         html_path = dir_path+ '/pennypincher_findings.html'
         header = '<h3><b>Cost Optimization Report |  ' + account_name + ' | Total Savings: $'+ str(round(total_savings, 2)) + '</h3></b>'
-        html = header + html
+        html= header + html
         f = open(html_path, "w+")
         f.write(html)
         f.close
@@ -63,13 +64,14 @@ def lambda_handler(event=None, context=None):
             ses_obj.ses_sendmail(
                 sub='Cost Optimization Report | ' + account_name + ' | Total Savings: $'+ str(round(total_savings, 2)),
                 html=html)
-        if 'slack' in  reporting_platform.lower().split(','):
-            print("Sending report to slack .....")
-            slack_obj.slack_alert(resource_info, account_name, str(round(total_savings, 2)))  
         ## Sending report in s3   
         if 's3' in  reporting_platform.lower().split(','):
             uploadDirectory(dir_path,report_bucket,current_datetime)
 
+        if 'slack' in  reporting_platform.lower().split(','):
+            print("Sending report to slack .....")
+            slack_obj.slack_alert(resource_info, account_name, str(round(total_savings, 2)),report_bucket,current_datetime,reporting_platform)  
+        
     except Exception as e:
         logger.error("Error on line {} in main.py".format(sys.exc_info()[-1].tb_lineno) +
                      " | Message: " + str(e))
