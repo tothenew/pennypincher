@@ -11,6 +11,7 @@ from utils.config_parser import parse_config
 from utils.config_parser import merges
 from utils.config_parser import check_env
 from utils.s3_send import uploadDirectory
+from utils.filemanager import FileManager
 def lambda_handler(event=None, context=None):
     print("Starting PennyPincher")
 
@@ -48,13 +49,13 @@ def lambda_handler(event=None, context=None):
         current_datetime=datetime.utcnow().isoformat("T","minutes").replace(":", "-")
         dir_path=f"/tmp/pennypincher_reports/{current_datetime}"
         os.makedirs(dir_path,exist_ok=True)
-        html_path = dir_path+ '/pennypincher_findings.html'
+        html_path = dir_path+ '/pennypincher_findings1.html'
         header = '<h3><b>Cost Optimization Report |  ' + account_name + ' | Total Savings: $'+ str(round(total_savings, 2)) + '</h3></b>'
         html = header + html
-        f = open(html_path, "w+")
-        f.write(html)
-        f.close
+        with FileManager(html_path, 'w') as f:
+            f.write(html)
         print("Findings File is at: pennypincher_findings.html")
+        file_name = "/tmp/pennypincher_reports"
         if len(resource_info) > 0:
             csv_obj = GENCSV(resource_info, total_savings, dir_path, current_datetime)
             csv_obj.generate_csv()
@@ -69,7 +70,7 @@ def lambda_handler(event=None, context=None):
         ## Sending report in s3   
         if 's3' in  reporting_platform.lower().split(','):
             uploadDirectory(dir_path,report_bucket,current_datetime)
-
+            
     except Exception as e:
         logger.error("Error on line {} in main.py".format(sys.exc_info()[-1].tb_lineno) +
                      " | Message: " + str(e))
