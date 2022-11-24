@@ -49,7 +49,7 @@ def lambda_handler(event=None, context=None):
         current_datetime=datetime.utcnow().isoformat("T","minutes").replace(":", "-")
         dir_path=f"/tmp/pennypincher_reports/{current_datetime}"
         os.makedirs(dir_path,exist_ok=True)
-        html_path = dir_path+ '/pennypincher_findings1.html'
+        html_path = dir_path+ '/pennypincher_findings.html'
         header = '<h3><b>Cost Optimization Report |  ' + account_name + ' | Total Savings: $'+ str(round(total_savings, 2)) + '</h3></b>'
         html = header + html
         with FileManager(html_path, 'w') as f:
