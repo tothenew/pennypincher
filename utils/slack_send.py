@@ -34,7 +34,7 @@ class Slackalert:
                     'v4':'s3v4',
                     'v2':'s3'
                     }
-            session = boto3.Session(profile_name='test-1')
+            session = boto3.Session()
             
             s3Client = session.client("s3",
                                     config=Config(signature_version=s3_signature['v4'])
