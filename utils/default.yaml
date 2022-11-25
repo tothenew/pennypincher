@@ -49,7 +49,9 @@ config:
     from_address: '-'                #SES verified email address from which email is to be sent
     to_address: '-'         #Email addresses of recipents (Comma Separated)
     ses_region: '-'                    #Region where SES is configured
-    reporting_platform: 'S3'    #Email/Slack/Email and Slack
+    reporting_platform: '-'    #Email/Slack/Email and Slack
     account_name: 'AWS Account'
-    report_bucket: ''
+    report_bucket: '-'
+    
+    
     

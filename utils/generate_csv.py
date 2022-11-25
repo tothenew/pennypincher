@@ -1,8 +1,10 @@
-import os
-import logging
-import sys
 import csv
+import logging
+import os
+import sys
 from datetime import datetime
+import boto3
+
 
 class GENCSV:
     """Generates XLSX Sheet"""
@@ -13,6 +15,7 @@ class GENCSV:
         self.current_datetime = current_datetime
         logging.basicConfig(level=logging.WARNING)
         self.logger = logging.getLogger()
+        
 
     def generate_csv(self):
         try:
@@ -21,15 +24,18 @@ class GENCSV:
                 summary_writer = csv.writer(summary)
                 summary_writer.writerows([self.resource_info[list(self.resource_info.keys())[0]]['Resources'][0]])
                 for resource_type in self.resource_info.keys():
-                    summary_writer.writerows(self.resource_info[resource_type]['Resources'][1:])
+                    summary_writer.writerows(self.resource_info[resource_type]['Resources'][1:])                        
             
             #Generating individual resource report
             for resource_type in self.resource_info.keys():
                 with open(f"{self.dir_path}/pennypincher_{resource_type}_report.csv", "w", newline="") as f:
                     writer = csv.writer(f)
                     writer.writerows(self.resource_info[resource_type]['Resources'])
+
         except Exception as e:
             self.logger.error(
                 "Error on line {} in generate_csv.py".format(sys.exc_info()[-1].tb_lineno) + " | Message: " +
                 str(e))
             sys.exit(1)
+
+  
