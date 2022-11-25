@@ -12,6 +12,7 @@ from utils.config_parser import merges
 from utils.config_parser import check_env
 from utils.s3_send import uploadDirectory
 from utils.filemanager import FileManager
+
 def lambda_handler(event=None, context=None):
     print("Starting PennyPincher")
 
@@ -64,13 +65,12 @@ def lambda_handler(event=None, context=None):
             ses_obj.ses_sendmail(
                 sub='Cost Optimization Report | ' + account_name + ' | Total Savings: $'+ str(round(total_savings, 2)),
                 html=html)
-        if 'slack' in  reporting_platform.lower().split(','):
-            print("Sending report to slack .....")
-            slack_obj.slack_alert(resource_info, account_name, str(round(total_savings, 2)))            
         ## Sending report in s3   
         if 's3' in  reporting_platform.lower().split(','):
             uploadDirectory(dir_path,report_bucket,current_datetime)
-            
+        if 'slack' in  reporting_platform.lower().split(','):
+            print("Sending report to slack .....")
+            slack_obj.slack_alert(resource_info, account_name, str(round(total_savings, 2)),report_bucket,current_datetime,reporting_platform)                   
     except Exception as e:
         logger.error("Error on line {} in main.py".format(sys.exc_info()[-1].tb_lineno) +
                      " | Message: " + str(e))

@@ -41,7 +41,10 @@ class HTML:
     def header_to_html(self, header):
         html = "<table><tr>"
         for i in header:
-            html = html + "<th>%s</th>" % (i)
+            if i == "Criteria":
+                continue
+            else:
+                html = html + "<th>%s</th>" % (i)
         html = html + "</tr>"
         return html
 
@@ -51,7 +54,10 @@ class HTML:
         for result in body:
             html = html + '<tr>'
             for i in result:
-                html = html + "<td>%s</td>" % (i)
+                if result.index(i) == 9:
+                    continue
+                else:
+                    html = html + "<td>%s</td>" % (i)
             html = html + "</tr>"
         html = html + "</table>"
         html = html + "<br><b> Total Savings = $%s </b>" % (round(savings, 2))
@@ -65,11 +71,13 @@ class HTML:
             ebs_table = self.body_to_html(ebs_list, savings)  # Table Values
             msg_list.append([ebs_table, resource_name])  # Append value to final result list
             html_infix = self.get_HTML_infix()
+            criteria = "<br><h4>"+headers[9]+" : "+ebs_list[0][9]+"</h4>"
             for resource in msg_list:
-                html = html_infix + resource[1] + " : </h4>" + html + resource[0]
+                html = html_infix + resource[1] + " : </h4>" + criteria + html + resource[0]
             return html
         except Exception as e:
             self.logger.error(
                 "Error on line {} in html_functions.py".format(sys.exc_info()[-1].tb_lineno) + " | Message: " +
                 str(e))
             sys.exit(1)
+

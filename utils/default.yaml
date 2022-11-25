@@ -53,5 +53,3 @@ config:
     account_name: 'AWS Account'
     report_bucket: '-'
     
-    
-    
