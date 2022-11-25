@@ -39,29 +39,13 @@ Parameters:
     Description: "Docker Image URI"
     Type: "String"
 
-Conditions:
-  CreateReportBucket: !Equals
-    - !Ref ReportBucket
-    - ""
+
 
 Resources:
-  ManagedReportBucket:
-    Type: AWS::S3::Bucket
-    Condition: CreateReportBucket
+  S3Bucket:
+    Type: 'AWS::S3::Bucket'
     Properties:
-      BucketName:  !Join
-      - "-"
-      - - "pennypincher-managedbucket"
-        - !Select
-          - 0
-          - !Split
-            - "-"
-            - !Select
-              - 2
-              - !Split
-                - "/"
-                - !Ref "AWS::StackId"
-      
+      BucketName: !Ref ReportBucket
   ServiceRoleForLambda:
     Type: 'AWS::IAM::Role'
     Description: 'IAM role for Penny Pincher'
@@ -116,7 +100,7 @@ Resources:
                       }
                    ]
                }'
-            - { ReportBucket: !If [ CreateReportBucket, !Ref ManagedReportBucket, !Ref ReportBucket ] }
+            - { ReportBucket: !Ref ReportBucket }
 
 
   LambdaFunction:
@@ -141,6 +125,5 @@ Resources:
           FROM_ADDRESS: !Ref SESFromEmailAddress
           TO_ADDRESS: !Ref SESToEmailAddress
           SES_REGION: !Ref SESRegion
-          REPORT_BUCKET: !If [ CreateReportBucket, !Ref ManagedReportBucket, !Ref ReportBucket ]
+          REPORT_BUCKET: !Ref ReportBucket
           WEBHOOK_URL: !Ref WebhookUrl
-           
