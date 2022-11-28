@@ -97,7 +97,7 @@ Advanced configuration details can be found [here](https://github.com/tothenew/p
 
 The following table lists the criteria kept to decide if the resource is idle or not and mentions the recommendations which can help in cost saving. This is configurable via [config.yaml](https://github.com/tothenew/pennypincher/blob/release_1.0/config.yaml)
 
-![Alt](pennypincher/docs/images/main/recommendation_criteria.png)
+![Alt](/images/main/recommendation_criteria.png)
 
 
 ### FAQ
@@ -117,8 +117,6 @@ The following table lists the criteria kept to decide if the resource is idle or
 4. Can I override the condition criteria?
 
     Yes, it can be overridden via [config.yaml](https://github.com/tothenew/pennypincher/blob/release_1.0/config.yaml)
-
-   ![Alt](/images/main/recommendation_criteria.png)
 
 5. Potential Cost saving is calculated monthly or Yearly
 
