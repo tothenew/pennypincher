@@ -97,6 +97,8 @@ Advanced configuration details can be found [here](https://github.com/tothenew/p
 
 The following table lists the criteria kept to decide if the resource is idle or not and mentions the recommendations which can help in cost saving. This is configurable via [config.yaml](https://github.com/tothenew/pennypincher/blob/release_1.0/config.yaml)
 
+![Alt](pennypincher/docs/images/main/recommendation_criteria.png)
+
 
 ### FAQ
 
