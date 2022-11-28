@@ -12,6 +12,7 @@ from utils.config_parser import merges
 from utils.config_parser import check_env
 from utils.s3_send import uploadDirectory
 from utils.filemanager import FileManager
+from utils.generate_inv import GENINV
 
 def lambda_handler(event=None, context=None):
     print("Starting PennyPincher")
@@ -45,7 +46,8 @@ def lambda_handler(event=None, context=None):
         ses_obj = SES(from_address=from_address, to_address=to_address, ses_region=ses_region)    #Object to send email
         slack_obj = Slackalert(channel=channel_name, webhook_url=webhook_url)           #object to send report to slack
 
-        html, resource_info, total_savings = resource.get_report(html_obj, slack_obj)
+        print(html_obj)
+        html, resource_info, total_savings, inventory_info = resource.get_report(html_obj, slack_obj)
         print("Total savings: $" + str(round(total_savings, 2)))
         current_datetime=datetime.utcnow().isoformat("T","minutes").replace(":", "-")
         dir_path=f"/tmp/pennypincher_reports/{current_datetime}"
@@ -61,6 +63,10 @@ def lambda_handler(event=None, context=None):
             csv_obj = GENCSV(resource_info, total_savings, dir_path, current_datetime)
             csv_obj.generate_csv()
             print(f"CSV Report is at: {dir_path} directory")
+        if len(inventory_info) > 0 :
+            inv_obj = GENINV(inventory_info, dir_path, current_datetime)
+            inv_obj.generate_inv()
+            print(f"Inventory is at: {dir_path} directory")
         if 'email' in  reporting_platform.lower().split(','):
             ses_obj.ses_sendmail(
                 sub='Cost Optimization Report | ' + account_name + ' | Total Savings: $'+ str(round(total_savings, 2)),
