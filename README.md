@@ -10,7 +10,7 @@ Penny Pincher is a tool that identifies all the resources which are provisioned 
 ### Features
 
 1. Generates a report consisting of all the idle resources in the account and potential savings.
-2. Two platforms are supported for receiving the report, one is email and another is slack.
+2. Three platforms are supported for receiving the report, That are email,slack and s3.
 3. The number of days for which resource metrics (usage) is to be monitored can be set by the end user.
 4. The solution is easily deployable as the whole setup can be done using AWS Cloudformation or Docker.
 
@@ -23,6 +23,7 @@ Penny Pincher is a tool that identifies all the resources which are provisioned 
 5. Elasticsearch
 6. Loadbalancer
 7. RDS
+8. Redshift
 
 
 ### How does it work?
@@ -34,9 +35,10 @@ Penny Pincher is a tool that identifies all the resources which are provisioned 
 1. To scan the entire account, the IAM user or keys should have ReadOnlyAccess.
 2. Supported Python version v3 and above.
 3. Supported Boto3 version v1.17.66 and above
+4. we can also use locally
 
 
-### Quick Setup With Docker
+### Quick Setup With Docker 
 
 
 To start Penny Pincher, run the following command
@@ -46,21 +48,20 @@ export AWS_SECRET_ACCESS_KEY=YOUR_AWS_SECRET_ACCESS_KEY
 export AWS_DEFAULT_REGION=AWS_REGION
 ```
 ```bash
-docker-compose up --build
+docker run -ti -v $PWD:/code -e AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID -e AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY -e AWS_SESSION_TOKEN=$AWS_SESSION_TOKEN -e AWS_DEFAULT_REGION='us-east-1' ttnd/pennypincher:v1.0   python3 main.py
 ```
-After the setup is complete, it will generate the report in an HTML and CSV format.
- 
-
-![Alt](/docs/images/main/sample_email_report.png)
-
-For detailed instructions, refer to [Setup through Docker Compose](docs/setup_through_docker.md)
-
 ### Local
 
 1. Set up AWS CLI or Generate the access tokens and set them as environment variables.
 2. `pip3 install -r requirements.txt`
 3. `python3 main.py`
 
+After the setup is complete, it will generate the report in an HTML and CSV format.
+ 
+
+![Alt](/docs/images/main/sample_email_report.png)
+
+For detailed instructions, refer to [Setup through Docker Compose](docs/setup_through_docker.md)
 
 ### Configuration Files and Usage
 Pennnypincher finds the idle resources based on the default criteria mentioned in the below table.
@@ -80,7 +81,9 @@ Users just need to uncomment the resource and config block to change the default
     1. email*
     2. email* and slack
     3. slack
-    4. Generate on Local (Default)
+    4. s3 Bucket
+    5. Generate on Local (Default)
+
 8. ACCOUNT_NAME :- AWS Account Name
 ```
 
@@ -112,6 +115,8 @@ The following table lists the criteria kept to decide if the resource is idle or
 4. Can I override the condition criteria?
 
     Yes, it can be overridden via [config.yaml](https://github.com/tothenew/pennypincher/blob/release_1.0/config.yaml)
+
+   ![Alt](/images/main/recommendation_criteria.png)
 
 5. Potential Cost saving is calculated monthly or Yearly
 
