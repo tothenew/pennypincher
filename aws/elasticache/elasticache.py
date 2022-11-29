@@ -12,6 +12,8 @@ class Elasticache:
     def __init__(self, headers, headers_inventory, config=None, regions=None):
         try:
          self.config = config.get('ELASTICACHE')
+         self.headers = headers
+         self.headers_inventory = headers_inventory
         except KeyError as e:
             self.logger.error(
                 "Config for ELASTICACHE missing from config.cfg | Message: " + str(e))        

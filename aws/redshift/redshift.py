@@ -13,6 +13,8 @@ class Redshift:
     def __init__(self, headers, headers_inventory, config=None, regions=None):
         try:
          self.config = config.get('REDSHIFT')
+         self.headers = headers
+         self.headers_inventory = headers_inventory
         except KeyError as e:
             self.logger.error(
                 "Config for REDSHIFT missing from config.cfg | Message: " + str(e))       

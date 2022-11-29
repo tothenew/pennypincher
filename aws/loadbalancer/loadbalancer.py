@@ -12,6 +12,8 @@ class Loadbalancer:
     def __init__(self, headers, headers_inventory, config=None, regions=None):
         try:
          self.config = config.get('LB')
+         self.headers = headers
+         self.headers_inventory = headers_inventory
         except KeyError as e:
             self.logger.error(
                 "Config for LB missing from config.cfg | Message: " + str(e))       

@@ -13,6 +13,8 @@ class Elasticsearch:
     def __init__(self, headers, headers_inventory, config=None, regions=None):
         try:
          self.config = config.get('ELASTICSEARCH')
+         self.headers = headers
+         self.headers_inventory = headers_inventory
         except KeyError as e:
             self.logger.error(
                 "Config for ELASTICSEARCH missing from config.cfg | Message: " + str(e))       
