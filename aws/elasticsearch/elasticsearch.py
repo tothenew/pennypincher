@@ -54,7 +54,7 @@ class Elasticsearch:
         pricing = Pricing(pricing_client, reg)
         return client, cloudwatch, pricing
 
-    def _get_parameters(self, es, reg, cloudwatch, pricing, es_list):    
+    def _get_parameters(self, es, reg, cloudwatch, pricing, es_list, elasticsearch_inv_list):    
         """Returns list containing idle Elasticsearch instance information."""               
         elasticsearch = []
         monthly_cost_master = 0                 
@@ -106,12 +106,27 @@ class Elasticsearch:
                 round(monthly_cost_master + monthly_cost_data, 2)
             ]
             es_list.append(elasticsearch)
-        return es_list
+        else:
+            elasticsearch_inv = [
+                es["DomainName"],
+                es["DomainName"],
+                "ELASTICSEARCH",
+                instance_type,
+                es['VPCOptions']['VPCId'],
+                instance_count,
+                reg
+                ]
+            elasticsearch_inv_list.append(elasticsearch_inv)
+        return es_list, elasticsearch_inv_list
     
     def get_result(self):  
         """Returns a list of lists which contains headings and idle Elasticsearch instance information."""
         try:
             es_list = []
+            elasticsearch_inv_list = []
+            headers_inv = [
+                'ResourceID','ResouceName','ServiceName','Type','VPC', 'State','Region'
+            ]
             headers=[   'ResourceID','ResouceName','ServiceName','Type','VPC',
                         'State','Region','Finding','EvaluationPeriod (seconds)','Criteria','Saving($)'
                     ]
@@ -120,13 +135,13 @@ class Elasticsearch:
                 client, cloudwatch, pricing = self._get_clients(reg)
                 for domainName in self._list_elasticsearch(client):
                     es = self._describe_elasticsearch(client, domainName["DomainName"])
-                    es_list= self._get_parameters(es, reg, cloudwatch, pricing, es_list)
+                    es_list, elasticsearch_inv_list = self._get_parameters(es, reg, cloudwatch, pricing, es_list, elasticsearch_inv_list)
                     
 
             #To fetch top 10 resources with maximum saving.
             es_sorted_list = sorted(es_list, key=lambda x: x[10], reverse=True)
             total_savings = self._get_savings(es_sorted_list)
-            return {'resource_list': es_sorted_list, 'headers': headers, 'savings': total_savings}
+            return {'resource_list': es_sorted_list, 'headers': headers, 'savings': total_savings}, {'headers_inv': headers_inv, 'inv_list': elasticsearch_inv_list}
 
         except exceptions.ClientError as error:
             handle_limit_exceeded_exception(error, 'elasticsearch.py')

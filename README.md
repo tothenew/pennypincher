@@ -7,13 +7,20 @@
 
 Penny Pincher is a tool that identifies all the resources which are provisioned but are not being used i.e. are idle and notifies you about the potential savings over email and slack.
 
+
+### Scope
+The tool is created by considering three types of user 
+1. Simple user - An end-to-end Cloudformation which will deploy the tool as a lambda function, 2.lambda invocation will generate the report and will be shared over slack, email, and S3.
+2. Power-user - A docker run command which will allow users to generate the reports on their local machine
+3. Dev user - The user can work as a developer by contributing to the repository.
 ### Features
 
 1. Generates a report consisting of all the idle resources in the account and potential savings.
-2. Three platforms are supported for receiving the report, That are email,slack and s3.
-3. The number of days for which resource metrics (usage) is to be monitored can be set by the end user.
-4. The solution is easily deployable as the whole setup can be done using AWS Cloudformation or Docker.
-
+2. Three platforms; slack,email and S3 are supported for receiving the report.
+3. HTML and csv reports are supported.
+4. The end user can modify the default cloudwatch metric values using a configuration file with Global environment variable support.
+5. The solution is easily deployable as the whole setup can be done using AWS Cloudformation, docker and local.
+6. End user also recieve an inventory file in csv format of all the scanned resources, it helps in draw out the comparison and coverage of the tool/
 ### Supported Services & Regions
  The tool crawls all the regions to get the findings for the supported services 
 1. EBS
@@ -27,8 +34,7 @@ Penny Pincher is a tool that identifies all the resources which are provisioned 
 
 
 ### How does it work?
- Boto3 API is used to scan the resources in the account according to the criteria defined in the configuration file and generate a report. 
-
+ Boto3 API is used to scan supported the resources in the account, scanned result list out the idle resources based resource and cloudwatch metrics. Idle resource further run down our pricing matrix to genrete the reports in csv and html format. Report shows the potential cost saving amount for each resources. The end user can recieve report via slack or email and cab also store them in s3 buckets.
 
 ### Pre-requisites
 
@@ -129,6 +135,11 @@ The following table lists the criteria kept to decide if the resource is idle or
 1. The European region's response to AWS API is not consistent with other regions. So European regions cause unexpected issues sometimes.
 
 ### Features Releasing in 1.0
-   1. Working on supporting the data output in JSON format. This will allow for additional output formats like xlsx and CSV.
-   2. The user's input is not enabled for configuring the recommendation criteria.
-   3. Send report via slack webhook 
+1. End-to-end Cloudformation run which can send reports to s3, slack, and email.
+2. Functionality to configure Cloudwatatch and resource metric via config files.
+3. Global environment variable support
+4. A csv inventory of whole account for comparison and tool coverage.
+
+### Future scope
+1. Cron suppport in clouydformation.
+2. Intellegent trend analysis on shared reports.

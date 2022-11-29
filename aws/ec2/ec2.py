@@ -61,7 +61,7 @@ class ElasticComputeCloud:
         pricing = Pricing(pricing_client, reg)
         return client, cloudwatch, pricing
 
-    def _get_parameters(self, instance, reg, client, cloudwatch, pricing, ec2_list):
+    def _get_parameters(self, instance, reg, client, cloudwatch, pricing, ec2_list, ec2_inv_list):
         """Returns a list containing idle EC2 information."""
         if 'SpotInstanceRequestId' not in instance:
             ec2 = []
@@ -119,13 +119,27 @@ class ElasticComputeCloud:
                     f"Average CPUUtilization < {self.config['avgCpu']} Maximum CPUUtilization < {self.config['maxCpu']} and NetworkIn+NetworkOut < {self.config['netInOut']}",
                     round(savings * 732, 2)
                    ]
-                ec2_list.append(ec2)            
-        return ec2_list
+                ec2_list.append(ec2)
+            else:
+                ec2_inv = [
+                    instance['InstanceId'],
+                    instance_name,
+                    "EC2",
+                    instance['InstanceType'],
+                    vpc_id,
+                    instance['State']['Name'],
+                    reg
+                ]
+                ec2_inv_list.append(ec2_inv)
+        return ec2_list, ec2_inv_list
 
     def get_result(self):  
         """Returns a list of lists which contains headings and idle EC2 information."""
         try:
             ec2_list = []
+            ec2_inv_list = []
+            headers_inv = ['ResourceID','ResouceName','ServiceName','Type','VPC',
+                        'State','Region']
             headers=[   'ResourceID','ResouceName','ServiceName','Type','VPC',
                         'State','Region','Finding','EvaluationPeriod (seconds)','Criteria','Saving($)'
                     ]
@@ -133,12 +147,12 @@ class ElasticComputeCloud:
                 client, cloudwatch, pricing = self._get_clients(reg)
                 for r in self._describe_ec2(client):
                         for instance in r['Instances']:
-                            ec2_list = self._get_parameters(instance,reg, client, cloudwatch, pricing, ec2_list)
+                            ec2_list,ec2_inv_list = self._get_parameters(instance,reg, client, cloudwatch, pricing, ec2_list,ec2_inv_list)
 
             #To fetch top 10 resources with maximum saving.
             ec2_sorted_list = sorted(ec2_list, key=lambda x: x[10], reverse=True)
             total_savings = self._get_savings(ec2_sorted_list)
-            return {'resource_list': ec2_sorted_list, 'headers': headers, 'savings': total_savings}
+            return {'resource_list': ec2_sorted_list, 'headers': headers, 'savings': total_savings}, {'headers_inv':headers_inv, 'inv_list':ec2_inv_list}
 
         except exceptions.ClientError as error:
             if error.response['Error']['Code'] == 'LimitExceededException':

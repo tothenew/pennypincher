@@ -25,6 +25,13 @@ class Slackalert:
         resource_info[resource_name]['Resources'] = resource_list
         resource_info[resource_name]['Savings'] = resource_savings
         return resource_info
+    
+    def get_resource_inventory(self, resource_name, inventory_info, resource_header, resource_list):
+        """Returns all the used resource information in a dictionary format."""
+        resource_list.insert(0, resource_header)
+        inventory_info[resource_name] = {}
+        inventory_info[resource_name]['Resources'] = resource_list
+        return inventory_info
 
     def slack_alert(self, resource_info, account_name, total_savings,bucket_name,current_datetime,reporting_platform):
         try:   

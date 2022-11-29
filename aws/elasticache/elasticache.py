@@ -48,7 +48,7 @@ class Elasticache:
         pricing = Pricing(pricing_client, reg)
         return client, cloudwatch, pricing
         
-    def _get_parameters(self, cache, reg, cloudwatch, pricing, ec_list):
+    def _get_parameters(self, cache, reg, cloudwatch, pricing, ec_list, ec_inv_list):
         """Returns a list containing idle Elasticache instance information."""
 
         cache_id = cache["CacheClusterId"]
@@ -92,12 +92,27 @@ class Elasticache:
                 savings
             ]
             ec_list.append(ec)
-        return ec_list
+        else:
+             ec_inv = [
+                cache_id,
+                cluster_name,
+                "ELASTICACHE",
+                cache_node_type,
+                "-",
+                cache_engine,
+                reg
+             ]
+             ec_inv_list.append(ec_inv)
+        return ec_list, ec_inv_list
 
     def get_result(self): 
         """Returns a list of lists which contains headings and idle Elasticache instance information."""
         try:
             ec_list = []
+            ec_inv_list = []
+            headers_inv= [
+                'ResourceID','ResouceName','ServiceName','Type','VPC','State','Region'
+            ]
             headers=[   'ResourceID','ResouceName','ServiceName','Type','VPC',
                         'State','Region','Finding','EvaluationPeriod (seconds)','Criteria','Saving($)'
                     ]
@@ -110,7 +125,7 @@ class Elasticache:
             #To fetch top 10 resources with maximum saving.
             ec_sorted_list = sorted(ec_list, key=lambda x: x[10], reverse=True)
             total_savings = self._get_savings(ec_sorted_list)
-            return {'resource_list': ec_sorted_list, 'headers': headers, 'savings': total_savings}
+            return {'resource_list': ec_sorted_list, 'headers': headers, 'savings': total_savings}, {'headers_inv': headers_inv, 'inv_list': ec_inv_list}
 
         except exceptions.ClientError as error:
             handle_limit_exceeded_exception(error, 'elasticache.py')

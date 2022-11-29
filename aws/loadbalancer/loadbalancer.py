@@ -81,10 +81,11 @@ class Loadbalancer:
             classic_lb.append(round(elb_price, 2))
         else:
             classic_lb.append(round(elb_price - alb_price, 2))
+        
         lb_list.append(classic_lb)
         return lb_list
     
-    def _get_lb_parameters(self, lb, reg, cloudwatch, alb_price, nlb_price, lb_list):
+    def _get_lb_parameters(self, lb, reg, cloudwatch, alb_price, nlb_price, lb_list, lb_inv_list):
         """Returns a list containing idle loadbalancers information."""
         
         nlb_albs = []
@@ -120,12 +121,28 @@ class Loadbalancer:
             round(price, 2)
             ]
             lb_list.append(nlb_albs)
-        return lb_list
+        else:
+            nlb_albs =[
+            lb['LoadBalancerName'],
+            lb['LoadBalancerName'],
+            "LOADBALANCER",
+            lb['Type'],
+            lb['VpcId'],
+            lb['State']['Code'],
+            reg
+            ]
+            lb_inv_list.append(nlb_albs)
+        return lb_list, lb_inv_list
 
     def get_result(self):  
         """Returns a list of lists which contains headings and idle loadbalancers information."""
         try:
             lb_list = []
+            lb_inv_list = []
+            headers_inv = ['ResourceID','ResouceName','ServiceName','Type','VPC',
+                        'State','Region'
+                        ]
+            
             headers=[   'ResourceID','ResouceName','ServiceName','Type','VPC',
                         'State','Region','Finding','EvaluationPeriod (seconds)','Criteria','Saving($)'
                     ]
@@ -136,12 +153,12 @@ class Loadbalancer:
                 for elb in self._describe_classic_lb(client):
                     lb_list = self._get_clb_parameters(elb, reg, cloudwatch, elb_price, alb_price, lb_list)
                 for lb in self._describe_lb(elbv2_client):
-                    lb_list = self._get_lb_parameters(lb, reg, cloudwatch, alb_price, nlb_price, lb_list)
+                    lb_list, lb_inv_list = self._get_lb_parameters(lb, reg, cloudwatch, alb_price, nlb_price, lb_list, lb_inv_list)
 
             #To fetch top 10 resources with maximum saving.
             lb_sorted_list = sorted(lb_list, key=lambda x: x[10], reverse=True)
             total_savings = self._get_savings(lb_sorted_list)
-            return {'resource_list': lb_sorted_list, 'headers': headers, 'savings': total_savings}
+            return {'resource_list': lb_sorted_list, 'headers': headers, 'savings': total_savings}, {'headers_inv': headers_inv, 'inv_list': lb_inv_list}
             
         except exceptions.ClientError as error:
             handle_limit_exceeded_exception(error, 'loadbalancer.py')

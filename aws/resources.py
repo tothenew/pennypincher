@@ -25,120 +25,122 @@ class Resources:
        """Function which fetches information resource : EBS."""
        print("Fetching idle resources for EBS")
        ebs_obj = ElasticBlockStore(self.config, self.region_list)
-       summary = ebs_obj.get_result()
-       return summary
+       summary, summary_inv = ebs_obj.get_result()
+       return summary, summary_inv
  
    def lb(self): 
        """Function which fetches information resource : Loadbalancers."""
        print("Fetching idle resources for LOABALANCERS")
        lb_obj = Loadbalancer(self.config, self.region_list)
-       summary = lb_obj.get_result()
-       return summary
+       summary, summary_inv = lb_obj.get_result()
+       return summary, summary_inv
  
    def rds(self): 
        """Function which fetches information resource : RDS"""
        print("Fetching idle resources for RDS")
        rds_obj = RelationalDatabaseService(self.config, self.region_list)
-       summary = rds_obj.get_result()
-       return summary
+       summary, summary_inv = rds_obj.get_result()
+       return summary, summary_inv
  
    def ec2(self): 
        """Function which fetches information resource : EC2"""
        print("Fetching idle resources for EC2")
        ec2_obj = ElasticComputeCloud(self.config, self.region_list)
-       summary = ec2_obj.get_result()
-       return summary
+       summary, summary_inv = ec2_obj.get_result()
+       return summary, summary_inv
  
    def ec(self): 
        """Function which fetches information resource : Elasticache."""
        print("Fetching idle resources for Elasticache")
        ec_obj = Elasticache(self.config, self.region_list)
-       summary = ec_obj.get_result()
-       return summary
+       summary, summary_inv = ec_obj.get_result()
+       return summary, summary_inv
  
    def es(self): 
        """Function which fetches information resource : Elasticsearch."""
        print("Fetching idle resources for Elasticsearch")
        es_obj = Elasticsearch(self.config, self.region_list)
-       summary = es_obj.get_result()
-       return summary
+       summary, summary_inv = es_obj.get_result()
+       return summary, summary_inv
  
    def redshift(self): 
        """Function which fetches information resource : Redshift."""
        print("Fetching idle resources for Redshift")
        rs_obj = Redshift(self.config, self.region_list)
-       summary = rs_obj.get_result()
-       return summary
+       summary, summary_inv = rs_obj.get_result()
+       return summary, summary_inv
  
    def eip(self): 
        """Function which fetches information resource : Elastic IP."""
        print("Fetching idle resources for EIP")
        eip_obj = ElasticIP(self.region_list)
-       summary = eip_obj.get_result()
-       return summary
+       summary, summary_inv = eip_obj.get_result()
+       return summary, summary_inv
       
-   def get_summary(self, service_name, summary, html_obj, slack_obj, resource_info):
+   def get_summary(self, service_name, summary, summary_inv, html_obj, slack_obj, resource_info, inventory_info):
        """Function which fetches the html page and resource information."""
        html_resource=''
        print("Total savings for {} : ${}".format(service_name, summary['savings']))
        if summary['savings'] != 0:
                html_resource = html_obj.get_html_page(service_name, summary['headers'], summary['resource_list'], summary['savings'])
                resource_info = slack_obj.get_resource_list(service_name, resource_info, summary['headers'], summary['resource_list'], summary['savings'])
-       return html_resource , resource_info
+               inventory_info = slack_obj.get_resource_inventory(service_name, inventory_info, summary_inv['headers_inv'], summary_inv['inv_list'] )
+       return html_resource , resource_info, inventory_info
 #print("Fetching idle resources for {}".format(service_name))
    def get_report(self, html_obj, slack_obj): 
        """Function which generates cost report to send on email and slack."""
        try:
            html = ''
            total_savings = 0
-           resource_info = {} #Dictionary which will contain all the information of resources. 
-            
+           resource_info = {} #Dictionary which will contain all the information of resources.
+           inventory_info = {} #Dictionary which will contain all the information of used resources. 
+          
            ####EC2####  
            #dictionary- resource_list, headers, savings
-           summary = self.ec2()    
-           html_resource , resource_info = self.get_summary('EC2', summary, html_obj, slack_obj, resource_info)
+           summary, summary_inv = self.ec2()    
+           html_resource , resource_info, inventory_info = self.get_summary('EC2', summary, summary_inv, html_obj, slack_obj, resource_info, inventory_info)
            total_savings += summary['savings']
            html += html_resource
           
            ####RDS####
-           summary = self.rds()
-           html_resource, resource_info = self.get_summary('RDS', summary, html_obj, slack_obj, resource_info)
+           summary, summary_inv = self.rds()
+           html_resource , resource_info, inventory_info = self.get_summary('RDS', summary, summary_inv, html_obj, slack_obj, resource_info, inventory_info)
            total_savings += summary['savings']
            html += html_resource
  
            ####LOADBALANCERS####
-           summary = self.lb()
-           html_resource , resource_info = self.get_summary('LOADBALANCERS', summary, html_obj, slack_obj, resource_info)
+           summary, summary_inv = self.lb()
+           html_resource , resource_info, inventory_info = self.get_summary('LOADBALANCERS', summary, summary_inv, html_obj, slack_obj, resource_info, inventory_info)
            total_savings += summary['savings']
            html += html_resource
-           
-        #    ####EBS####
-           summary = self.ebs()
-           html_resource , resource_info = self.get_summary('EBS', summary, html_obj, slack_obj, resource_info)
+        
+           ####EBS####
+           summary, summary_inv = self.ebs()
+           html_resource , resource_info, inventory_info = self.get_summary('EBS', summary, summary_inv, html_obj, slack_obj, resource_info, inventory_info)
            total_savings += summary['savings']
            html += html_resource
  
            ####EIP####
-           summary = self.eip()
-           html_resource , resource_info = self.get_summary('EIP', summary, html_obj, slack_obj, resource_info)
+           summary, summary_inv = self.eip()
+           html_resource , resource_info, inventory_info = self.get_summary('EBS', summary, summary_inv, html_obj, slack_obj, resource_info, inventory_info)
            total_savings += summary['savings']
            html += html_resource
  
            ####ELASTICACHE####
-           summary = self.ec()
-           html_resource , resource_info = self.get_summary('ELASTICACHE', summary, html_obj, slack_obj, resource_info)
+           summary, summary_inv = self.ec()
+           html_resource , resource_info, inventory_info = self.get_summary('ELASTICACHE', summary, summary_inv, html_obj, slack_obj, resource_info, inventory_info)
            total_savings += summary['savings']
            html += html_resource
  
-           ####ELASTICSEARCH####
-           summary = self.es()
-           html_resource , resource_info = self.get_summary('ELASTICSEARCH', summary, html_obj, slack_obj, resource_info)
+           ###ELASTICSEARCH####
+           summary, summary_inv = self.es()
+           html_resource , resource_info, inventory_info = self.get_summary('ELASTICSEARCH', summary, summary_inv, html_obj, slack_obj, resource_info, inventory_info)
            total_savings += summary['savings']
            html += html_resource
  
            ####REDSHIFT####
-           summary = self.redshift()
-           html_resource , resource_info = self.get_summary('REDSHIFT', summary, html_obj, slack_obj, resource_info)
+           summary, summary_inv = self.redshift()
+           html_resource , resource_info, inventory_info = self.get_summary('REDSHIFT', summary, summary_inv, html_obj, slack_obj, resource_info, inventory_info)
            total_savings += summary['savings']
            html += html_resource
  
@@ -146,7 +148,7 @@ class Resources:
            html_prefix = html_obj.get_HTML_prefix()
            html_suffix = html_obj.get_HTML_suffix()
            html = html_prefix + html + html_suffix
-           return html, resource_info, total_savings
+           return html, resource_info, total_savings, inventory_info
  
        except Exception as e:
            self.logger.error("Error on line {} in resources.py".format(sys.exc_info()[-1].tb_lineno) + " | Message: " +
