@@ -66,7 +66,6 @@ def lambda_handler(event=None, context=None):
         if len(inventory_info) > 0 :
             inv_obj = GENINV(inventory_info, dir_path, current_datetime)
             inv_obj.generate_inv()
-            print(f"Inventory is at: {dir_path} directory")
         if 'email' in  reporting_platform.lower().split(','):
             ses_obj.ses_sendmail(
                 sub='Cost Optimization Report | ' + account_name + ' | Total Savings: $'+ str(round(total_savings, 2)),

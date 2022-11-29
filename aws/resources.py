@@ -25,22 +25,22 @@ class Resources:
        """Function which fetches information resource : EBS."""
        print("Fetching idle resources for EBS")
        ebs_obj = ElasticBlockStore(self.config, self.region_list)
-       summary = ebs_obj.get_result()
-       return summary
+       summary, summary_inv = ebs_obj.get_result()
+       return summary, summary_inv
  
    def lb(self): 
        """Function which fetches information resource : Loadbalancers."""
        print("Fetching idle resources for LOABALANCERS")
        lb_obj = Loadbalancer(self.config, self.region_list)
-       summary = lb_obj.get_result()
-       return summary
+       summary, summary_inv = lb_obj.get_result()
+       return summary, summary_inv
  
    def rds(self): 
        """Function which fetches information resource : RDS"""
        print("Fetching idle resources for RDS")
        rds_obj = RelationalDatabaseService(self.config, self.region_list)
-       summary = rds_obj.get_result()
-       return summary
+       summary, summary_inv = rds_obj.get_result()
+       return summary, summary_inv
  
    def ec2(self): 
        """Function which fetches information resource : EC2"""
@@ -60,22 +60,22 @@ class Resources:
        """Function which fetches information resource : Elasticsearch."""
        print("Fetching idle resources for Elasticsearch")
        es_obj = Elasticsearch(self.config, self.region_list)
-       summary = es_obj.get_result()
-       return summary
+       summary, summary_inv = es_obj.get_result()
+       return summary, summary_inv
  
    def redshift(self): 
        """Function which fetches information resource : Redshift."""
        print("Fetching idle resources for Redshift")
        rs_obj = Redshift(self.config, self.region_list)
-       summary = rs_obj.get_result()
-       return summary
+       summary, summary_inv = rs_obj.get_result()
+       return summary, summary_inv
  
    def eip(self): 
        """Function which fetches information resource : Elastic IP."""
        print("Fetching idle resources for EIP")
        eip_obj = ElasticIP(self.region_list)
-       summary = eip_obj.get_result()
-       return summary
+       summary, summary_inv = eip_obj.get_result()
+       return summary, summary_inv
       
    def get_summary(self, service_name, summary, summary_inv, html_obj, slack_obj, resource_info, inventory_info):
        """Function which fetches the html page and resource information."""
@@ -109,10 +109,10 @@ class Resources:
            html += html_resource
  
            ####LOADBALANCERS####
-        #    summary = self.lb()
-        #    html_resource , resource_info = self.get_summary('LOADBALANCERS', summary, html_obj, slack_obj, resource_info)
-        #    total_savings += summary['savings']
-        #    html += html_resource
+           summary, summary_inv = self.lb()
+           html_resource , resource_info, inventory_info = self.get_summary('LOADBALANCERS', summary, summary_inv, html_obj, slack_obj, resource_info, inventory_info)
+           total_savings += summary['savings']
+           html += html_resource
         
            ####EBS####
            summary, summary_inv = self.ebs()
@@ -139,7 +139,7 @@ class Resources:
            html += html_resource
  
            ####REDSHIFT####
-           summary = self.redshift()
+           summary, summary_inv = self.redshift()
            html_resource , resource_info, inventory_info = self.get_summary('REDSHIFT', summary, summary_inv, html_obj, slack_obj, resource_info, inventory_info)
            total_savings += summary['savings']
            html += html_resource
