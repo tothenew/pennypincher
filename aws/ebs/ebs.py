@@ -11,9 +11,11 @@ from utils.cloudwatch_utils import CloudwatchUtils
 class ElasticBlockStore:
     """To fetch information of all unused EBS volumes."""
 
-    def __init__(self, config=None, regions=None):
+    def __init__(self, headers, headers_inventory, config=None, regions=None):
         try:
          self.config = config.get('EBS')
+         self.headers = headers
+         self.headers_inventory = headers_inventory
         except KeyError as e:
             self.logger.error(
                 "Config for EBS missing from config.cfg | Message: " + str(e))  
@@ -114,12 +116,7 @@ class ElasticBlockStore:
         try:
             ebs_list = []
             ebs_inv_list = []
-            headers_inv=[   'ResourceID','ResouceName','ServiceName','Type','VPC',
-                        'State','Region'
-                    ]
-            headers=[   'ResourceID','ResouceName','ServiceName','Type','VPC',
-                        'State','Region','Finding','EvaluationPeriod (seconds)','Criteria','Saving($)'
-                    ]
+            
             for reg in self.regions:
                 client, cloudwatch, pricing = self._get_clients(reg)
                 for vol in self._describe_ebs(client):
@@ -128,7 +125,7 @@ class ElasticBlockStore:
             #To fetch top 10 resources with maximum saving.
             ebs_sorted_list = sorted(ebs_list, key=lambda x: x[10], reverse=True)
             total_savings = self._get_savings(ebs_sorted_list[:11])
-            return { 'resource_list': ebs_sorted_list[:11], 'headers': headers, 'savings': total_savings }, {'headers_inv': headers_inv, 'inv_list': ebs_inv_list}
+            return { 'resource_list': ebs_sorted_list[:11], 'headers': self.headers, 'savings': total_savings }, {'headers_inv': self.headers_inventory, 'inv_list': ebs_inv_list}
 
         except exceptions.ClientError as error:
             handle_limit_exceeded_exception(error, 'ebs.py')

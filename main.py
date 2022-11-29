@@ -31,6 +31,15 @@ def lambda_handler(event=None, context=None):
     account_name = env_config['account_name'] 
     webhook_url = env_config['webhook_url']
     report_bucket = env_config['report_bucket']
+
+    #Report Headers
+    headers_inventory = ['ResourceID','ResouceName','ServiceName','Type','VPC',
+                          'State','Region'
+                        ]
+    headers = ['ResourceID','ResouceName','ServiceName','Type','VPC',
+               'State','Region','Finding','EvaluationPeriod (seconds)','Criteria','Saving($)'
+              ]
+
     #For removing any existing loggers in lambda
     root = logging.getLogger()
     if root.handlers:
@@ -41,7 +50,7 @@ def lambda_handler(event=None, context=None):
     logger = logging.getLogger()
     try:
         print(reporting_platform.lower().split(','))
-        resource = Resources(resource_config)    #Object for generating report
+        resource = Resources(resource_config, headers, headers_inventory)    #Object for generating report
         html_obj = HTML()               #Object for generating html page
         ses_obj = SES(from_address=from_address, to_address=to_address, ses_region=ses_region)    #Object to send email
         slack_obj = Slackalert(channel=channel_name, webhook_url=webhook_url)           #object to send report to slack

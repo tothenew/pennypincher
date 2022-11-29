@@ -9,9 +9,11 @@ from utils.utils import handle_limit_exceeded_exception
 class Elasticache:
     """To fetch information of all idle elasticache instances."""
 
-    def __init__(self, config=None, regions=None):
+    def __init__(self, headers, headers_inventory, config=None, regions=None):
         try:
          self.config = config.get('ELASTICACHE')
+         self.headers = headers
+         self.headers_inventory = headers_inventory
         except KeyError as e:
             self.logger.error(
                 "Config for ELASTICACHE missing from config.cfg | Message: " + str(e))        
@@ -110,12 +112,7 @@ class Elasticache:
         try:
             ec_list = []
             ec_inv_list = []
-            headers_inv= [
-                'ResourceID','ResouceName','ServiceName','Type','VPC','State','Region'
-            ]
-            headers=[   'ResourceID','ResouceName','ServiceName','Type','VPC',
-                        'State','Region','Finding','EvaluationPeriod (seconds)','Criteria','Saving($)'
-                    ]
+            
             for reg in self.regions:
                 client, cloudwatch, pricing = self._get_clients(reg)
                 elasticache_clusters = self._describe_elasticache(client)
@@ -125,7 +122,7 @@ class Elasticache:
             #To fetch top 10 resources with maximum saving.
             ec_sorted_list = sorted(ec_list, key=lambda x: x[10], reverse=True)
             total_savings = self._get_savings(ec_sorted_list)
-            return {'resource_list': ec_sorted_list, 'headers': headers, 'savings': total_savings}, {'headers_inv': headers_inv, 'inv_list': ec_inv_list}
+            return {'resource_list': ec_sorted_list, 'headers': self.headers, 'savings': total_savings}, {'headers_inv': self.headers_inventory, 'inv_list': ec_inv_list}
 
         except exceptions.ClientError as error:
             handle_limit_exceeded_exception(error, 'elasticache.py')

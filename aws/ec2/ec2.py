@@ -9,9 +9,11 @@ from aws.ec2.pricing import Pricing
 class ElasticComputeCloud:
     """To fetch information of all idle EC2's."""
 
-    def __init__(self, config=None, regions=None):
+    def __init__(self, headers, headers_inventory, config=None, regions=None):
         self.config = config['EC2']
         self.regions = regions
+        self.headers = headers
+        self.headers_inventory = headers_inventory
         logging.basicConfig(level=logging.WARNING)
         self.logger = logging.getLogger()
 
@@ -138,11 +140,7 @@ class ElasticComputeCloud:
         try:
             ec2_list = []
             ec2_inv_list = []
-            headers_inv = ['ResourceID','ResouceName','ServiceName','Type','VPC',
-                        'State','Region']
-            headers=[   'ResourceID','ResouceName','ServiceName','Type','VPC',
-                        'State','Region','Finding','EvaluationPeriod (seconds)','Criteria','Saving($)'
-                    ]
+            
             for reg in self.regions:
                 client, cloudwatch, pricing = self._get_clients(reg)
                 for r in self._describe_ec2(client):
@@ -152,7 +150,7 @@ class ElasticComputeCloud:
             #To fetch top 10 resources with maximum saving.
             ec2_sorted_list = sorted(ec2_list, key=lambda x: x[10], reverse=True)
             total_savings = self._get_savings(ec2_sorted_list)
-            return {'resource_list': ec2_sorted_list, 'headers': headers, 'savings': total_savings}, {'headers_inv':headers_inv, 'inv_list':ec2_inv_list}
+            return {'resource_list': ec2_sorted_list, 'headers': self.headers, 'savings': total_savings}, {'headers_inv': self.headers_inventory, 'inv_list':ec2_inv_list}
 
         except exceptions.ClientError as error:
             if error.response['Error']['Code'] == 'LimitExceededException':

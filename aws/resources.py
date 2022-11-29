@@ -14,8 +14,10 @@ from utils.config_parser import merges
 class Resources:
    """For making api calls to AWS resources and generating cost report to send on email and slack."""
  
-   def __init__(self, config):
+   def __init__(self, config, headers, headers_inventory):
        self.region_list = get_region_list() 
+       self.headers = headers
+       self.headers_inventory = headers_inventory
        """To get supported regions on an AWS account in list format."""
        self.config=config
        logging.basicConfig(level=logging.WARNING)
@@ -24,56 +26,56 @@ class Resources:
    def ebs(self): 
        """Function which fetches information resource : EBS."""
        print("Fetching idle resources for EBS")
-       ebs_obj = ElasticBlockStore(self.config, self.region_list)
+       ebs_obj = ElasticBlockStore(config=self.config, regions=self.region_list, headers = self.headers, headers_inventory = self.headers_inventory)
        summary, summary_inv = ebs_obj.get_result()
        return summary, summary_inv
  
    def lb(self): 
        """Function which fetches information resource : Loadbalancers."""
        print("Fetching idle resources for LOABALANCERS")
-       lb_obj = Loadbalancer(self.config, self.region_list)
+       lb_obj = Loadbalancer(config=self.config, regions=self.region_list, headers = self.headers, headers_inventory = self.headers_inventory)
        summary, summary_inv = lb_obj.get_result()
        return summary, summary_inv
  
    def rds(self): 
        """Function which fetches information resource : RDS"""
        print("Fetching idle resources for RDS")
-       rds_obj = RelationalDatabaseService(self.config, self.region_list)
+       rds_obj = RelationalDatabaseService(config=self.config, regions=self.region_list, headers = self.headers, headers_inventory = self.headers_inventory)
        summary, summary_inv = rds_obj.get_result()
        return summary, summary_inv
  
    def ec2(self): 
        """Function which fetches information resource : EC2"""
        print("Fetching idle resources for EC2")
-       ec2_obj = ElasticComputeCloud(self.config, self.region_list)
+       ec2_obj = ElasticComputeCloud(config=self.config, regions=self.region_list, headers = self.headers, headers_inventory = self.headers_inventory)
        summary, summary_inv = ec2_obj.get_result()
        return summary, summary_inv
  
    def ec(self): 
        """Function which fetches information resource : Elasticache."""
        print("Fetching idle resources for Elasticache")
-       ec_obj = Elasticache(self.config, self.region_list)
+       ec_obj = Elasticache(config=self.config, regions=self.region_list, headers = self.headers, headers_inventory = self.headers_inventory)
        summary, summary_inv = ec_obj.get_result()
        return summary, summary_inv
  
    def es(self): 
        """Function which fetches information resource : Elasticsearch."""
        print("Fetching idle resources for Elasticsearch")
-       es_obj = Elasticsearch(self.config, self.region_list)
+       es_obj = Elasticsearch(config=self.config, regions=self.region_list, headers = self.headers, headers_inventory = self.headers_inventory)
        summary, summary_inv = es_obj.get_result()
        return summary, summary_inv
  
    def redshift(self): 
        """Function which fetches information resource : Redshift."""
        print("Fetching idle resources for Redshift")
-       rs_obj = Redshift(self.config, self.region_list)
+       rs_obj = Redshift(config=self.config, regions=self.region_list, headers = self.headers, headers_inventory = self.headers_inventory)
        summary, summary_inv = rs_obj.get_result()
        return summary, summary_inv
  
    def eip(self): 
        """Function which fetches information resource : Elastic IP."""
        print("Fetching idle resources for EIP")
-       eip_obj = ElasticIP(self.region_list)
+       eip_obj = ElasticIP(regions = self.region_list, headers = self.headers, headers_inventory = self.headers_inventory)
        summary, summary_inv = eip_obj.get_result()
        return summary, summary_inv
       
@@ -84,7 +86,7 @@ class Resources:
        if summary['savings'] != 0:
                html_resource = html_obj.get_html_page(service_name, summary['headers'], summary['resource_list'], summary['savings'])
                resource_info = slack_obj.get_resource_list(service_name, resource_info, summary['headers'], summary['resource_list'], summary['savings'])
-               inventory_info = slack_obj.get_resource_inventory(service_name, inventory_info, summary_inv['headers_inv'], summary_inv['inv_list'] )
+       inventory_info = slack_obj.get_resource_inventory(service_name, inventory_info, summary_inv['headers_inv'], summary_inv['inv_list'] )
        return html_resource , resource_info, inventory_info
 #print("Fetching idle resources for {}".format(service_name))
    def get_report(self, html_obj, slack_obj): 
@@ -99,6 +101,7 @@ class Resources:
            #dictionary- resource_list, headers, savings
            summary, summary_inv = self.ec2()    
            html_resource , resource_info, inventory_info = self.get_summary('EC2', summary, summary_inv, html_obj, slack_obj, resource_info, inventory_info)
+        #    print(inventory_info)
            total_savings += summary['savings']
            html += html_resource
           
