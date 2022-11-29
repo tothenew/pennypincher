@@ -10,7 +10,7 @@ from utils.utils import handle_limit_exceeded_exception
 class Elasticsearch:
     """To fetch information of all idle elasticsearch instances."""
 
-    def __init__(self, config=None, regions=None):
+    def __init__(self, headers, headers_inventory, config=None, regions=None):
         try:
          self.config = config.get('ELASTICSEARCH')
         except KeyError as e:
@@ -124,12 +124,6 @@ class Elasticsearch:
         try:
             es_list = []
             elasticsearch_inv_list = []
-            headers_inv = [
-                'ResourceID','ResouceName','ServiceName','Type','VPC', 'State','Region'
-            ]
-            headers=[   'ResourceID','ResouceName','ServiceName','Type','VPC',
-                        'State','Region','Finding','EvaluationPeriod (seconds)','Criteria','Saving($)'
-                    ]
   
             for reg in self.regions:
                 client, cloudwatch, pricing = self._get_clients(reg)
@@ -141,7 +135,7 @@ class Elasticsearch:
             #To fetch top 10 resources with maximum saving.
             es_sorted_list = sorted(es_list, key=lambda x: x[10], reverse=True)
             total_savings = self._get_savings(es_sorted_list)
-            return {'resource_list': es_sorted_list, 'headers': headers, 'savings': total_savings}, {'headers_inv': headers_inv, 'inv_list': elasticsearch_inv_list}
+            return {'resource_list': es_sorted_list, 'headers': self.headers, 'savings': total_savings}, {'headers_inv': self.headers_inv, 'inv_list': elasticsearch_inv_list}
 
         except exceptions.ClientError as error:
             handle_limit_exceeded_exception(error, 'elasticsearch.py')

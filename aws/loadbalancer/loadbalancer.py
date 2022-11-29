@@ -9,7 +9,7 @@ from utils.utils import handle_limit_exceeded_exception
 
 class Loadbalancer:
     """To fetch information of all idle Loadbalancers."""
-    def __init__(self, config=None, regions=None):
+    def __init__(self, headers, headers_inventory, config=None, regions=None):
         try:
          self.config = config.get('LB')
         except KeyError as e:
@@ -139,13 +139,7 @@ class Loadbalancer:
         try:
             lb_list = []
             lb_inv_list = []
-            headers_inv = ['ResourceID','ResouceName','ServiceName','Type','VPC',
-                        'State','Region'
-                        ]
             
-            headers=[   'ResourceID','ResouceName','ServiceName','Type','VPC',
-                        'State','Region','Finding','EvaluationPeriod (seconds)','Criteria','Saving($)'
-                    ]
             for reg in self.regions:
                 client, cloudwatch, elbv2_client, pricing_client = self._get_clients(reg)
                 elb_price, alb_price, nlb_price = self._get_lb_price(pricing_client, reg)
@@ -158,7 +152,7 @@ class Loadbalancer:
             #To fetch top 10 resources with maximum saving.
             lb_sorted_list = sorted(lb_list, key=lambda x: x[10], reverse=True)
             total_savings = self._get_savings(lb_sorted_list)
-            return {'resource_list': lb_sorted_list, 'headers': headers, 'savings': total_savings}, {'headers_inv': headers_inv, 'inv_list': lb_inv_list}
+            return {'resource_list': lb_sorted_list, 'headers': self.headers, 'savings': total_savings}, {'headers_inv': self.headers_inv, 'inv_list': lb_inv_list}
             
         except exceptions.ClientError as error:
             handle_limit_exceeded_exception(error, 'loadbalancer.py')

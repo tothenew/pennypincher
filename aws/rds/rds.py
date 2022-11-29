@@ -10,7 +10,7 @@ from utils.utils import handle_limit_exceeded_exception
 class RelationalDatabaseService:
     """To fetch information of all idle RDS instances."""
     
-    def __init__(self, config=None, regions=None):
+    def __init__(self, headers, headers_inventory, config=None, regions=None):
         try:
          self.config = config.get('RDS')
         except KeyError as e:
@@ -117,12 +117,6 @@ class RelationalDatabaseService:
         try:
             rds_list = []
             rds_inv_list = []
-            headers_inv = [
-                'ResourceID','ResouceName','ServiceName','Type','VPC', 'State','Region'
-                ]
-            headers=[   'ResourceID','ResouceName','ServiceName','Type','VPC',
-                        'State','Region','Finding','EvaluationPeriod (seconds)','Criteria','Saving($)'
-                    ]
 
             for reg in self.regions:
                 client, cloudwatch, pricing = self._get_clients(reg)
@@ -132,7 +126,7 @@ class RelationalDatabaseService:
             #To fetch top 10 resources with maximum saving.
             rds_sorted_list = sorted(rds_list, key=lambda x: x[10], reverse=True)
             total_savings = self._get_savings(rds_sorted_list)
-            return {'resource_list': rds_sorted_list, 'headers': headers, 'savings': total_savings}, {'headers_inv': headers_inv, 'inv_list': rds_inv_list}
+            return {'resource_list': rds_sorted_list, 'headers': self.headers, 'savings': total_savings}, {'headers_inv': self.headers_inv, 'inv_list': rds_inv_list}
 
         except exceptions.ClientError as error:
             handle_limit_exceeded_exception(error, 'rds.py')

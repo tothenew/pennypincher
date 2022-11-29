@@ -9,8 +9,10 @@ from utils.utils import handle_limit_exceeded_exception
 class ElasticIP:
     """To fetch information of all unused elastic IP's."""
 
-    def __init__(self, regions=None):   
+    def __init__(self, headers, headers_inventory, regions=None):   
         self.regions = regions
+        self.headers = headers
+        self.headers_inventory = headers_inventory
         logging.basicConfig(level=logging.WARNING)
         self.logger = logging.getLogger()
 
@@ -90,12 +92,6 @@ class ElasticIP:
         try:
             eip_list = []
             eip_inv_list = []
-            headers_inv = ['ResourceID','ResouceName','ServiceName','Type','VPC',
-                        'State','Region']
-            
-            headers=[   'ResourceID','ResouceName','ServiceName','Type','VPC',
-                        'State','Region','Finding','EvaluationPeriod (seconds)','Criteria','Saving($)'
-                    ]
 
             for reg in self.regions:
                 client, pricing = self._get_clients(reg)
@@ -105,7 +101,7 @@ class ElasticIP:
             #To fetch top 10 resources with maximum saving.
             eip_sorted_list = sorted(eip_list, key=lambda x: x[10], reverse=True)
             total_savings = self._get_savings(eip_sorted_list[:11])
-            return {'resource_list': eip_sorted_list[:10], 'headers': headers, 'savings': total_savings}, {'headers_inv': headers_inv, 'inv_list': eip_inv_list}
+            return {'resource_list': eip_sorted_list[:10], 'headers': self.headers, 'savings': total_savings}, {'headers_inv': self.headers_inv, 'inv_list': eip_inv_list}
 
 
         except exceptions.ClientError as error:
