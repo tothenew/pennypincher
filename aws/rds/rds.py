@@ -53,7 +53,7 @@ class RelationalDatabaseService:
         pricing = Pricing(pricing_client, reg)
         return client, cloudwatch, pricing
    
-    def _get_parameters(self, rds_instance, reg, cloudwatch, pricing, rds_list):
+    def _get_parameters(self, rds_instance, reg, cloudwatch, pricing, rds_list, rds_inv_list):
         """Returns a list containing idle RDS information."""    
         rds = []
         iops = 0
@@ -98,13 +98,28 @@ class RelationalDatabaseService:
                 savings
                ]
             rds_list.append(rds)
-        return rds_list
+        else:
+            rds_inv =[
+                rds_instance["DBInstanceIdentifier"],
+                rds_instance["DBInstanceIdentifier"],
+                "RDS",
+                rds_instance["DBInstanceClass"],
+                rds_instance['DBSubnetGroup']['VpcId'],
+                rds_instance["DBInstanceStatus"],
+                reg
+            ]
+            rds_inv_list.append(rds_inv)
+        return rds_list, rds_inv_list
 
 
     def get_result(self):     
         """Returns a list of lists which contains headings and idle RDS information."""
         try:
             rds_list = []
+            rds_inv_list = []
+            headers_inv = [
+                'ResourceID','ResouceName','ServiceName','Type','VPC', 'State','Region'
+                ]
             headers=[   'ResourceID','ResouceName','ServiceName','Type','VPC',
                         'State','Region','Finding','EvaluationPeriod (seconds)','Criteria','Saving($)'
                     ]
@@ -112,12 +127,12 @@ class RelationalDatabaseService:
             for reg in self.regions:
                 client, cloudwatch, pricing = self._get_clients(reg)
                 for rds_instance in self._describe_rds(client):
-                        rds_list = self._get_parameters(rds_instance, reg, cloudwatch, pricing, rds_list)
+                        rds_list,rds_inv_list = self._get_parameters(rds_instance, reg, cloudwatch, pricing, rds_list, rds_inv_list)
                         
             #To fetch top 10 resources with maximum saving.
             rds_sorted_list = sorted(rds_list, key=lambda x: x[10], reverse=True)
             total_savings = self._get_savings(rds_sorted_list)
-            return {'resource_list': rds_sorted_list, 'headers': headers, 'savings': total_savings}
+            return {'resource_list': rds_sorted_list, 'headers': headers, 'savings': total_savings}, {'headers_inv': headers_inv, 'inv_list': rds_inv_list}
 
         except exceptions.ClientError as error:
             handle_limit_exceeded_exception(error, 'rds.py')

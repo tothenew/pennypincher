@@ -48,7 +48,7 @@ class Redshift:
         pricing = Pricing(pricing_client, reg)
         return client, cloudwatch, pricing
 
-    def _get_parameters(self,cluster, reg, cloudwatch, pricing, rs_list ):
+    def _get_parameters(self,cluster, reg, cloudwatch, pricing, rs_list, rs_inv_list ):
         """Returns a list containing idle redshift information."""        
         node_price = pricing.get_node_price(cluster['NodeType'])
         db_connection_count = cloudwatch.get_sum_metric('AWS/Redshift', 'DatabaseConnections',
@@ -73,27 +73,40 @@ class Redshift:
             savings
             ]
             rs_list.append(rs)
-        return rs_list
+        else:
+            rs_inv = [
+            cluster['ClusterIdentifier'],
+            cluster['DBName'],
+            "REDSHIFT",
+            cluster['NodeType'],
+            cluster['VpcId'],
+            "-",
+            reg
+             ]
+            rs_inv_list.append(rs_inv)
+        return rs_list, rs_inv_list
 
     def get_result(self):   
         """Returns a list of lists which contains headings and idle redshift information."""
         try:
             rs_list = []
-            headers = ['ClusterID', 'DBName', 'NodeType', 'NumberOfNodes', 'CreationDate', 'AWSRegion', 'Finding',
-                       'Savings($)']
+            rs_inv_list = []
+            headers_inv = [ 'ResourceID','ResouceName','ServiceName','Type','VPC',
+                        'State','Region'
+                        ]
             headers=[   'ResourceID','ResouceName','ServiceName','Type','VPC',
                         'State','Region','Finding','EvaluationPeriod (seconds)','Criteria','Saving($)'
                     ]
             for reg in self.regions:
                 client, cloudwatch, pricing = self._get_clients(reg)
                 for cluster in self._describe_redshift_clusters(client):
-                    rs_list = self._get_parameters(cluster, reg, cloudwatch, pricing, rs_list)                    
+                    rs_list, rs_inv_list = self._get_parameters(cluster, reg, cloudwatch, pricing, rs_list, rs_inv_list)                    
                     
                     
             #To fetch top 10 resources with maximum saving.
             rs_sorted_list = sorted(rs_list, key=lambda x: x[10], reverse=True)
             total_savings = self._get_savings(rs_sorted_list)
-            return {'resource_list': rs_sorted_list, 'headers': headers, 'savings': total_savings}
+            return {'resource_list': rs_sorted_list, 'headers': headers, 'savings': total_savings}, {'headers_inv': headers_inv, 'inv_list': rs_inv_list}
 
         except exceptions.ClientError as error:
             handle_limit_exceeded_exception(error, 'redshift.py')

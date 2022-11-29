@@ -34,7 +34,7 @@ class ElasticIP:
         pricing = Pricing(pricing_client, reg)
         return client, pricing
 
-    def _get_parameters(self, address, reg, client, pricing, eip_list):
+    def _get_parameters(self, address, reg, client, pricing, eip_list, eip_inv_list):
         """Returns a list containing unused EIP information."""
         
         instance_id = private_ip = association_id = instance_state = ''
@@ -72,12 +72,27 @@ class ElasticIP:
             round(price, 2)
             ]
             eip_list.append(eip)
-        return eip_list
+        else:
+            eip_inv = [
+            address["PublicIp"],
+            address["PublicIp"],
+            "EIP",
+            "-",
+            "-",
+            "-",
+            reg
+            ]
+            eip_inv_list.append(eip_inv)
+        return eip_list, eip_inv_list
 
     def get_result(self):     
         """Returns a list of lists which contains headings and unused EIP information."""
         try:
             eip_list = []
+            eip_inv_list = []
+            headers_inv = ['ResourceID','ResouceName','ServiceName','Type','VPC',
+                        'State','Region']
+            
             headers=[   'ResourceID','ResouceName','ServiceName','Type','VPC',
                         'State','Region','Finding','EvaluationPeriod (seconds)','Criteria','Saving($)'
                     ]
@@ -85,12 +100,13 @@ class ElasticIP:
             for reg in self.regions:
                 client, pricing = self._get_clients(reg)
                 for address in self._describe_eip(client):
-                        eip_list = self._get_parameters(address, reg, client, pricing, eip_list)
+                        eip_list,eip_inv_list = self._get_parameters(address, reg, client, pricing, eip_list, eip_inv_list)
                         
             #To fetch top 10 resources with maximum saving.
             eip_sorted_list = sorted(eip_list, key=lambda x: x[10], reverse=True)
             total_savings = self._get_savings(eip_sorted_list[:11])
-            return {'resource_list': eip_sorted_list[:10], 'headers': headers, 'savings': total_savings}
+            return {'resource_list': eip_sorted_list[:10], 'headers': headers, 'savings': total_savings}, {'headers_inv': headers_inv, 'inv_list': eip_inv_list}
+
 
         except exceptions.ClientError as error:
             handle_limit_exceeded_exception(error, 'eip.py')

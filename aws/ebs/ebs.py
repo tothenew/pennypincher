@@ -49,7 +49,7 @@ class ElasticBlockStore:
         pricing = Pricing(pricing_client, reg)
         return client, cloudwatch, pricing
     
-    def _get_parameters(self, vol, reg, cloudwatch, pricing, ebs_list):
+    def _get_parameters(self, vol, reg, cloudwatch, pricing, ebs_list, ebs_inv_list):
         """Returns a list containing idle EBS information."""
         ebs = []
         iops = 0
@@ -94,26 +94,41 @@ class ElasticBlockStore:
                 f"VolumeReadOps+VolumeWriteOps == {self.config['unused']}",
                 round(savings, 2)
                ]
+            
             ebs_list.append(ebs)
-        return ebs_list
-
+        else:
+            ebs_inv = [
+                vol["VolumeId"],
+                vol["VolumeId"],
+                "EBS",
+                vol["VolumeType"],
+                "-",
+                vol["State"],
+                vol["AvailabilityZone"][:-1]
+                ]
+            ebs_inv_list.append(ebs_inv)
+        return ebs_list, ebs_inv_list
 
     def get_result(self):  
         """Returns a list of lists which contains headings and idle EBS information."""
         try:
             ebs_list = []
+            ebs_inv_list = []
+            headers_inv=[   'ResourceID','ResouceName','ServiceName','Type','VPC',
+                        'State','Region'
+                    ]
             headers=[   'ResourceID','ResouceName','ServiceName','Type','VPC',
                         'State','Region','Finding','EvaluationPeriod (seconds)','Criteria','Saving($)'
                     ]
             for reg in self.regions:
                 client, cloudwatch, pricing = self._get_clients(reg)
                 for vol in self._describe_ebs(client):
-                    ebs_list = self._get_parameters(vol, reg, cloudwatch, pricing, ebs_list)
+                    ebs_list,ebs_inv_list  = self._get_parameters(vol, reg, cloudwatch, pricing, ebs_list,ebs_inv_list)
             
             #To fetch top 10 resources with maximum saving.
             ebs_sorted_list = sorted(ebs_list, key=lambda x: x[10], reverse=True)
             total_savings = self._get_savings(ebs_sorted_list[:11])
-            return { 'resource_list': ebs_sorted_list[:11], 'headers': headers, 'savings': total_savings }
+            return { 'resource_list': ebs_sorted_list[:11], 'headers': headers, 'savings': total_savings }, {'headers_inv': headers_inv, 'inv_list': ebs_inv_list}
 
         except exceptions.ClientError as error:
             handle_limit_exceeded_exception(error, 'ebs.py')
