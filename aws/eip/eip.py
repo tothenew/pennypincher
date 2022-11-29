@@ -101,7 +101,7 @@ class ElasticIP:
             #To fetch top 10 resources with maximum saving.
             eip_sorted_list = sorted(eip_list, key=lambda x: x[10], reverse=True)
             total_savings = self._get_savings(eip_sorted_list[:11])
-            return {'resource_list': eip_sorted_list[:10], 'headers': self.headers, 'savings': total_savings}, {'headers_inv': self.headers_inv, 'inv_list': eip_inv_list}
+            return {'resource_list': eip_sorted_list[:10], 'headers': self.headers, 'savings': total_savings}, {'headers_inv': self.headers_inventory, 'inv_list': eip_inv_list}
 
 
         except exceptions.ClientError as error:

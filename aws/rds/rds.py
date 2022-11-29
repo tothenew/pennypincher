@@ -126,7 +126,7 @@ class RelationalDatabaseService:
             #To fetch top 10 resources with maximum saving.
             rds_sorted_list = sorted(rds_list, key=lambda x: x[10], reverse=True)
             total_savings = self._get_savings(rds_sorted_list)
-            return {'resource_list': rds_sorted_list, 'headers': self.headers, 'savings': total_savings}, {'headers_inv': self.headers_inv, 'inv_list': rds_inv_list}
+            return {'resource_list': rds_sorted_list, 'headers': self.headers, 'savings': total_savings}, {'headers_inv': self.headers_inventory, 'inv_list': rds_inv_list}
 
         except exceptions.ClientError as error:
             handle_limit_exceeded_exception(error, 'rds.py')

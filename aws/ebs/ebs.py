@@ -125,7 +125,7 @@ class ElasticBlockStore:
             #To fetch top 10 resources with maximum saving.
             ebs_sorted_list = sorted(ebs_list, key=lambda x: x[10], reverse=True)
             total_savings = self._get_savings(ebs_sorted_list[:11])
-            return { 'resource_list': ebs_sorted_list[:11], 'headers': self.headers, 'savings': total_savings }, {'headers_inv': self.headers_inv, 'inv_list': ebs_inv_list}
+            return { 'resource_list': ebs_sorted_list[:11], 'headers': self.headers, 'savings': total_savings }, {'headers_inv': self.headers_inventory, 'inv_list': ebs_inv_list}
 
         except exceptions.ClientError as error:
             handle_limit_exceeded_exception(error, 'ebs.py')

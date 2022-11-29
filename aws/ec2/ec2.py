@@ -150,7 +150,7 @@ class ElasticComputeCloud:
             #To fetch top 10 resources with maximum saving.
             ec2_sorted_list = sorted(ec2_list, key=lambda x: x[10], reverse=True)
             total_savings = self._get_savings(ec2_sorted_list)
-            return {'resource_list': ec2_sorted_list, 'headers': self.headers, 'savings': total_savings}, {'headers_inv': self.headers_inv, 'inv_list':ec2_inv_list}
+            return {'resource_list': ec2_sorted_list, 'headers': self.headers, 'savings': total_savings}, {'headers_inv': self.headers_inventory, 'inv_list':ec2_inv_list}
 
         except exceptions.ClientError as error:
             if error.response['Error']['Code'] == 'LimitExceededException':

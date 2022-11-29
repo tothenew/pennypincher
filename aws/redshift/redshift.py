@@ -101,7 +101,7 @@ class Redshift:
             #To fetch top 10 resources with maximum saving.
             rs_sorted_list = sorted(rs_list, key=lambda x: x[10], reverse=True)
             total_savings = self._get_savings(rs_sorted_list)
-            return {'resource_list': rs_sorted_list, 'headers': self.headers, 'savings': total_savings}, {'headers_inv': self.headers_inv, 'inv_list': rs_inv_list}
+            return {'resource_list': rs_sorted_list, 'headers': self.headers, 'savings': total_savings}, {'headers_inv': self.headers_inventory, 'inv_list': rs_inv_list}
 
         except exceptions.ClientError as error:
             handle_limit_exceeded_exception(error, 'redshift.py')
