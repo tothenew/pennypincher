@@ -7,13 +7,20 @@
 
 Penny Pincher is a tool that identifies all the resources which are provisioned but are not being used i.e. are idle and notifies you about the potential savings over email and slack.
 
+
+### Scope
+The tool is created by considering three types of user 
+1. Simple user - An end-to-end Cloudformation which will deploy the tool as a lambda function, 2.lambda invocation will generate the report and will be shared over slack, email, and S3.
+2. Power-user - A docker run command which will allow users to generate the reports on their local machine
+3. Dev user - The user can work as a developer by contributing to the repository.
 ### Features
 
 1. Generates a report consisting of all the idle resources in the account and potential savings.
-2. Two platforms are supported for receiving the report, one is email and another is slack.
-3. The number of days for which resource metrics (usage) is to be monitored can be set by the end user.
-4. The solution is easily deployable as the whole setup can be done using AWS Cloudformation or Docker.
-
+2. Three platforms; slack,email and S3 are supported for receiving the report.
+3. HTML and csv reports are supported.
+4. The end user can modify the default cloudwatch metric values using a configuration file with Global environment variable support.
+5. The solution is easily deployable as the whole setup can be done using AWS Cloudformation, docker and local.
+6. End user also recieve an inventory file in csv format of all the scanned resources, it helps in draw out the comparison and coverage of the tool/
 ### Supported Services & Regions
  The tool crawls all the regions to get the findings for the supported services 
 1. EBS
@@ -26,8 +33,7 @@ Penny Pincher is a tool that identifies all the resources which are provisioned 
 
 
 ### How does it work?
- Boto3 API is used to scan the resources in the account according to the criteria defined in the configuration file and generate a report. 
-
+ Boto3 API is used to scan supported the resources in the account, scanned result list out the idle resources based resource and cloudwatch metrics. Idle resource further run down our pricing matrix to genrete the reports in csv and html format. Report shows the potential cost saving amount for each resources. The end user can recieve report via slack or email and cab also store them in s3 buckets.
 
 ### Pre-requisites
 
