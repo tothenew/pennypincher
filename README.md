@@ -130,6 +130,11 @@ The following table lists the criteria kept to decide if the resource is idle or
 1. The European region's response to AWS API is not consistent with other regions. So European regions cause unexpected issues sometimes.
 
 ### Features Releasing in 1.0
-   1. Working on supporting the data output in JSON format. This will allow for additional output formats like xlsx and CSV.
-   2. The user's input is not enabled for configuring the recommendation criteria.
-   3. Send report via slack webhook 
+1. End-to-end Cloudformation run which can send reports to s3, slack, and email.
+2. Functionality to configure Cloudwatatch and resource metric via config files.
+3. Global environment variable support
+4. A csv inventory of whole account for comparison and tool coverage.
+
+### Future scope
+1. Cron suppport in clouydformation.
+2. Intellegent trend analysis on shared reports.
