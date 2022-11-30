@@ -61,6 +61,7 @@ class Elasticsearch:
         elasticsearch = []
         monthly_cost_master = 0                 
         iops = volume_size = 0
+        is_idle = 'No'
         if es['EBSOptions']['EBSEnabled']:
             storage_type = es['EBSOptions']['VolumeType']
             volume_size = es['EBSOptions']['VolumeSize']
@@ -94,6 +95,7 @@ class Elasticsearch:
         finding = self._get_es_finding(idle_instance_count)
         if finding == 'Idle':
             #An elasticsearch instance is considered idle if sum of indexing rate and search rate = 0.
+            is_idle = 'Yes'
             elasticsearch = [
                 es["DomainName"],
                 es["DomainName"],
@@ -108,17 +110,19 @@ class Elasticsearch:
                 round(monthly_cost_master + monthly_cost_data, 2)
             ]
             es_list.append(elasticsearch)
-        else:
-            elasticsearch_inv = [
+        
+        elasticsearch_inv = [
                 es["DomainName"],
                 es["DomainName"],
                 "ELASTICSEARCH",
                 instance_type,
                 es['VPCOptions']['VPCId'],
                 instance_count,
-                reg
+                reg,
+                is_idle
                 ]
-            elasticsearch_inv_list.append(elasticsearch_inv)
+        elasticsearch_inv_list.append(elasticsearch_inv)
+            
         return es_list, elasticsearch_inv_list
     
     def get_result(self):  

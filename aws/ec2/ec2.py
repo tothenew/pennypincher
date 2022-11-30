@@ -68,7 +68,7 @@ class ElasticComputeCloud:
         if 'SpotInstanceRequestId' not in instance:
             ec2 = []
             instance_name = vpc_id = instance_os_details = ''
-            
+            is_idle = 'No'
             platform_details = self._get_image_info(client, instance['ImageId'])
             if 'Tags' in instance:
                 for tag in instance['Tags']:
@@ -108,6 +108,7 @@ class ElasticComputeCloud:
                 vpc_id = instance['VpcId']
             if finding == 'Idle':
                 #An EC2 is considered idle if it's finding comes out to be 'idle'.
+                is_idle = 'Yes'
                 ec2 = [
                     instance['InstanceId'],
                     instance_name,
@@ -122,17 +123,18 @@ class ElasticComputeCloud:
                     round(savings * 732, 2)
                    ]
                 ec2_list.append(ec2)
-            else:
-                ec2_inv = [
+            ec2_inv = [
                     instance['InstanceId'],
                     instance_name,
                     "EC2",
                     instance['InstanceType'],
                     vpc_id,
                     instance['State']['Name'],
-                    reg
+                    reg,
+                    is_idle
                 ]
-                ec2_inv_list.append(ec2_inv)
+            ec2_inv_list.append(ec2_inv)
+                
         return ec2_list, ec2_inv_list
 
     def get_result(self):  

@@ -42,6 +42,7 @@ class ElasticIP:
         instance_id = private_ip = association_id = instance_state = ''
         eip = []
         finding = 'Unallocated'
+        is_idle = 'No'
         if 'PrivateIpAddress' in address:
             private_ip = address["PrivateIpAddress"]
         if 'AssociationId' in address:
@@ -60,6 +61,9 @@ class ElasticIP:
         if finding == 'Instance Stopped' or finding == 'Unallocated':
             #An EIP is considered unused if it is attached with a stopped instance or is unallocated.
             price = pricing.get_eip_price()
+            if round(price, 2) != 0:
+                is_idle = 'Yes'
+                
             eip = [
             address["PublicIp"],
             address["PublicIp"],
@@ -73,18 +77,21 @@ class ElasticIP:
             "EIP is Unallocated or Associated to a Stopped Instance",
             round(price, 2)
             ]
+            
             eip_list.append(eip)
-        else:
-            eip_inv = [
+        
+        eip_inv = [
             address["PublicIp"],
             address["PublicIp"],
             "EIP",
             "-",
             "-",
             "-",
-            reg
+            reg,
+            is_idle
             ]
-            eip_inv_list.append(eip_inv)
+        eip_inv_list.append(eip_inv)
+        
         return eip_list, eip_inv_list
 
     def get_result(self):     

@@ -58,6 +58,7 @@ class RelationalDatabaseService:
     def _get_parameters(self, rds_instance, reg, cloudwatch, pricing, rds_list, rds_inv_list):
         """Returns a list containing idle RDS information."""    
         rds = []
+        is_idle = 'No'
         iops = 0
         if 'iops' in rds_instance.keys():
             iops = rds_instance['Iops']
@@ -85,6 +86,7 @@ class RelationalDatabaseService:
 
         if finding == 'Idle':
             #An RDS instance is classified as idle if the connection count = 0.
+            is_idle = 'Yes'
             savings = round(db_cost + storage_cost, 2)
             rds =[
                 rds_instance["DBInstanceIdentifier"],
@@ -100,17 +102,18 @@ class RelationalDatabaseService:
                 savings
                ]
             rds_list.append(rds)
-        else:
-            rds_inv =[
+        rds_inv =[
                 rds_instance["DBInstanceIdentifier"],
                 rds_instance["DBInstanceIdentifier"],
                 "RDS",
                 rds_instance["DBInstanceClass"],
                 rds_instance['DBSubnetGroup']['VpcId'],
                 rds_instance["DBInstanceStatus"],
-                reg
+                reg,
+                is_idle
             ]
-            rds_inv_list.append(rds_inv)
+        rds_inv_list.append(rds_inv)
+        
         return rds_list, rds_inv_list
 
 

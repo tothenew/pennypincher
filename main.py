@@ -34,7 +34,7 @@ def lambda_handler(event=None, context=None):
 
     #Report Headers
     headers_inventory = ['ResourceID','ResouceName','ServiceName','Type','VPC',
-                          'State','Region'
+                          'State','Region', 'Idle'
                         ]
     headers = ['ResourceID','ResouceName','ServiceName','Type','VPC',
                'State','Region','Finding','EvaluationPeriod (seconds)','Criteria','Saving($)'

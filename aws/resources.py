@@ -101,7 +101,6 @@ class Resources:
            #dictionary- resource_list, headers, savings
            summary, summary_inv = self.ec2()    
            html_resource , resource_info, inventory_info = self.get_summary('EC2', summary, summary_inv, html_obj, slack_obj, resource_info, inventory_info)
-        #    print(inventory_info)
            total_savings += summary['savings']
            html += html_resource
           
@@ -125,7 +124,7 @@ class Resources:
  
            ####EIP####
            summary, summary_inv = self.eip()
-           html_resource , resource_info, inventory_info = self.get_summary('EBS', summary, summary_inv, html_obj, slack_obj, resource_info, inventory_info)
+           html_resource , resource_info, inventory_info = self.get_summary('EIP', summary, summary_inv, html_obj, slack_obj, resource_info, inventory_info)
            total_savings += summary['savings']
            html += html_resource
  

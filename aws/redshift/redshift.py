@@ -75,8 +75,8 @@ class Redshift:
             savings
             ]
             rs_list.append(rs)
-        else:
-            rs_inv = [
+        
+        rs_inv = [
             cluster['ClusterIdentifier'],
             cluster['DBName'],
             "REDSHIFT",
@@ -85,7 +85,13 @@ class Redshift:
             "-",
             reg
              ]
-            rs_inv_list.append(rs_inv)
+        rs_inv_list.append(rs_inv)
+        
+        if finding == 'Idle':
+            rs_inv.append("Yes")
+        else:
+            rs_inv.append("No")
+        
         return rs_list, rs_inv_list
 
     def get_result(self):   
