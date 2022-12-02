@@ -62,7 +62,18 @@ Resources:
     Type: 'AWS::IAM::Role'
     Description: 'IAM role for Penny Pincher'
     Properties:
-      RoleName: 'Penny-Pincher-Docker-Lambda-Role-4'
+      RoleName: !Join
+      - "-"
+      - - "Penny-Pincher-Docker-Lambda"
+        - !Select
+          - 0
+          - !Split
+            - "-"
+            - !Select
+              - 2
+              - !Split
+                - "/"
+                - !Ref "AWS::StackId"
       AssumeRolePolicyDocument:
         Version: '2012-10-17'
         Statement:
@@ -119,7 +130,19 @@ Resources:
     Type: 'AWS::Lambda::Function'
     Description: 'Generates Cost report with all the idle resources information and sends it to email or slack or both'
     Properties:
-      FunctionName: 'Penny-Pincher-Docker-Lambda-4'
+      #'Penny-Pincher-Docker-Lambda-4'
+      FunctionName: !Join
+      - "-"
+      - - "enny-Pincher-Docker-Lambda"
+        - !Select
+          - 0
+          - !Split
+            - "-"
+            - !Select
+              - 2
+              - !Split
+                - "/"
+                - !Ref "AWS::StackId"
       Architectures:
         - x86_64
       Role: !GetAtt ServiceRoleForLambda.Arn
@@ -143,6 +166,11 @@ Resources:
     DependsOn: LambdaFunction
     Properties:
       ServiceToken: !GetAtt LambdaFunction.Arn
+
+Outputs:
+  BucketName:
+    Description: S3 bucket name
+    Value: !Ref ManagedReportBucket
 
       
            
