@@ -4,10 +4,6 @@ Parameters:
   AccountName:
     Description: 'Takes account name as input'
     Type: 'String'
-  CloudwatchConfig:
-    Description: 'Takes number of days to be considered for calculating cloudwatch metric value. Can be null or given in the format resource=number of days e.g. ebs=20, lb=15, rds=30'
-    Type: 'String'
-    Default: 'Null'
   ReportingPlatform:
     Description: 'Takes comma seperated reporting values, allowed values are S3, Slack, Email'
     Type: 'String'
@@ -66,7 +62,7 @@ Resources:
     Type: 'AWS::IAM::Role'
     Description: 'IAM role for Penny Pincher'
     Properties:
-      RoleName: 'Penny-Pincher-Docker-Lambda-Role'
+      RoleName: 'Penny-Pincher-Docker-Lambda-Role-4'
       AssumeRolePolicyDocument:
         Version: '2012-10-17'
         Statement:
@@ -123,7 +119,7 @@ Resources:
     Type: 'AWS::Lambda::Function'
     Description: 'Generates Cost report with all the idle resources information and sends it to email or slack or both'
     Properties:
-      FunctionName: 'Penny-Pincher-Docker-Lambda'
+      FunctionName: 'Penny-Pincher-Docker-Lambda-4'
       Architectures:
         - x86_64
       Role: !GetAtt ServiceRoleForLambda.Arn
@@ -135,7 +131,6 @@ Resources:
       Environment:
         Variables:
           ACCOUNT_NAME: !Ref AccountName
-          CONFIG: !Ref CloudwatchConfig
           REPORTING_PLATFORM: !Ref ReportingPlatform
           CHANNEL_NAME: !Ref SlackChannelName
           FROM_ADDRESS: !Ref SESFromEmailAddress
@@ -143,4 +138,11 @@ Resources:
           SES_REGION: !Ref SESRegion
           REPORT_BUCKET: !If [ CreateReportBucket, !Ref ManagedReportBucket, !Ref ReportBucket ]
           WEBHOOK_URL: !Ref WebhookUrl
+  TriggerPennyPincher:
+    Type: Custom::TriggerPennyPincher
+    DependsOn: LambdaFunction
+    Properties:
+      ServiceToken: !GetAtt LambdaFunction.Arn
+
+      
            

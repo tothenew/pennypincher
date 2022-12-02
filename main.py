@@ -1,6 +1,9 @@
 import os
 import logging
 import sys
+import cfnresponse
+import boto3
+import uuid
 from datetime import datetime
 from utils.html_functions import HTML
 from utils.ses import SES
@@ -13,6 +16,9 @@ from utils.config_parser import check_env
 from utils.s3_send import uploadDirectory
 from utils.filemanager import FileManager
 from utils.generate_inv import GENINV
+
+log = logging.getLogger(__name__)
+log.setLevel(logging.DEBUG)
 
 def lambda_handler(event=None, context=None):
     print("Starting PennyPincher")
@@ -48,6 +54,7 @@ def lambda_handler(event=None, context=None):
     #Initilizaing logger for error logging
     logging.basicConfig(level=logging.WARNING)
     logger = logging.getLogger()
+    
     try:
         print(reporting_platform.lower().split(','))
         resource = Resources(resource_config, headers, headers_inventory)    #Object for generating report
@@ -84,11 +91,35 @@ def lambda_handler(event=None, context=None):
             uploadDirectory(dir_path,report_bucket,current_datetime)
         if 'slack' in  reporting_platform.lower().split(','):
             print("Sending report to slack .....")
-            slack_obj.slack_alert(resource_info, account_name, str(round(total_savings, 2)),report_bucket,current_datetime,reporting_platform)                   
+            slack_obj.slack_alert(resource_info, account_name, str(round(total_savings, 2)),report_bucket,current_datetime,reporting_platform)      
+                 
     except Exception as e:
         logger.error("Error on line {} in main.py".format(sys.exc_info()[-1].tb_lineno) +
                      " | Message: " + str(e))
         sys.exit(1)
+
+
+def cfnresponsefun(event, context):
+    
+    '''Redirect to handler func based on RequestType '''
+    physical_resource_id = event.get('PhysicalResourceId', 'ssm-%s' % uuid.uuid4().hex)
+
+    try:
+        response = None
+        print(event)
+        if event['RequestType'] == 'Create' or event['RequestType'] == 'Update':
+            response = lambda_handler()#Main logic to run, in our case lambda_handler function
+            print(response)
+
+        cfnresponse.send(event, context, cfnresponse.SUCCESS, response, physical_resource_id)
+        return 'Completed Successfully'
+
+    except Exception as ex:
+        log.error("Error: Failed to %s update release info on gateway: %s" % (event['RequestType'], str(ex)))
+        cfnresponse.send(event, context,
+                        cfnresponse.FAILED,
+                        {'Exception': repr(ex)})
+        return 'Exception: %s' % str(ex)
 
 
 if __name__ == "__main__":
