@@ -92,6 +92,7 @@ class Loadbalancer:
         
         nlb_albs = []
         finding = namespace = metric_name = ''
+        is_idle = 'No'
         price = 0
         lb_arn = lb['LoadBalancerArn'].split('/', 1)[1]
         if lb['Type'] == 'network':
@@ -109,6 +110,7 @@ class Loadbalancer:
             finding = 'Idle'
 
         if finding == 'Idle':
+            is_idle = 'Yes'
             nlb_albs =[
             lb['LoadBalancerName'],
             lb['LoadBalancerName'],
@@ -123,17 +125,19 @@ class Loadbalancer:
             round(price, 2)
             ]
             lb_list.append(nlb_albs)
-        else:
-            nlb_albs =[
+            
+        nlb_albs_inv =[
             lb['LoadBalancerName'],
             lb['LoadBalancerName'],
             "LOADBALANCER",
             lb['Type'],
             lb['VpcId'],
             lb['State']['Code'],
-            reg
+            reg,
+            is_idle
             ]
-            lb_inv_list.append(nlb_albs)
+        lb_inv_list.append(nlb_albs_inv)
+            
         return lb_list, lb_inv_list
 
     def get_result(self):  

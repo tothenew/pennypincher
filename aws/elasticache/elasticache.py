@@ -52,7 +52,7 @@ class Elasticache:
         
     def _get_parameters(self, cache, reg, cloudwatch, pricing, ec_list, ec_inv_list):
         """Returns a list containing idle Elasticache instance information."""
-
+        is_idle = 'No'
         cache_id = cache["CacheClusterId"]
         cache_node_type = cache["CacheNodeType"]
         cache_engine = cache['Engine']
@@ -80,6 +80,7 @@ class Elasticache:
         savings = round(current_price, 2)
         if finding == 'Idle':
             #An Elasticache is considered idle if its cache hit and miss sum is 0.
+            is_idle = 'Yes'
             ec = [
                 cache_id,
                 cluster_name,
@@ -94,17 +95,19 @@ class Elasticache:
                 savings
             ]
             ec_list.append(ec)
-        else:
-             ec_inv = [
+            
+        ec_inv = [
                 cache_id,
                 cluster_name,
                 "ELASTICACHE",
                 cache_node_type,
                 "-",
                 cache_engine,
-                reg
+                reg,
+                is_idle
              ]
-             ec_inv_list.append(ec_inv)
+        ec_inv_list.append(ec_inv)
+            
         return ec_list, ec_inv_list
 
     def get_result(self): 

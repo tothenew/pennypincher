@@ -7,7 +7,6 @@ from aws.ebs.pricing import Pricing
 from utils.client import Client
 from utils.cloudwatch_utils import CloudwatchUtils
 
-
 class ElasticBlockStore:
     """To fetch information of all unused EBS volumes."""
 
@@ -56,6 +55,7 @@ class ElasticBlockStore:
         ebs = []
         iops = 0
         finding = ''
+        is_idle = 'No'
         create_time = vol['CreateTime']
         creation_date = datetime.strptime(str(create_time).split(' ')[0], '%Y-%m-%d').date()
         age = get_backup_age(creation_date)
@@ -83,6 +83,7 @@ class ElasticBlockStore:
         savings = storage_price * float(vol["Size"]) + iops_price * iops
         if finding == 'Unused' or finding == 'Available':
             #An EBS is considered idle if it's finding comes out to be 'Unused' or 'Available'.
+            is_idle = 'Yes'
             ebs = [
                 vol["VolumeId"],
                 vol["VolumeId"],
@@ -96,19 +97,20 @@ class ElasticBlockStore:
                 f"VolumeReadOps+VolumeWriteOps == {self.config['unused']}",
                 round(savings, 2)
                ]
-            
             ebs_list.append(ebs)
-        else:
-            ebs_inv = [
+            
+        ebs_inv = [
                 vol["VolumeId"],
                 vol["VolumeId"],
                 "EBS",
                 vol["VolumeType"],
                 "-",
                 vol["State"],
-                vol["AvailabilityZone"][:-1]
+                vol["AvailabilityZone"][:-1],
+                is_idle
                 ]
-            ebs_inv_list.append(ebs_inv)
+        ebs_inv_list.append(ebs_inv)
+            
         return ebs_list, ebs_inv_list
 
     def get_result(self):  
@@ -120,7 +122,7 @@ class ElasticBlockStore:
             for reg in self.regions:
                 client, cloudwatch, pricing = self._get_clients(reg)
                 for vol in self._describe_ebs(client):
-                    ebs_list,ebs_inv_list  = self._get_parameters(vol, reg, cloudwatch, pricing, ebs_list,ebs_inv_list)
+                    ebs_list,ebs_inv_list  = self._get_parameters(vol, reg, cloudwatch, pricing, ebs_list, ebs_inv_list)
             
             #To fetch top 10 resources with maximum saving.
             ebs_sorted_list = sorted(ebs_list, key=lambda x: x[10], reverse=True)
