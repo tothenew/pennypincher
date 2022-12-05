@@ -39,6 +39,16 @@ Conditions:
   CreateReportBucket: !Equals
     - !Ref ReportBucket
     - ""
+  VerifyToEmail: !Equals
+    - !Ref SESToEmailAddress
+    - "-"
+  IfToEmailNotNull: !Not
+    - Condition: VerifyToEmail
+  VerifyFromEmail: !Equals
+    - !Ref SESFromEmailAddress
+    - "-"
+  IfFromEmailNotNull: !Not
+    - Condition: VerifyFromEmail
 
 Resources:
   ManagedReportBucket:
@@ -125,7 +135,18 @@ Resources:
                }'
             - { ReportBucket: !If [ CreateReportBucket, !Ref ManagedReportBucket, !Ref ReportBucket ] }
 
+  ToEmailVerfification:
+    Type: AWS::SES::EmailIdentity
+    Condition: IfToEmailNotNull
+    Properties: 
+      EmailIdentity: !Ref SESToEmailAddress
 
+  FromEmailVerfification:
+    Type: AWS::SES::EmailIdentity
+    Condition: IfFromEmailNotNull
+    Properties: 
+      EmailIdentity: !Ref SESFromEmailAddress
+      
   LambdaFunction:
     Type: 'AWS::Lambda::Function'
     Description: 'Generates Cost report with all the idle resources information and sends it to email or slack or both'
@@ -133,7 +154,7 @@ Resources:
       #'Penny-Pincher-Docker-Lambda-4'
       FunctionName: !Join
       - "-"
-      - - "enny-Pincher-Docker-Lambda"
+      - - "Penny-Pincher-Docker-Lambda"
         - !Select
           - 0
           - !Split
@@ -161,6 +182,7 @@ Resources:
           SES_REGION: !Ref SESRegion
           REPORT_BUCKET: !If [ CreateReportBucket, !Ref ManagedReportBucket, !Ref ReportBucket ]
           WEBHOOK_URL: !Ref WebhookUrl
+
   TriggerPennyPincher:
     Type: Custom::TriggerPennyPincher
     DependsOn: LambdaFunction
