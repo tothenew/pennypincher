@@ -4,9 +4,10 @@ Parameters:
   AccountName:
     Description: '(Optional)- Takes account name as input'
     Type: 'String'
-  BucketName:
-    Description: 'A S3 bucket to store reports which contain zip file'
+  CodeBucketName:
+    Description: 'A S3 bucket  which contain zip file'
     Type: "String"
+    Default: 'penny-pincher-s3-bucket'
   ReportingPlatform:
     Description: 'Takes comma seperated reporting values, allowed values are S3, Slack, Email'
     Type: 'String'
@@ -32,9 +33,9 @@ Parameters:
   ReportBucket:
     Description: '(Optional)- A S3 bucket to store reports'
     Type: "String"
-  # ImageUri:
-  #   Description: "Docker Image URI"
-  #   Type: "String"
+  ImageUri:
+    Description: "Docker Image URI"
+    Type: "String"
 
 Conditions:
   CreateReportBucket: !Equals
@@ -155,8 +156,8 @@ Resources:
       CompatibleRuntimes:
         - 'python3.8'
       Content:
-        S3Bucket: !Ref BucketName
-        S3Key: 'pennypincher-test.zip'
+        S3Bucket: !Ref CodeBucketName
+        S3Key: 'pennypincher.zip'
       LayerName: 'Penny-Pincher-Lambda-Packages-Layer'
 
   LambdaFunction:
@@ -182,8 +183,8 @@ Resources:
       Role: !GetAtt ServiceRoleForLambda.Arn
       Handler: 'main.cfnresponsefun'
       Code:
-        S3Bucket: !Ref BucketName
-        S3Key: 'pennypincher-test.zip'
+        S3Bucket: !Ref CodeBucketName
+        S3Key: 'pennypincher.zip'
       PackageType: 'Zip'
       Timeout: 900
       MemorySize: 1024
