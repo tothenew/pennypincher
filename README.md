@@ -2,6 +2,7 @@
 
 [![CodeQL Status](https://github.com/tothenew/pennypincher/workflows/CodeQL/badge.svg)](https://github.com/tothenew/pennypincher/actions)
 [![LICENSE](https://img.shields.io/github/license/tothenew/pennypincher)](https://github.com/tothenew/pennypincher/blob/master/LICENSE)
+[![Launch Stack](https://s3.amazonaws.com/cloudformation-examples/cloudformation-launch-stack.png)]
 
 ### Overview 
 
@@ -20,7 +21,7 @@ The tool is created by considering three types of user
 3. HTML and csv reports are supported.
 4. The end user can modify the default cloudwatch metric values using a configuration file with Global environment variable support.
 5. The solution is easily deployable as the whole setup can be done using AWS Cloudformation, docker and local.
-6. End user also recieve an inventory file in csv format of all the scanned resources, it helps in draw out the comparison and coverage of the tool/
+6. End user also recieve an inventory file in csv format of all the scanned resources, it helps in draw out the comparison and coverage of the tool
 ### Supported Services & Regions
  The tool crawls all the regions to get the findings for the supported services 
 1. EBS
@@ -67,7 +68,11 @@ For detailed instructions, refer to [Setup through Docker Compose](docs/setup_th
 2. `pip3 install -r requirements.txt`
 3. `python3 main.py`
 
+### SES approval
 
+1. An email address which we are using as identity to send report, it needs to be verified before we use it. 
+2. While deploying tool as lambda function through cloudformation stack, it verify an email and user gets one verification email in which he can find one link and user needs to follow that link to verify that email.
+3. After verification user gets the reports.
 ### Configuration Files and Usage
 Pennnypincher finds the idle resources based on the default criteria mentioned in the below table.
 We have provided support for [config.yaml](https://github.com/tothenew/pennypincher/blob/release_1.0/config.yaml) file which allows the end user to override the default configuration values.
@@ -136,5 +141,5 @@ The following table lists the criteria kept to decide if the resource is idle or
 4. A csv inventory of whole account for comparison and tool coverage.
 
 ### Future scope
-1. Cron suppport in clouydformation.
+1. Cron suppport in cloudformation.
 2. Intellegent trend analysis on shared reports.
