@@ -188,6 +188,8 @@ Resources:
       PackageType: 'Zip'
       Timeout: 900
       MemorySize: 1024
+      Layers:
+        - !Ref LambdaLayer
       Environment:
         Variables:
           ACCOUNT_NAME: !Ref AccountName
