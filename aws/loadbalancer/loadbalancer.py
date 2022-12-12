@@ -54,7 +54,7 @@ class Loadbalancer:
         elbv2_client = session.client('elbv2')
         return client, cloudwatch, elbv2_client, pricing_client
 
-    def _get_clb_parameters(self, elb, reg, cloudwatch, elb_price, alb_price, lb_list):
+    def _get_clb_parameters(self, elb, reg, cloudwatch, elb_price, alb_price, lb_list, lb_inv_list):
         """Returns list containing idle loadbalancers information."""
         
         classic_lb = []        
@@ -85,7 +85,18 @@ class Loadbalancer:
             classic_lb.append(round(elb_price - alb_price, 2))
         
         lb_list.append(classic_lb)
-        return lb_list
+        clb_inv = [
+            elb['LoadBalancerName'],
+            elb['LoadBalancerName'],
+            "LOADBALANCER",
+            'Classic',
+            elb['VpcId'],
+            '-',
+            reg,
+            'Yes'
+            ]
+        lb_inv_list.append(clb_inv)
+        return lb_list, lb_inv_list
     
     def _get_lb_parameters(self, lb, reg, cloudwatch, alb_price, nlb_price, lb_list, lb_inv_list):
         """Returns a list containing idle loadbalancers information."""
@@ -151,7 +162,7 @@ class Loadbalancer:
                 elb_price, alb_price, nlb_price = self._get_lb_price(pricing_client, reg)
 
                 for elb in self._describe_classic_lb(client):
-                    lb_list = self._get_clb_parameters(elb, reg, cloudwatch, elb_price, alb_price, lb_list)
+                    lb_list, lb_inv_list = self._get_clb_parameters(elb, reg, cloudwatch, elb_price, alb_price, lb_list, lb_inv_list)
                 for lb in self._describe_lb(elbv2_client):
                     lb_list, lb_inv_list = self._get_lb_parameters(lb, reg, cloudwatch, alb_price, nlb_price, lb_list, lb_inv_list)
 
