@@ -38,12 +38,13 @@ def lambda_handler(event=None, context=None):
     webhook_url = env_config['webhook_url']
     report_bucket = env_config['report_bucket']
     #Verifying Identities
-    email_addresses = to_address.split(',')
-    email_addresses.append(from_address)
-    unique_list = set(email_addresses) 
-    email_addresses = (list(unique_list))
-    response= verify_identity(email_addresses)
-    print(response)
+    if 'email' in  reporting_platform.lower().split(','):
+        email_addresses = to_address.split(',')
+        email_addresses.append(from_address)
+        unique_list = set(email_addresses) 
+        email_addresses = (list(unique_list))
+        response= verify_identity(email_addresses)
+        print(response)
     #Report Headerse
     headers_inventory = ['ResourceID','ResouceName','ServiceName','Type','VPC',
                           'State','Region', 'Idle'

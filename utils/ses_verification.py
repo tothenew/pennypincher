@@ -10,7 +10,6 @@ def verify_email_identity(address):
 def verify_identity(emailaddresses):
     response = ses_client.list_identities( IdentityType='EmailAddress')
     identities=response["Identities"]
-    print(identities)
     for email in emailaddresses:
         if email not in identities:
             verify_email_identity(email)

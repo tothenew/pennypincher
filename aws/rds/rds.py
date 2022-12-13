@@ -126,8 +126,10 @@ class RelationalDatabaseService:
             for reg in self.regions:
                 client, cloudwatch, pricing = self._get_clients(reg)
                 for rds_instance in self._describe_rds(client):
-                        rds_list,rds_inv_list = self._get_parameters(rds_instance, reg, cloudwatch, pricing, rds_list, rds_inv_list)
-                        
+                        try:
+                            rds_list,rds_inv_list = self._get_parameters(rds_instance, reg, cloudwatch, pricing, rds_list, rds_inv_list)
+                        except:
+                            print("PriceList is empty")
             #To fetch top 10 resources with maximum saving.
             rds_sorted_list = sorted(rds_list, key=lambda x: x[10], reverse=True)
             total_savings = self._get_savings(rds_sorted_list)
