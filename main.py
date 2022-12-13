@@ -16,13 +16,13 @@ from utils.config_parser import check_env
 from utils.s3_send import uploadDirectory
 from utils.filemanager import FileManager
 from utils.generate_inv import GENINV
-
+from utils.ses_verification import verify_identity
 log = logging.getLogger(__name__)
 log.setLevel(logging.DEBUG)
 
 def lambda_handler(event=None, context=None):
     print("Starting PennyPincher")
-
+    
     default_config = parse_config('./utils/default.yaml') 
     overwrite_config = parse_config('./config.yaml') 
     final_config = merges(default_config,overwrite_config)
@@ -37,8 +37,14 @@ def lambda_handler(event=None, context=None):
     account_name = env_config['account_name'] 
     webhook_url = env_config['webhook_url']
     report_bucket = env_config['report_bucket']
-
-    #Report Headers
+    #Verifying Identities
+    email_addresses = to_address.split(',')
+    email_addresses.append(from_address)
+    unique_list = set(email_addresses) 
+    email_addresses = (list(unique_list))
+    response= verify_identity(email_addresses)
+    print(response)
+    #Report Headerse
     headers_inventory = ['ResourceID','ResouceName','ServiceName','Type','VPC',
                           'State','Region', 'Idle'
                         ]

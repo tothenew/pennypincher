@@ -2,37 +2,32 @@ AWSTemplateFormatVersion: '2010-09-09'
 
 Parameters:
   AccountName:
-    Description: 'Takes account name as input'
+    Description: '(Optional)- Takes account name as input'
     Type: 'String'
   ReportingPlatform:
     Description: 'Takes comma seperated reporting values, allowed values are S3, Slack, Email'
     Type: 'String'
-    Default: 'Email'
+    Default: 's3'
   SlackChannelName:
-    Description: 'Takes slack channel name as input. Keep the defaults in case slack notifications are not required'
+    Description: '(Optional) Takes slack channel name as input. Keep the defaults in case slack notifications are not required'
     Type: 'String'
     Default: '-'
   WebhookUrl:
-    Description: 'Takes slack webhook url as input . Keep the defaults in case slack notifications are not required'
+    Description: '(Optional)Takes slack webhook url as input . Keep the defaults in case slack notifications are not required'
     Type: 'String'
     Default: '-'
   SESFromEmailAddress:
     Type: 'String'
-    Description: 'Takes the email id from which the mail containing cost report will be sent. Keep the defaults in case email notifications are not required'
-    Default: '-'
+    Description: '(Optional) Takes the email id from which the mail containing cost report will be sent. Keep the defaults in case email notifications are not required'
   SESToEmailAddress:
-    Description: 'Takes email ids (in comma separated format) to which the mail containing cost report will be sent. Keep the defaults in case email notifications are not required'
+    Description: '(Optional) Takes email id to which the mail containing cost report will be sent. Keep the defaults in case email notifications are not required'
     Type: 'String'
-    Default: '-'
   SESRegion:
-    Description: 'Takes the AWS region abbreviation (e.g. ap-south-1 for Mumbai) in which SES is configured'
+    Description: '(Optional) Takes the AWS region abbreviation (e.g. ap-south-1 for Mumbai) in which SES is configured'
     Type: 'String'
     Default: 'us-east-1'
   ReportBucket:
-    Description: 'A S3 bucket to store reports'
-    Type: "String"
-  ImageUri:
-    Description: "Docker Image URI"
+    Description: '(Optional)- A S3 bucket to store reports'
     Type: "String"
 
 Conditions:
@@ -41,12 +36,12 @@ Conditions:
     - ""
   VerifyToEmail: !Equals
     - !Ref SESToEmailAddress
-    - "-"
+    - ""
   IfToEmailNotNull: !Not
     - Condition: VerifyToEmail
   VerifyFromEmail: !Equals
     - !Ref SESFromEmailAddress
-    - "-"
+    - ""
   IfFromEmailNotNull: !Not
     - Condition: VerifyFromEmail
 
@@ -135,26 +130,13 @@ Resources:
                }'
             - { ReportBucket: !If [ CreateReportBucket, !Ref ManagedReportBucket, !Ref ReportBucket ] }
 
-  ToEmailVerfification:
-    Type: AWS::SES::EmailIdentity
-    Condition: IfToEmailNotNull
-    Properties: 
-      EmailIdentity: !Ref SESToEmailAddress
-
-  FromEmailVerfification:
-    Type: AWS::SES::EmailIdentity
-    Condition: IfFromEmailNotNull
-    Properties: 
-      EmailIdentity: !Ref SESFromEmailAddress
-      
   LambdaFunction:
     Type: 'AWS::Lambda::Function'
     Description: 'Generates Cost report with all the idle resources information and sends it to email or slack or both'
     Properties:
-      #'Penny-Pincher-Docker-Lambda-4'
       FunctionName: !Join
       - "-"
-      - - "Penny-Pincher-Docker-Lambda"
+      - - "Penny-Pincher-Lambda"
         - !Select
           - 0
           - !Split
@@ -166,10 +148,13 @@ Resources:
                 - !Ref "AWS::StackId"
       Architectures:
         - x86_64
+      Runtime: 'python3.8'
       Role: !GetAtt ServiceRoleForLambda.Arn
+      Handler: 'main.cfnresponsefun'
       Code:
-        ImageUri: !Ref ImageUri
-      PackageType: 'Image'
+        S3Bucket: penny-pincher-s3-bucket
+        S3Key: 'penny.zip'
+      PackageType: 'Zip'
       Timeout: 900
       MemorySize: 1024
       Environment:
@@ -189,10 +174,6 @@ Resources:
     Properties:
       ServiceToken: !GetAtt LambdaFunction.Arn
 
-Outputs:
-  BucketName:
-    Description: S3 bucket name
-    Value: !Ref ManagedReportBucket
 
       
            
