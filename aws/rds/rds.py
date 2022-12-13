@@ -101,6 +101,8 @@ class RelationalDatabaseService:
                 f"DatabaseConnections == {self.config['connectionCount']}",
                 savings
                ]
+            print("============upper rds==================")
+            print(rds)
             rds_list.append(rds)
         rds_inv =[
                 rds_instance["DBInstanceIdentifier"],
@@ -112,10 +114,10 @@ class RelationalDatabaseService:
                 reg,
                 is_idle
             ]
+        print("============upper rds_inv==================")
+        print(rds_inv)
         rds_inv_list.append(rds_inv)
-        
         return rds_list, rds_inv_list
-
 
     def get_result(self):     
         """Returns a list of lists which contains headings and idle RDS information."""
@@ -127,7 +129,9 @@ class RelationalDatabaseService:
                 client, cloudwatch, pricing = self._get_clients(reg)
                 for rds_instance in self._describe_rds(client):
                         rds_list,rds_inv_list = self._get_parameters(rds_instance, reg, cloudwatch, pricing, rds_list, rds_inv_list)
-                        
+
+            print("rds_list=="+rds_list)
+            print("rds_inv_list=="+rds_inv_list)
             #To fetch top 10 resources with maximum saving.
             rds_sorted_list = sorted(rds_list, key=lambda x: x[10], reverse=True)
             total_savings = self._get_savings(rds_sorted_list)

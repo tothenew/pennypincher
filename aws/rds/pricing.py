@@ -97,6 +97,7 @@ class Pricing:
                 f = self.rds_filter.format(r=self.formatted_region, i=db_instance, e=db_engine, d=deployment_option)
             instance_data = self.pricing_client.get_products(ServiceCode='AmazonRDS', Filters=json.loads(f))
             instance_price = get_price1(instance_data)
+            print(type(instance_price))
             f = self.rds_storage.format(r=self.formatted_region, d=deployment_option, v=db_volume)
             volume_data = self.pricing_client.get_products(ServiceCode='AmazonRDS', Filters=json.loads(f))
             volume_price = get_price(volume_data) * allocated_storage
