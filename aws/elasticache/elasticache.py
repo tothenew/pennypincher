@@ -120,7 +120,7 @@ class Elasticache:
                 client, cloudwatch, pricing = self._get_clients(reg)
                 elasticache_clusters = self._describe_elasticache(client)
                 for cache in elasticache_clusters:
-                    ec_list = self._get_parameters(cache, reg, cloudwatch, pricing, ec_list, ec_inv_list)
+                    ec_list,ec_inv_list = self._get_parameters(cache, reg, cloudwatch, pricing, ec_list, ec_inv_list)
                     
             #To fetch top 10 resources with maximum saving.
             ec_sorted_list = sorted(ec_list, key=lambda x: x[10], reverse=True)
