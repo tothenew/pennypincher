@@ -51,10 +51,15 @@ class HTML:
     def body_to_html(self, body, savings):   
         """Generates html table with list of lists."""
         html = ''
+        print("printing body")
+        print(type(body))
+        print("printing values of body +++++")
+        print(body)
         for result in body:
             html = html + '<tr>'
             for i in result:
-                if result.index(i) == 9:
+                #to skip criteria column from html format report (skipping criteria colum to reduce redundant occurrence of same criteria)
+                if result.index(i) == 9: # index 9 = criteria 
                     continue
                 else:
                     html = html + "<td>%s</td>" % (i)
