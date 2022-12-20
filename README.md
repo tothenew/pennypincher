@@ -69,7 +69,11 @@ For detailed instructions, refer to [Setup through Docker Compose](docs/setup_th
 2. `pip3 install -r requirements.txt`
 3. `python3 main.py`
 
+### SES approval
 
+1. An email address which we are using as identity to send report, it needs to be verified before we use it. 
+2. While deploying tool as lambda function through cloudformation stack, it verify an email and user gets one verification email in which he can find one link and user needs to follow that link to verify that email.
+3. After verification user gets the reports.
 ### Configuration Files and Usage
 Pennnypincher finds the idle resources based on the default criteria mentioned in the below table.
 We have provided support for [config.yaml](https://github.com/tothenew/pennypincher/blob/release_1.0/config.yaml) file which allows the end user to override the default configuration values.
