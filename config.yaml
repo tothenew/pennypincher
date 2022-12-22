@@ -40,9 +40,9 @@
 #       cloudwatch_metrics_days: 14
 #       cloudwatch_metrics_period: 1209600
     
- config:
-   env:  
-      report_bucket: !ENV ${REPORT_BUCKET}
+#  config:
+#    env:  
+#     report_bucket: !ENV ${REPORT_BUCKET} #Value can be picked up via cloudformation
 #     channel_name: '-'             #Slack Channel Name
 #     webhook_url: '-'                   #Slack Channel webhook url
 #     config: 'Null'                         #Configuration for Cloudwatch e.g. ebs=20, lb=15

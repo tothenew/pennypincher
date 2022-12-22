@@ -164,7 +164,6 @@ Resources:
     Type: 'AWS::Lambda::Function'
     Description: 'Generates Cost report with all the idle resources information and sends it to email or slack or both'
     Properties:
-      #'Penny-Pincher-Docker-Lambda-4'
       FunctionName: !Join
       - "-"
       - - "Penny-Pincher-Docker-Lambda"
@@ -207,10 +206,7 @@ Resources:
     Properties:
       ServiceToken: !GetAtt LambdaFunction.Arn
 
-Outputs:
-  BucketName:
-    Description: S3 bucket name
-    Value: !Ref ManagedReportBucket
+
 
       
            
