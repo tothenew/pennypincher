@@ -54,7 +54,8 @@ class HTML:
         for result in body:
             html = html + '<tr>'
             for i in result:
-                if result.index(i) == 9:
+                #to skip criteria column from html format report (skipping criteria colum to reduce redundant occurrence of same criteria)
+                if result.index(i) == 9: # index 9 = criteria
                     continue
                 else:
                     html = html + "<td>%s</td>" % (i)
