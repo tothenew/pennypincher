@@ -83,11 +83,24 @@ class Pricing:
             license_model = 'License included'
             if db_license == 'bring-your-own-license':
                 license_model = 'Bring your own license'
-            deployment_option = 'Single-AZ'
             if multi_az:
-                deployment_option = 'Multi-AZ'
+                deployment_option = 'Multi-AZ'    
             db_engine = self._get_rds_engine(db_engine_identifier)
             db_volume = self._get_rds_volume(storage_type)
+            if not multi_az:
+                deployment_option = 'Single-AZ'
+                f = self.rds_filter.format(r=self.formatted_region, i=db_instance, e=db_engine, d=deployment_option)
+                instance_data = self.pricing_client.get_products(ServiceCode='AmazonRDS', Filters=json.loads(f))
+                if len(instance_data['PriceList']) != 0:
+                    instance_price = get_price1(instance_data)
+                else:
+                    deployment_option = 'Multi-AZ (readable standbys)'
+                    if len(instance_data['PriceList']) != 0:
+                        instance_price = get_price1(instance_data)
+                    else:
+                        deployment_option == 'Multi-AZ (SQL Server Mirror)'
+                        instance_price = get_price1(instance_data)
+                
             if 'SQL Server' in db_engine or 'Oracle' in db_engine:
                 db_edition = self._get_rds_edition(db_engine_identifier)
                 f = self.rds_filter_oracle_mysql.format(r=self.formatted_region, i=db_instance, e=db_engine,

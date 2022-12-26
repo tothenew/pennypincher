@@ -123,10 +123,10 @@ class Resources:
            html += html_resource
  
            ####EIP####
-           summary, summary_inv = self.eip()
-           html_resource , resource_info, inventory_info = self.get_summary('EIP', summary, summary_inv, html_obj, slack_obj, resource_info, inventory_info)
-           total_savings += summary['savings']
-           html += html_resource
+        #    summary, summary_inv = self.eip()
+        #    html_resource , resource_info, inventory_info = self.get_summary('EIP', summary, summary_inv, html_obj, slack_obj, resource_info, inventory_info)
+        #    total_savings += summary['savings']
+        #    html += html_resource
  
            ####ELASTICACHE####
            summary, summary_inv = self.ec()
