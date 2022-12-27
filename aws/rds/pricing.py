@@ -6,6 +6,7 @@ from utils.utils import get_region_name, get_price, get_price1, handle_limit_exc
 
 class Pricing:
     """For getting and returning the price of the RDS."""
+    
     #Filters for get_products pricing api call used to fetch RDS price.
     rds_filter = '[{{"Field": "databaseEngine", "Value": "{e}", "Type": "TERM_MATCH"}},' \
                  '{{"Field": "instanceType", "Value": "{i}", "Type": "TERM_MATCH"}},' \
@@ -104,7 +105,7 @@ class Pricing:
             if 'SQL Server' in db_engine or 'Oracle' in db_engine:
                 db_edition = self._get_rds_edition(db_engine_identifier)
                 f = self.rds_filter_oracle_mysql.format(r=self.formatted_region, i=db_instance, e=db_engine,
-                                                   d=deployment_option, de=db_edition, lm=license_model)   
+                                                   d=deployment_option, de=db_edition, lm=license_model)
             else:
                 f = self.rds_filter.format(r=self.formatted_region, i=db_instance, e=db_engine, d=deployment_option)
             instance_data = self.pricing_client.get_products(ServiceCode='AmazonRDS', Filters=json.loads(f))

@@ -101,6 +101,7 @@ def get_price(data):
     price = float(od[id1]['priceDimensions'][id2]['pricePerUnit']['USD'])
     return price
 
+
 def get_price1(data):   
     """Fetches and returns price from pricing api json."""
     od = json.loads(data['PriceList'][0])['terms']['OnDemand']
@@ -108,6 +109,7 @@ def get_price1(data):
     id2 = list(od[id1]['priceDimensions'])[0]
     price = float(od[id1]['priceDimensions'][id2]['pricePerUnit']['USD'])
     return price * 732
+
 
 def get_price2(data):  
     """Fetches and returns price from pricing api json."""
