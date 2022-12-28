@@ -103,7 +103,6 @@ def get_price(data):
 
 
 def get_price1(data):   
-    print(data)
     """Fetches and returns price from pricing api json."""
     od = json.loads(data['PriceList'][0])['terms']['OnDemand']
     id1 = list(od)[0]

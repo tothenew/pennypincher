@@ -6,7 +6,6 @@ from aws.rds.pricing import Pricing
 from utils.client import Client
 from utils.cloudwatch_utils import CloudwatchUtils
 from utils.utils import handle_limit_exceeded_exception
-import boto3
 
 class RelationalDatabaseService:
     """To fetch information of all idle RDS instances."""
@@ -56,24 +55,21 @@ class RelationalDatabaseService:
         pricing = Pricing(pricing_client, reg)
         return client, cloudwatch, pricing
    
-    def _get_parameters(self, rds_instance, reg, cloudwatch, pricing, rds_list, rds_inv_list, multi_az_capable):
+    def _get_parameters(self, rds_instance, reg, cloudwatch, pricing, rds_list, rds_inv_list):
         """Returns a list containing idle RDS information."""    
         rds = []
         is_idle = 'No'
         iops = 0
         if 'iops' in rds_instance.keys():
             iops = rds_instance['Iops']
-        print("getting error")
+
         db_cost, storage_cost = pricing.get_rds_price(rds_instance["Engine"],
                                                         rds_instance['DBInstanceClass'],
                                                         rds_instance['MultiAZ'], rds_instance['LicenseModel'],
                                                         rds_instance['StorageType'],
                                                         rds_instance['AllocatedStorage'],
-                                                        iops,
-                                                        multi_az_capable
-                                                        )
-        
-# self.get_orderable_options(client, rds_instance)
+                                                        iops)
+
         avg_cpu, avg_cpu = cloudwatch.get_avg_max_metric('AWS/RDS', 'CPUUtilization',
                                                             'DBInstanceIdentifier',
                                                             rds_instance["DBInstanceIdentifier"], self.config)
@@ -119,37 +115,25 @@ class RelationalDatabaseService:
         rds_inv_list.append(rds_inv)
         
         return rds_list, rds_inv_list
-    
-    def get_orderable_options(self, client, rds_instance):
-        db_engine = rds_instance["DBInstanceIdentifier"]
-        instance_data = client.describe_orderable_db_instance_options(Engine=db_engine)
-        result = instance_data['MultiAZCapable']
-        print(instance_data)
-        return result
+
 
     def get_result(self):     
         """Returns a list of lists which contains headings and idle RDS information."""
         try:
             rds_list = []
             rds_inv_list = []
-            
+
             for reg in self.regions:
                 client, cloudwatch, pricing = self._get_clients(reg)
-                # client = boto3.client('rds')
                 for rds_instance in self._describe_rds(client):
-                        # try:
-                        #     # rds_list,rds_inv_list = self._get_parameters(rds_instance, reg, rds_list, rds_inv_list)
-                        multi_az_capable = self.get_orderable_options(client, rds_instance)
-                        rds_list,rds_inv_list = self._get_parameters(rds_instance, reg, cloudwatch, pricing, rds_list, rds_inv_list, multi_az_capable)
-                        # except:
-                        #     print("PriceList is empty")
+                        try:
+                            rds_list,rds_inv_list = self._get_parameters(rds_instance, reg, cloudwatch, pricing, rds_list, rds_inv_list)
+                        except:
+                            print("PriceList is empty")
             #To fetch top 10 resources with maximum saving.
             rds_sorted_list = sorted(rds_list, key=lambda x: x[10], reverse=True)
             total_savings = self._get_savings(rds_sorted_list)
-            print(total_savings)
-            print(rds_sorted_list)
             return {'resource_list': rds_sorted_list, 'headers': self.headers, 'savings': total_savings}, {'headers_inv': self.headers_inventory, 'inv_list': rds_inv_list}
-        
 
         except exceptions.ClientError as error:
             handle_limit_exceeded_exception(error, 'rds.py')
