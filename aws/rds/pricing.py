@@ -3,6 +3,7 @@ from botocore import exceptions
 import sys
 import json
 from utils.utils import get_region_name, get_price, get_price1, handle_limit_exceeded_exception
+import boto3
 
 class Pricing:
     """For getting and returning the price of the RDS."""
@@ -78,29 +79,38 @@ class Pricing:
             sys.exit(1)
 
     def get_rds_price(self, db_engine_identifier, db_instance, multi_az, db_license, storage_type, allocated_storage,
-                      iops):  
+                      iops, multi_az_capabale): 
         """Returns RDS Price."""
         try:
             license_model = 'License included'
             if db_license == 'bring-your-own-license':
                 license_model = 'Bring your own license'
-            if multi_az:
-                deployment_option = 'Multi-AZ'    
             db_engine = self._get_rds_engine(db_engine_identifier)
             db_volume = self._get_rds_volume(storage_type)
-            if not multi_az:
-                deployment_option = 'Single-AZ'
-                f = self.rds_filter.format(r=self.formatted_region, i=db_instance, e=db_engine, d=deployment_option)
-                instance_data = self.pricing_client.get_products(ServiceCode='AmazonRDS', Filters=json.loads(f))
-                if len(instance_data['PriceList']) != 0:
-                    instance_price = get_price1(instance_data)
+            if multi_az:
+                deployment_option = 'Multi-AZ'
+            else:
+                # orerable_api ## for_db_cluster
+                if multi_az_capabale:
+                    deployment_option = 'Single-AZ'
                 else:
                     deployment_option = 'Multi-AZ (readable standbys)'
-                    if len(instance_data['PriceList']) != 0:
-                        instance_price = get_price1(instance_data)
-                    else:
-                        deployment_option == 'Multi-AZ (SQL Server Mirror)'
-                        instance_price = get_price1(instance_data)
+            # if len(instance_data['PriceList']) != 0:
+            #     deployment_option = 'Multi-AZ (SQL Server Mirror)'
+            
+            # if not multi_az:
+            #     deployment_option = 'Single-AZ'
+            #     f = self.rds_filter.format(r=self.formatted_region, i=db_instance, e=db_engine, d=deployment_option)
+            #     instance_data = self.pricing_client.get_products(ServiceCode='AmazonRDS', Filters=json.loads(f))
+            #     if len(instance_data['PriceList']) != 0:
+            #         instance_price = get_price1(instance_data)
+            #     else:
+            #         deployment_option = 'Multi-AZ (readable standbys)'
+            #         if len(instance_data['PriceList']) != 0:
+            #             instance_price = get_price1(instance_data)
+            #         else:
+            #             deployment_option == 'Multi-AZ (SQL Server Mirror)'
+            #             instance_price = get_price1(instance_data)
                 
             if 'SQL Server' in db_engine or 'Oracle' in db_engine:
                 db_edition = self._get_rds_edition(db_engine_identifier)
@@ -108,7 +118,8 @@ class Pricing:
                                                    d=deployment_option, de=db_edition, lm=license_model)
             else:
                 f = self.rds_filter.format(r=self.formatted_region, i=db_instance, e=db_engine, d=deployment_option)
-            instance_data = self.pricing_client.get_products(ServiceCode='AmazonRDS', Filters=json.loads(f))
+            # instance_data = self.pricing_client.get_products(ServiceCode='AmazonRDS', Filters=json.loads(f))
+            instance_data = self.pricing_client.describe_orderable_db_instance_options(Engine=db_engine, Filters=json.loads(f))
             instance_price = get_price1(instance_data)
             f = self.rds_storage.format(r=self.formatted_region, d=deployment_option, v=db_volume)
             volume_data = self.pricing_client.get_products(ServiceCode='AmazonRDS', Filters=json.loads(f))
@@ -121,6 +132,7 @@ class Pricing:
 
             storage_price = volume_price + iops_price
             return float(instance_price), float(storage_price)
+            
 
         except exceptions.ClientError as error:
             handle_limit_exceeded_exception(error, 'rds pricing.py')
