@@ -12,6 +12,9 @@ class Pricing:
                  '{{"Field": "instanceType", "Value": "{i}", "Type": "TERM_MATCH"}},' \
                  '{{"Field": "location", "Value": "{r}", "Type": "TERM_MATCH"}},' \
                  '{{"Field": "deploymentOption", "Value": "{d}", "Type": "TERM_MATCH"}}]'
+    non_deployment_option_filter= '[{{"Field": "databaseEngine", "Value": "{e}", "Type": "TERM_MATCH"}},' \
+                 '{{"Field": "instanceType", "Value": "{i}", "Type": "TERM_MATCH"}},' \
+                 '{{"Field": "location", "Value": "{r}", "Type": "TERM_MATCH"}}]'
 
     rds_filter_oracle_mysql = '[{{"Field": "databaseEngine", "Value": "{e}", "Type": "TERM_MATCH"}},' \
                               '{{"Field": "instanceType", "Value": "{i}", "Type": "TERM_MATCH"}},' \
@@ -23,6 +26,8 @@ class Pricing:
     rds_storage = '[{{"Field": "volumeType", "Value": "{v}", "Type": "TERM_MATCH"}},' \
                   '{{"Field": "location", "Value": "{r}", "Type": "TERM_MATCH"}},' \
                   '{{"Field": "deploymentOption", "Value": "{d}", "Type": "TERM_MATCH"}}]'
+    non_deployment_option_storage_filter= '[{{"Field": "volumeType", "Value": "{v}", "Type": "TERM_MATCH"}},' \
+                  '{{"Field": "location", "Value": "{r}", "Type": "TERM_MATCH"}}]'
 
     rds_iops = '[{{"Field": "productFamily", "Value": "Provisioned IOPS", "Type": "TERM_MATCH"}},' \
                '{{"Field": "location", "Value": "{r}", "Type": "TERM_MATCH"}},' \
@@ -78,15 +83,19 @@ class Pricing:
             sys.exit(1)
 
     def get_rds_price(self, db_engine_identifier, db_instance, multi_az, db_license, storage_type, allocated_storage,
-                      iops):  
+                      iops,oderable_data):  
         """Returns RDS Price."""
         try:
             license_model = 'License included'
             if db_license == 'bring-your-own-license':
                 license_model = 'Bring your own license'
-            deployment_option = 'Single-AZ'
             if multi_az:
                 deployment_option = 'Multi-AZ'
+            else:
+                if not oderable_data["MultiAZCapable"]  and oderable_data["Engine"]== "postgres":
+                    deployment_option = 'Multi-AZ (readable standbys)'
+                else:
+                    deployment_option = 'Single-AZ'
             db_engine = self._get_rds_engine(db_engine_identifier)
             db_volume = self._get_rds_volume(storage_type)
             if 'SQL Server' in db_engine or 'Oracle' in db_engine:
@@ -95,7 +104,14 @@ class Pricing:
                                                    d=deployment_option, de=db_edition, lm=license_model)
             else:
                 f = self.rds_filter.format(r=self.formatted_region, i=db_instance, e=db_engine, d=deployment_option)
+            # print(oderable_data)
             instance_data = self.pricing_client.get_products(ServiceCode='AmazonRDS', Filters=json.loads(f))
+            if instance_data['PriceList'] == []:
+                f = self.non_deployment_option_filter.format(r=self.formatted_region, i=db_instance, e=db_engine)
+                instance_price = get_price1(instance_data)
+                f = self.non_deployment_option_storage_filter.format(r=self.formatted_region, v=db_volume)
+                volume_data = self.pricing_client.get_products(ServiceCode='AmazonRDS', Filters=json.loads(f))
+                volume_price = get_price(volume_data) * allocated_storage                
             instance_price = get_price1(instance_data)
             f = self.rds_storage.format(r=self.formatted_region, d=deployment_option, v=db_volume)
             volume_data = self.pricing_client.get_products(ServiceCode='AmazonRDS', Filters=json.loads(f))
