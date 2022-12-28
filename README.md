@@ -2,6 +2,7 @@
 
 [![CodeQL Status](https://github.com/tothenew/pennypincher/workflows/CodeQL/badge.svg)](https://github.com/tothenew/pennypincher/actions)
 [![LICENSE](https://img.shields.io/github/license/tothenew/pennypincher)](https://github.com/tothenew/pennypincher/blob/master/LICENSE)
+[![Launch Stack](https://s3.amazonaws.com/cloudformation-examples/cloudformation-launch-stack.png)](https://console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/new?stackName=&templateURL=https://pennypicher-s3.s3.amazonaws.com/penny_pincher_cfn.yml)
 
 ### Overview 
 
@@ -67,7 +68,11 @@ For detailed instructions, refer to [Setup through Docker Compose](docs/setup_th
 2. `pip3 install -r requirements.txt`
 3. `python3 main.py`
 
+### SES approval
 
+1. An email address which we are using as identity to send report, it needs to be verified before we use it. 
+2. While deploying tool as lambda function through cloudformation stack, it verify an email and user gets one verification email in which he can find one link and user needs to follow that link to verify that email.
+3. After verification user gets the reports.
 ### Configuration Files and Usage
 Pennnypincher finds the idle resources based on the default criteria mentioned in the below table.
 We have provided support for [config.yaml](https://github.com/tothenew/pennypincher/blob/release_1.0/config.yaml) file which allows the end user to override the default configuration values.
