@@ -3,7 +3,6 @@ from botocore import exceptions
 import sys
 import json
 from utils.utils import get_region_name, get_price, get_price1, handle_limit_exceeded_exception
-import boto3
 
 class Pricing:
     """For getting and returning the price of the RDS."""
@@ -84,7 +83,7 @@ class Pricing:
             sys.exit(1)
 
     def get_rds_price(self, db_engine_identifier, db_instance, multi_az, db_license, storage_type, allocated_storage,
-                      iops, orderable_data):  
+                      iops,orderable_data):  
         """Returns RDS Price."""
         try:
             license_model = 'License included'
@@ -97,14 +96,12 @@ class Pricing:
                     deployment_option = 'Multi-AZ (readable standbys)'
                 else:
                     deployment_option = 'Single-AZ'
-            db_engine = self._get_rds_engine(db_engine_identifier)
-            db_volume = self._get_rds_volume(storage_type)
-            
             if orderable_data["MultiAZCapable"] and (orderable_data["Engine"]=="sqlserver-ee" or orderable_data["Engine"]=="sqlserver-se"):
                 deployment_option = 'Multi-AZ (SQL Server Mirror)'
             else:
                 deployment_option = 'Single-AZ'
-            
+            db_engine = self._get_rds_engine(db_engine_identifier)
+            db_volume = self._get_rds_volume(storage_type)
             if 'SQL Server' in db_engine or 'Oracle' in db_engine:
                 db_edition = self._get_rds_edition(db_engine_identifier)
                 f = self.rds_filter_oracle_mysql.format(r=self.formatted_region, i=db_instance, e=db_engine,
@@ -131,7 +128,6 @@ class Pricing:
 
             storage_price = volume_price + iops_price
             return float(instance_price), float(storage_price)
-            
 
         except exceptions.ClientError as error:
             handle_limit_exceeded_exception(error, 'rds pricing.py')

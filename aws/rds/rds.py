@@ -6,7 +6,6 @@ from aws.rds.pricing import Pricing
 from utils.client import Client
 from utils.cloudwatch_utils import CloudwatchUtils
 from utils.utils import handle_limit_exceeded_exception
-import boto3
 
 class RelationalDatabaseService:
     """To fetch information of all idle RDS instances."""
@@ -33,7 +32,7 @@ class RelationalDatabaseService:
         response = client.describe_db_instances()
         return response['DBInstances']
 
-    def _get_orderable_options(self, client, rds_instance):
+    def get_orderable_options(self, client, rds_instance):
         # print(rds_instance)
         data = client.describe_orderable_db_instance_options(Engine=rds_instance['Engine'],DBInstanceClass=rds_instance['DBInstanceClass'],LicenseModel=rds_instance['LicenseModel'])
         return data["OrderableDBInstanceOptions"][0]
@@ -61,13 +60,14 @@ class RelationalDatabaseService:
         pricing = Pricing(pricing_client, reg)
         return client, cloudwatch, pricing
    
-    def _get_parameters(self, rds_instance, reg, cloudwatch, pricing, rds_list, rds_inv_list, orderable_data):
+    def _get_parameters(self, rds_instance, reg, cloudwatch, pricing, rds_list, rds_inv_list,orderable_data):
         """Returns a list containing idle RDS information."""    
         rds = []
         is_idle = 'No'
         iops = 0
         if 'iops' in rds_instance.keys():
             iops = rds_instance['Iops']
+
         db_cost, storage_cost = pricing.get_rds_price(rds_instance["Engine"],
                                                         rds_instance['DBInstanceClass'],
                                                         rds_instance['MultiAZ'], rds_instance['LicenseModel'],
@@ -121,24 +121,24 @@ class RelationalDatabaseService:
         
         return rds_list, rds_inv_list
 
+
     def get_result(self):     
         # """Returns a list of lists which contains headings and idle RDS information."""
         try:
             rds_list = []
             rds_inv_list = []
-            
+
             for reg in self.regions:
                 client, cloudwatch, pricing = self._get_clients(reg)
                 for rds_instance in self._describe_rds(client):
                         try:
-                            orderable_data=self._get_orderable_options(client, rds_instance)
-                            rds_list,rds_inv_list = self._get_parameters(rds_instance, reg, cloudwatch, pricing, rds_list, rds_inv_list, orderable_data)
+                            orderable_data=self.get_orderable_options(client, rds_instance)
+                            rds_list,rds_inv_list = self._get_parameters(rds_instance, reg, cloudwatch, pricing, rds_list, rds_inv_list,orderable_data)
                         except:
                             print("PriceList may be empty")
             #To fetch top 10 resources with maximum saving.
             rds_sorted_list = sorted(rds_list, key=lambda x: x[10], reverse=True)
             total_savings = self._get_savings(rds_sorted_list)
-            print(total_savings)
             return {'resource_list': rds_sorted_list, 'headers': self.headers, 'savings': total_savings}, {'headers_inv': self.headers_inventory, 'inv_list': rds_inv_list}
 
         except exceptions.ClientError as error:
