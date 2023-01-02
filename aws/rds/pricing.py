@@ -83,7 +83,7 @@ class Pricing:
             sys.exit(1)
 
     def get_rds_price(self, db_engine_identifier, db_instance, multi_az, db_license, storage_type, allocated_storage,
-                      iops,orderable_data):  
+                      iops, orderable_data):  
         """Returns RDS Price."""
         try:
             license_model = 'License included'
