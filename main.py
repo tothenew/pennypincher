@@ -114,15 +114,15 @@ def cfnresponsefun(event, context):
     try:
         response = None
         print(event)
-        if event['RequestType'] == 'Create' or event['RequestType'] == 'Update':
-            response = lambda_handler()#Main logic to run, in our case lambda_handler function
-            print(response)
-
-        cfnresponse.send(event, context, cfnresponse.SUCCESS, response, physical_resource_id)
+        response = lambda_handler() # Main logic to run, in our case lambda_handler function
+        print(response)
+        if 'RequestType' in event:
+            if event['RequestType'] == 'Create' or event['RequestType'] == 'Update':
+                cfnresponse.send(event, context, cfnresponse.SUCCESS, response, physical_resource_id)
         return 'Completed Successfully'
 
     except Exception as ex:
-        log.error("Error: Failed to %s update release info on gateway: %s" % (event['RequestType'], str(ex)))
+        log.error("Error: Failed to %s trigger the lambda: %s" % (event['RequestType'], str(ex)))
         cfnresponse.send(event, context,
                         cfnresponse.FAILED,
                         {'Exception': repr(ex)})
