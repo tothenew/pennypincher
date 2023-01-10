@@ -134,8 +134,9 @@ class RelationalDatabaseService:
                         try:
                             oderable_data=self.get_orderable_options(client, rds_instance)
                             rds_list,rds_inv_list = self._get_parameters(rds_instance, reg, cloudwatch, pricing, rds_list, rds_inv_list,oderable_data)
-                        except:
+                        except Exception as e:
                             print("PriceList may be empty")
+                            self.logger.error("Error on line {} in rds.py".format(sys.exc_info()[-1].tb_lineno) + " | Message: " + str(e))
             #To fetch top 10 resources with maximum saving.
             rds_sorted_list = sorted(rds_list, key=lambda x: x[10], reverse=True)
             total_savings = self._get_savings(rds_sorted_list)
