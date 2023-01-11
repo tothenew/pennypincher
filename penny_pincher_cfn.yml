@@ -27,7 +27,7 @@ Parameters:
     Type: 'String'
     Default: 'us-east-1'
   ReportBucket:
-    Description: '(Optional)- A S3 bucket to store reports'
+    Description: '(Optional)- Takes existing S3 bucket to store reports'
     Type: "String"
 
 Conditions:
