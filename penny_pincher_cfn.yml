@@ -9,18 +9,18 @@ Parameters:
     Type: 'String'
     Default: 's3'
   SlackChannelName:
-    Description: '(Optional) Takes slack channel name as input. Keep the defaults in case slack notifications are not required'
+    Description: '(If you have chosen 'slack' as a reporting platform)Takes slack channel name as input. Keep the defaults in case slack notifications are not required'
     Type: 'String'
     Default: '-'
   WebhookUrl:
-    Description: '(Optional)Takes slack webhook url as input . Keep the defaults in case slack notifications are not required'
+    Description: '(If you have chosen 'slack' as a reporting platform)Takes slack webhook url as input . Keep the defaults in case slack notifications are not required'
     Type: 'String'
     Default: '-'
-  SESFromEmailAddress:
+  SenderEmailAddress:
     Type: 'String'
-    Description: '(Optional) Takes the email id from which the mail containing cost report will be sent. Keep the defaults in case email notifications are not required'
-  SESToEmailAddress:
-    Description: '(Optional) Takes email id to which the mail containing cost report will be sent. Keep the defaults in case email notifications are not required'
+    Description: '(If you have chosen 'email' as a reporting platform) Takes the email id from which the mail containing cost report will be sent. Keep the defaults in case email notifications are not required'
+  RecipientEmailAddress:
+    Description: '(If you have chosen 'email' as a reporting platform) Takes email id to which the mail containing cost report will be sent. Keep the defaults in case email notifications are not required'
     Type: 'String'
   SESRegion:
     Description: '(Optional) Takes the AWS region abbreviation (e.g. ap-south-1 for Mumbai) in which SES is configured'
@@ -35,12 +35,12 @@ Conditions:
     - !Ref ReportBucket
     - ""
   VerifyToEmail: !Equals
-    - !Ref SESToEmailAddress
+    - !Ref RecipientEmailAddress
     - ""
   IfToEmailNotNull: !Not
     - Condition: VerifyToEmail
   VerifyFromEmail: !Equals
-    - !Ref SESFromEmailAddress
+    - !Ref SenderEmailAddress
     - ""
   IfFromEmailNotNull: !Not
     - Condition: VerifyFromEmail
@@ -163,8 +163,8 @@ Resources:
           ACCOUNT_NAME: !Ref AccountName
           REPORTING_PLATFORM: !Ref ReportingPlatform
           CHANNEL_NAME: !Ref SlackChannelName
-          FROM_ADDRESS: !Ref SESFromEmailAddress
-          TO_ADDRESS: !Ref SESToEmailAddress
+          FROM_ADDRESS: !Ref SenderEmailAddress
+          TO_ADDRESS: !Ref RecipientEmailAddress
           SES_REGION: !Ref SESRegion
           REPORT_BUCKET: !If [ CreateReportBucket, !Ref ManagedReportBucket, !Ref ReportBucket ]
           WEBHOOK_URL: !Ref WebhookUrl

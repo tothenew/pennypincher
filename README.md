@@ -42,8 +42,13 @@ The tool is created by considering three types of user
 2. Supported Python version v3 and above.
 3. Supported Boto3 version v1.17.66 and above
 
+### There are three ways to use this tool, which are as follows
 
-### Quick Setup With Docker
+### 1. With Cloudformation
+1. At the top of this readme.md file there is one button named 'Launch Stack', click on this button.
+2. Enter required information.
+3. Launch cnf stack with 'submit' button.
+### 2. Quick Setup With Docker
 
 
 To start Penny Pincher, run the following command
@@ -62,17 +67,17 @@ After the setup is complete, it will generate the report in an HTML and CSV form
 
 For detailed instructions, refer to [Setup through Docker Compose](docs/setup_through_docker.md)
 
-### Local
+### 3. Local
 
 1. Set up AWS CLI or Generate the access tokens and set them as environment variables.
 2. `pip3 install -r requirements.txt`
 3. `python3 main.py`
 
-### SES approval
+### If user choose 'email' as a reporting platform then how does user get an email notification ?
 
 1. An email address which we are using as identity to send report, it needs to be verified before we use it. 
-2. While deploying tool as lambda function through cloudformation stack, it verify an email and user gets one verification email in which he can find one link and user needs to follow that link to verify that email.
-3. After verification user gets the reports.
+2. While deploying tool as lambda function through cloudformation stack, it verify an email and user gets one verification email in which user can find one link and he/she needs to follow that link to verify that email.
+3. After verification user gets the reports on same email.
 ### Configuration Files and Usage
 Pennnypincher finds the idle resources based on the default criteria mentioned in the below table.
 We have provided support for [config.yaml](https://github.com/tothenew/pennypincher/blob/release_1.0/config.yaml) file which allows the end user to override the default configuration values.
@@ -89,8 +94,8 @@ Users just need to uncomment the resource and config block to change the default
 5. SES_REGION
 6. REPORTING_PLATFORM :- Where to send the report 
     1. email*
-    2. email* and slack
-    3. slack
+    2. slack
+    3. s3
     4. Generate on Local (Default)
 8. ACCOUNT_NAME :- AWS Account Name
 ```
