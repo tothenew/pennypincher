@@ -89,4 +89,4 @@ class Pricing:
         except Exception as e:
             self.logger.error("Error on line {} in ec2 pricing.py".format(sys.exc_info()[-1].tb_lineno) + " | Message: "
                               + str(e))
-            sys.exit(1)
+            # sys.exit(1)

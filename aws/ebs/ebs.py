@@ -122,7 +122,11 @@ class ElasticBlockStore:
             for reg in self.regions:
                 client, cloudwatch, pricing = self._get_clients(reg)
                 for vol in self._describe_ebs(client):
-                    ebs_list,ebs_inv_list  = self._get_parameters(vol, reg, cloudwatch, pricing, ebs_list, ebs_inv_list)
+                    try:
+                        ebs_list,ebs_inv_list  = self._get_parameters(vol, reg, cloudwatch, pricing, ebs_list, ebs_inv_list)
+                    except Exception as e:
+                        print("PriceList may be empty")
+                        self.logger.error("Error on line {} in rds.py".format(sys.exc_info()[-1].tb_lineno) + " | Message: " + str(e))
             
             #To fetch top 10 resources with maximum saving.
             ebs_sorted_list = sorted(ebs_list, key=lambda x: x[10], reverse=True)

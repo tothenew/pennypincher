@@ -134,9 +134,12 @@ class Elasticsearch:
             for reg in self.regions:
                 client, cloudwatch, pricing = self._get_clients(reg)
                 for domainName in self._list_elasticsearch(client):
-                    es = self._describe_elasticsearch(client, domainName["DomainName"])
-                    es_list, elasticsearch_inv_list = self._get_parameters(es, reg, cloudwatch, pricing, es_list, elasticsearch_inv_list)
-                    
+                    try:
+                        es = self._describe_elasticsearch(client, domainName["DomainName"])
+                        es_list, elasticsearch_inv_list = self._get_parameters(es, reg, cloudwatch, pricing, es_list, elasticsearch_inv_list)
+                    except Exception as e:
+                        print("PriceList may be empty")
+                        self.logger.error("Error on line {} in rds.py".format(sys.exc_info()[-1].tb_lineno) + " | Message: " + str(e))
 
             #To fetch top 10 resources with maximum saving.
             es_sorted_list = sorted(es_list, key=lambda x: x[10], reverse=True)

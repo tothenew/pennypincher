@@ -103,8 +103,11 @@ class Redshift:
             for reg in self.regions:
                 client, cloudwatch, pricing = self._get_clients(reg)
                 for cluster in self._describe_redshift_clusters(client):
-                    rs_list, rs_inv_list = self._get_parameters(cluster, reg, cloudwatch, pricing, rs_list, rs_inv_list)                    
-                    
+                    try:
+                        rs_list, rs_inv_list = self._get_parameters(cluster, reg, cloudwatch, pricing, rs_list, rs_inv_list)                    
+                    except Exception as e:
+                            print("PriceList may be empty")
+                            self.logger.error("Error on line {} in rds.py".format(sys.exc_info()[-1].tb_lineno) + " | Message: " + str(e))
                     
             #To fetch top 10 resources with maximum saving.
             rs_sorted_list = sorted(rs_list, key=lambda x: x[10], reverse=True)

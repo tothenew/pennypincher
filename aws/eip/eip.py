@@ -103,8 +103,11 @@ class ElasticIP:
             for reg in self.regions:
                 client, pricing = self._get_clients(reg)
                 for address in self._describe_eip(client):
+                    try:
                         eip_list,eip_inv_list = self._get_parameters(address, reg, client, pricing, eip_list, eip_inv_list)
-                        
+                    except Exception as e:
+                        print("PriceList may be empty")
+                        self.logger.error("Error on line {} in rds.py".format(sys.exc_info()[-1].tb_lineno) + " | Message: " + str(e))
             #To fetch top 10 resources with maximum saving.
             eip_sorted_list = sorted(eip_list, key=lambda x: x[10], reverse=True)
             total_savings = self._get_savings(eip_sorted_list[:11])
