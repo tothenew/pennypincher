@@ -9,18 +9,18 @@ Parameters:
     Type: 'String'
     Default: 's3'
   SlackChannelName:
-    Description: '(If you have chosen 'slack' as a reporting platform)Takes slack channel name as input. Keep the defaults in case slack notifications are not required'
+    Description: '(If you have chosen slack as a reporting platform)Takes slack channel name as input. Keep the defaults in case slack notifications are not required'
     Type: 'String'
     Default: '-'
   WebhookUrl:
-    Description: '(If you have chosen 'slack' as a reporting platform)Takes slack webhook url as input . Keep the defaults in case slack notifications are not required'
+    Description: '(If you have chosen slack as a reporting platform)Takes slack webhook url as input . Keep the defaults in case slack notifications are not required'
     Type: 'String'
     Default: '-'
   SenderEmailAddress:
     Type: 'String'
-    Description: '(If you have chosen 'email' as a reporting platform) Takes the email id from which the mail containing cost report will be sent. Keep the defaults in case email notifications are not required'
+    Description: '(If you have chosen email as a reporting platform) Takes the email id from which the mail containing cost report will be sent. Keep the defaults in case email notifications are not required'
   RecipientEmailAddress:
-    Description: '(If you have chosen 'email' as a reporting platform) Takes email id to which the mail containing cost report will be sent. Keep the defaults in case email notifications are not required'
+    Description: '(If you have chosen email as a reporting platform) Takes email id to which the mail containing cost report will be sent. Keep the defaults in case email notifications are not required'
     Type: 'String'
   SESRegion:
     Description: '(Optional) Takes the AWS region abbreviation (e.g. ap-south-1 for Mumbai) in which SES is configured'
