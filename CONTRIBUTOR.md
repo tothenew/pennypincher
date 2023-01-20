@@ -77,22 +77,20 @@ Pull requests follow a basic five step process:
 
    + **Make Needed Changes Locally.** The developer then is able to make their needed changes or additions to the code whether they are working on resolving an issue or new feature.
 
-   + Push Local Changes to Forked Repository. Once the developer has completed and tested the new code changes, they push these changes back to the forked repository they created in step one.
-
-   + Make a Pull Request. This is where the actual pull request takes place! After requesting a pull request, the main repository maintainer is alerted for review. The maintainer will then review the work done in the developer’s forked repository, and then make any comments or request any edits that need to be made for approval.
-
+   + **Push Local Changes to Forked Repository.** Once the developer has completed and tested the new code changes, they push these changes back to the forked repository they created in step one.
+   
+   + **Make a Pull Request.** This is where the actual pull request takes place! After requesting a pull request, the main repository maintainer is alerted for review. The maintainer will then review the work done in the developer’s forked repository, and then make any comments or request any edits that need to be made for approval.
    + Any edits are then sent back to the developer for additional commits (changes to code) that may be needed.
     If no edits are needed, the pull request is approved by the maintainer.
 
-   + Merge with Main Project. Once the repository maintainer has approved a pull request, the developer’s new updates in the forked repository are merged with the main project repository. The product is then updated with the new feature or bug fix, and can now be viewed by end users.
+   + **Merge with Main Project.** Once the repository maintainer has approved a pull request, the developer’s new updates in the forked repository are merged with the main project repository. The product is then updated with the new feature or bug fix, and can now be viewed by end users.
 
 ## Your First Code Contribution
 
 Unsure where to begin contributing to TTN? You can start by looking through these beginner and help-wanted issues:
 
-
-   + beginner - issues that should only require a few lines of code, and a test or two.
-
-   + help-wanted - issues which should be a bit more involved than beginner issues.
+   + **beginner** - issues that should only require a few lines of code, and a test or two.
+   
+   + **help-wanted** - issues which should be a bit more involved than beginner issues.
 
 Both issue lists are sorted by the total number of comments. While not perfect, the number of comments is a reasonable proxy for the impact a given change will have.
