@@ -14,7 +14,7 @@ jobs:
       run: bash ZipCode.sh 
 
     - name: push Zip to s3 bucket
-      run: aws  s3 cp /temp/penny/penny.zip s3://testbucket2700/
+      run: aws s3 cp /temp/penny/penny.zip s3://test1bucket2700/
       env:
         LOCAL_PATH: '/temp/penny/'
         AWS_S3_BUCKET: '${{secrets.AWS_S3_BUCKET_NAME}}'
