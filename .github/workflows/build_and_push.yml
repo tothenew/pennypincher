@@ -1,4 +1,4 @@
-name: ReleaseZip
+name: BuildAndPushZip
 
 on:
   push:
