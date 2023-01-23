@@ -3,7 +3,7 @@ name: ReleaseZip
 on:
   push:
     branches:
-      -  github-actions-tobuild-and-push-zip-to-s3
+      - build_&_push_zip_to_s3bucket_using_githubactions
 
 jobs:
   build:
