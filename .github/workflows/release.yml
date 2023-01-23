@@ -10,5 +10,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v1
-    - name: Release to S3
-      run: bash ZipCode.sh ${{secrets.AWS_S3_BUCKET_NAME}} "/tmp/penny/penny.zip" ${{secrets.AWS_ACCESS_KEY_ID}} ${{secrets.AWS_SECRET_ACCESS_KEY}} "penny.zip"
+    - name: Create zip
+      run: bash ZipCode.sh 
+
+    - name: push Zip to s3 bucket
+      uses:  actions/checkout@v2
+      env:
+        LOCAL_PATH: 'ZipCode.sh'
+        AWS_S3_BUCKET: '${{secrets.AWS_S3_BUCKET_NAME}}'
+        AWS_ACCESS_KEY_ID: ${{secrets.AWS_ACCESS_KEY_ID}}
+        AWS_SECRET_ACCESS_KEY: ${{secrets.AWS_SECRET_ACCESS_KEY}}
