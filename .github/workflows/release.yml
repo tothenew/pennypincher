@@ -14,7 +14,6 @@ jobs:
       run: bash ZipCode.sh 
 
     - name: push Zip to s3 bucket
-      uses:  actions/checkout@v2
       run: aws  s3 cp /temp/penny/penny.zip s3://testbucket2700/
       env:
         LOCAL_PATH: '/temp/penny/'
