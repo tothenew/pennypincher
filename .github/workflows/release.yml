@@ -11,4 +11,4 @@ jobs:
     steps:
     - uses: actions/checkout@v1
     - name: Release to S3
-      run: bash pennypincher/ZipCode.sh testbucket2700 "/tmp/penny/penny.zip" ${{secrets.AWS_ACCESS_KEY_ID}} ${{secrets.AWS_SECRET_ACCESS_KEY}} "penny.zip"
+      run: bash ZipCode.sh testbucket2700 "/tmp/penny/penny.zip" ${{secrets.AWS_ACCESS_KEY_ID}} ${{secrets.AWS_SECRET_ACCESS_KEY}} "penny.zip"
