@@ -44,6 +44,16 @@ def get_region_name(region_code):
                           'eu-south-1': 'EU (Milan)',
                           'me-south-1': 'Middle East (Bahrain)',
                           'sa-east-1': 'South America (Sao Paulo)',
+                          'af-south-1': 'Africa (Cape Town)',
+                          'ap-east-1': 'Asia Pacific (Hong Kong)',
+                          'ap-south-2' : 'Asia Pacific (Hyderabad)',
+                          'ap-southeast-3': 'Asia Pacific (Jakarta)',
+                          'eu-south-1': 'Europe (Milan)',
+                          'eu-south-2': 'Europe (Spain)',
+                          'eu-central-2': 'Europe (Zurich)',
+                          'me-south-1': 'Middle East (Bahrain)',
+                          'me-central-1': 'Middle East (UAE)'
+
                           }
         return region_mapping.get(region_code)
     except Exception as e:
@@ -87,6 +97,15 @@ def get_region_code(region_code):
                           'eu-north-1': 'EUN1',
                           'me-south-1': 'MES1',
                           'sa-east-1': 'SAE1',
+                          'af-south-1': 'AFS1',
+                          'ap-east-1': 'APE1',
+                          'ap-south-2' : 'APS5',
+                          'ap-southeast-3': 'APS4',
+                          'eu-south-1': 'EUS1',
+                          'eu-south-2': 'EUS2',
+                          'eu-central-2': 'EUC2',
+                          'me-south-1': 'MES1',
+                          'me-central-1': 'MEC1'
                           }
         return region_mapping.get(region_code)
     except Exception as e:
