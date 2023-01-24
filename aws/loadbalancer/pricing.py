@@ -30,7 +30,7 @@ class Pricing:
             else:
                 usageType = str(self.region_code) + '-LoadBalancerUsage'
             f = self.lb_filter.format(r=self.formatted_region, pf=product_family, ut=usageType)
-            data = self.pricing_client.get_products(ServiceCode='AmazonEC2', Filters=json.loads(f))
+            data = self.pricing_client.get_products(ServiceCode='AWSELB', Filters=json.loads(f))
             price = get_price1(data)
             return float(price)
 
