@@ -1,6 +1,9 @@
 AWSTemplateFormatVersion: '2010-09-09'
 
 Parameters:
+  LambdaIAMRoleArn:
+    Description: 'Takes ARN of IAM role which we are attaching to lambda'
+    Type: 'String'
   AccountName:
     Description: '(Optional)- Takes account name as input'
     Type: 'String'
@@ -62,74 +65,6 @@ Resources:
               - !Split
                 - "/"
                 - !Ref "AWS::StackId"
-      
-  ServiceRoleForLambda:
-    Type: 'AWS::IAM::Role'
-    Description: 'IAM role for Penny Pincher'
-    Properties:
-      RoleName: !Join
-      - "-"
-      - - "Penny-Pincher-Docker-Lambda"
-        - !Select
-          - 0
-          - !Split
-            - "-"
-            - !Select
-              - 2
-              - !Split
-                - "/"
-                - !Ref "AWS::StackId"
-      AssumeRolePolicyDocument:
-        Version: '2012-10-17'
-        Statement:
-          - Effect: 'Allow'
-            Principal:
-              Service:
-                - 'lambda.amazonaws.com'
-            Action:
-              - 'sts:AssumeRole'
-      ManagedPolicyArns:
-        - arn:aws:iam::aws:policy/AmazonSESFullAccess
-      Policies:
-        - PolicyName: 'Penny-Pincher-Lambda-Inline-Policy'
-          PolicyDocument: !Sub
-            - '{
-                   "Version": "2012-10-17",
-                   "Statement": [
-                       {
-                           "Sid": "VisualEditor0",
-                           "Effect": "Allow",
-                           "Action": [
-                               "ec2:DescribeImages",
-                               "ec2:DescribeInstances",
-                               "ec2:DescribeRegions",
-                               "ec2:DescribeVolumes",
-                               "ec2:DescribeAddresses",
-                               "pricing:GetProducts",
-                               "elasticache:DescribeCacheClusters",
-                               "es:ListDomainNames",
-                               "es:DescribeElasticsearchDomain",
-                               "elasticloadbalancing:DescribeLoadBalancers",
-                               "rds:DescribeDBInstances",
-                               "redshift:DescribeClusters",
-                               "ses:SendEmail",
-                               "logs:CreateLogStream",
-                               "logs:CreateLogGroup",
-                               "logs:PutLogEvents",
-                               "cloudwatch:GetMetricStatistics",
-                               "rds:DescribeOrderableDBInstanceOptions"
-                           ],
-                           "Resource": "*"
-                       },
-                       {
-                                  "Sid": "VisualEditor1",
-                                  "Effect": "Allow",
-                                  "Action": "*",
-                                  "Resource":"arn:aws:s3:::${ReportBucket}/*"
-                      }
-                   ]
-               }'
-            - { ReportBucket: !If [ CreateReportBucket, !Ref ManagedReportBucket, !Ref ReportBucket ] }
 
   LambdaFunction:
     Type: 'AWS::Lambda::Function'
@@ -150,7 +85,7 @@ Resources:
       Architectures:
         - x86_64
       Runtime: 'python3.8'
-      Role: !GetAtt ServiceRoleForLambda.Arn
+      Role: !Ref LambdaIAMRoleArn
       Handler: 'main.cfnresponsefun'
       Code:
         S3Bucket: penny-pincher-s3-bucket

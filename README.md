@@ -43,6 +43,7 @@ The tool is created by considering three types of user
 3. Supported Boto3 version v1.17.66 and above
 
 ### Permissions which needs to be give in IAM role
+```json
 {
   "Version": "2012-10-17",
   "Statement": [
@@ -79,6 +80,7 @@ The tool is created by considering three types of user
     }
   ]
 }
+```
 
 ### There are three ways to use this tool, which are as follows
 
