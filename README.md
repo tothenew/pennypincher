@@ -2,7 +2,7 @@
 
 [![CodeQL Status](https://github.com/tothenew/pennypincher/workflows/CodeQL/badge.svg)](https://github.com/tothenew/pennypincher/actions)
 [![LICENSE](https://img.shields.io/github/license/tothenew/pennypincher)](https://github.com/tothenew/pennypincher/blob/master/LICENSE)
-[![Launch Stack](https://s3.amazonaws.com/cloudformation-examples/cloudformation-launch-stack.png)](https://console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/new?stackName=&templateURL=https://penny-pincher-s3-bucket.s3.amazonaws.com/penny_pincher_cfn.yml)
+[![Launch Stack](https://s3.amazonaws.com/cloudformation-examples/cloudformation-launch-stack.png)](https://console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/new?stackName=&templateURL=https://test-pennypincher.s3.amazonaws.com/penny_pincher_cfn.yml)
 
 ### Overview 
 

@@ -88,7 +88,7 @@ Resources:
       Role: !Ref LambdaIAMRoleArn
       Handler: 'main.cfnresponsefun'
       Code:
-        S3Bucket: penny-pincher-s3-bucket
+        S3Bucket: test-pennypincher
         S3Key: 'penny.zip'
       PackageType: 'Zip'
       Timeout: 900
@@ -109,3 +109,17 @@ Resources:
     DependsOn: LambdaFunction
     Properties:
       ServiceToken: !GetAtt LambdaFunction.Arn
+
+  CronToTriggerLambda:
+    Type: AWS::Events::Rule
+    Properties: 
+      Description: Trigger lambda after 2 weeks
+      # EventBusName: String
+      Name: LambdaTrigger
+      RoleArn: !Ref LambdaIAMRoleArn
+      # ScheduleExpression: cron(0 0 ? * 2/2 *)
+      ScheduleExpression: cron(0/5 * * * ? *)
+      State: ENABLED
+      Targets: 
+        - Id: PennypincherLambdafunction
+          Arn: !GetAtt LambdaFunction.Arn
