@@ -1,0 +1,34 @@
+name: ReleaseZip
+
+on:
+  push:
+    branches:
+      -  githubactions-to-build-push-zipfile-tos3
+
+permissions:
+ id-token: write
+ contents: read 
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v1
+    - name: Create zip
+      run: bash ZipCode.sh 
+
+    - name: configure aws credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        role-to-assume: arn:aws:iam::366753255224:role/github-actions-role
+        role-duration-seconds: 900 # the ttl of the session, in seconds.
+        aws-region: us-east-1 # u
+
+    - name: push Zip to s3 
+      run: aws s3 cp /tmp/penny/penny.zip s3://testbucket2700/
+      env:
+        LOCAL_PATH: '/tmp/penny/'
+        AWS_S3_BUCKET: '${{secrets.AWS_S3_BUCKET_NAME}}'
+        AWS_ACCESS_KEY_ID: ${{secrets.AWS_ACCESS_KEY_ID}}
+        AWS_SECRET_ACCESS_KEY: ${{secrets.AWS_SECRET_ACCESS_KEY}}
+        AWS_DEFAULT_REGION: 'us-east-2'
