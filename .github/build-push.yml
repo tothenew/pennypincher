@@ -6,8 +6,8 @@ on:
       -  githubactions-to-build-push-zipfile-tos3
 
 permissions:
- id-token: write
- contents: read 
+  id-token: write
+  contents: read 
 
 jobs:
   build:
