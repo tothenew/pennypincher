@@ -22,13 +22,13 @@ jobs:
       with:
         role-to-assume: '${{secrets.IAMROLE_GITHUB}}'
         role-duration-seconds: 900 # the ttl of the session, in seconds.
-        aws-region: us-east-1 # u
+        aws-region: us-east-2 # u
 
     - name: push Zip to s3 
       run: aws s3 cp /tmp/penny/penny.zip s3://testbucket2700/
       env:
         LOCAL_PATH: '/tmp/penny/'
-        AWS_S3_BUCKET: '${{secrets.AWS_S3_BUCKET_NAME}}'
-        AWS_ACCESS_KEY_ID: ${{secrets.AWS_ACCESS_KEY_ID}}
-        AWS_SECRET_ACCESS_KEY: ${{secrets.AWS_SECRET_ACCESS_KEY}}
-        AWS_DEFAULT_REGION: 'us-east-2'
+        # AWS_S3_BUCKET: '${{secrets.AWS_S3_BUCKET_NAME}}'
+        # AWS_ACCESS_KEY_ID: ${{secrets.AWS_ACCESS_KEY_ID}}
+        # AWS_SECRET_ACCESS_KEY: ${{secrets.AWS_SECRET_ACCESS_KEY}}
+        # AWS_DEFAULT_REGION: 'us-east-2'
