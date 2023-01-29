@@ -1,0 +1,2 @@
+ResourceID,ResouceName,ServiceName,Type,VPC,State,Region,Finding,EvaluationPeriod (seconds),Criteria,Saving($)
+vol-02d42971db0615ad9,vol-02d42971db0615ad9,EBS,gp2,-,available,us-east-1,Available,1209600,VolumeReadOps+VolumeWriteOps == 0,10.0

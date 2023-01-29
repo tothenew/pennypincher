@@ -153,7 +153,7 @@ Resources:
       Role: !GetAtt ServiceRoleForLambda.Arn
       Handler: 'main.cfnresponsefun'
       Code:
-        S3Bucket: penny-pincher-s3-bucket
+        S3Bucket: testbucket2700
         S3Key: 'penny.zip'
       PackageType: 'Zip'
       Timeout: 900
