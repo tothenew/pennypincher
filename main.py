@@ -91,7 +91,7 @@ def lambda_handler(event=None, context=None):
             inv_obj.generate_inv()
         if 'email' in  reporting_platform.lower().split(','):
             ses_obj.ses_sendmail(
-                sub='Cost Optimization Report | ' + account_name + ' | Total Savings: $'+ str(round(total_savings, 2)),
+                sub='Cost Optimization Report | ' + account_name + ' | Total Savings: $'+ str(round(total_savings, 2)), dir_path=dir_path,
                 html=html)
         ## Sending report in s3   
         if 's3' in  reporting_platform.lower().split(','):

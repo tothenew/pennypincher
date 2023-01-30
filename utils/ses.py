@@ -17,7 +17,7 @@ class SES:
         logging.basicConfig(level=logging.WARNING)
         self.logger = logging.getLogger()
 
-    def ses_sendmail(self, sub, html=''):   
+    def ses_sendmail(self, sub, dir_path, html=''):   
         """Sends email."""
         
         try:
@@ -31,7 +31,7 @@ class SES:
             part = MIMEText(html, 'html')
             message.attach(part)
             
-            file = "pennypincher_summary_report.csv"
+            file = f"{dir_path}/pennypincher_summary_report.csv"
             part = MIMEApplication(open(file, 'rb').read())
             part.add_header('Content-Disposition', 'attachment', filename=file)
             content = message.attach(part)
