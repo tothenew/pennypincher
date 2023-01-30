@@ -118,7 +118,7 @@ Resources:
       Name: LambdaTrigger
       RoleArn: !Ref LambdaIAMRoleArn
       # ScheduleExpression: cron(0 0 ? * 2/2 *)
-      ScheduleExpression: cron(0/5 * * * ? *)
+      ScheduleExpression: cron(0/15 * * * ? *)
       State: ENABLED
       Targets: 
         - Id: PennypincherLambdafunction
