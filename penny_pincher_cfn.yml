@@ -113,13 +113,22 @@ Resources:
   CronToTriggerLambda:
     Type: AWS::Events::Rule
     Properties: 
-      Description: Trigger lambda after 2 weeks
+      Description: "ScheduledRule"
       # EventBusName: String
       Name: LambdaTrigger
-      RoleArn: !Ref LambdaIAMRoleArn
+      # RoleArn: !Ref LambdaIAMRoleArn
       # ScheduleExpression: cron(0 0 ? * 2/2 *)
-      ScheduleExpression: cron(0/15 * * * ? *)
+      # ScheduleExpression: cron(0/15 * * * ? *)
+      ScheduleExpression: "rate(10 minutes)"
       State: ENABLED
       Targets: 
         - Id: PennypincherLambdafunction
           Arn: !GetAtt LambdaFunction.Arn
+
+  PermissionForEventsToInvokeLambda: 
+    Type: AWS::Lambda::Permission
+    Properties: 
+      FunctionName: !Ref "LambdaFunction"
+    Action: "lambda:InvokeFunction"
+    Principal: "events.amazonaws.com"
+    SourceArn: !GetAtt CronToTriggerLambda.Arn
