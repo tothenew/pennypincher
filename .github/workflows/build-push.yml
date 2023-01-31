@@ -3,7 +3,7 @@ name: ReleaseZip
 on:
   push:
     branches:
-      -  githubactions-to-build-push-zipfile-tos3
+      -  develop
       
 permissions:
   id-token: write
@@ -15,7 +15,7 @@ jobs:
     steps:
     - uses: actions/checkout@v1
     - name: Create zip
-      run: bash ZipCode.sh 
+      run: bash ZipCode.sh
 
     - name: configure aws credentials
       uses: aws-actions/configure-aws-credentials@v1
