@@ -22,7 +22,7 @@ jobs:
       uses: aws-actions/configure-aws-credentials@v1
       with:
         role-to-assume: '${{secrets.IAMROLE_GITHUB}}'
-        role-duration-seconds: 300 # the ttl of the session, in seconds.
+        role-duration-seconds: 900 # the ttl of the session, in seconds.
         aws-region: us-east-1 # u
 
     - name: push Zip to s3 
