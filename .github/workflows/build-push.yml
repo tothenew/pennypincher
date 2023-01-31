@@ -3,7 +3,8 @@ name: ReleaseZip
 on:
   push:
     branches:
-      -  develop
+      - develop
+      - master
       
 permissions:
   id-token: write
@@ -29,4 +30,7 @@ jobs:
       env:
         LOCAL_PATH: '/tmp/penny/'
         AWS_S3_BUCKET: '${{secrets.AWS_S3_BUCKET_NAME}}'
+
+    - name: to make Zip public
+      run: aws s3api put-object-acl --acl public-read --bucket penny-pincher-s3-bucket --key penny.zip
         
