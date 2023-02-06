@@ -31,7 +31,7 @@ class HTML:
 
     def get_HTML_infix(self):   
         """To display resource name in page."""
-        html_infix = "<br><br><h4> Resource - "
+        html_infix = "<br><br><h4>  Resource -"
         return html_infix
 
     def get_HTML_suffix(self):
@@ -63,6 +63,8 @@ class HTML:
         html = html + "<br><b> Total Savings = $%s </b>" % (round(savings, 2))
         return html
 
+        
+
     def get_html_page(self, resource_name, headers, ebs_list, savings): 
         """Generates html page."""
         try:
@@ -75,6 +77,7 @@ class HTML:
             for resource in msg_list:
                 html = html_infix + resource[1] + " : </h4>" + criteria + html + resource[0]
             return html
+        
         except Exception as e:
             self.logger.error(
                 "Error on line {} in html_functions.py".format(sys.exc_info()[-1].tb_lineno) + " | Message: " +

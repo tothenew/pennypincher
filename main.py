@@ -17,6 +17,10 @@ from utils.s3_send import uploadDirectory
 from utils.filemanager import FileManager
 from utils.generate_inv import GENINV
 from utils.ses_verification import verify_identity
+from utils.html_functions import HTML
+from botocore.client import Config
+from datetime import date
+
 log = logging.getLogger(__name__)
 log.setLevel(logging.DEBUG)
 
@@ -68,8 +72,8 @@ def lambda_handler(event=None, context=None):
         html_obj = HTML()               #Object for generating html page
         ses_obj = SES(from_address=from_address, to_address=to_address, ses_region=ses_region)    #Object to send email
         slack_obj = Slackalert(channel=channel_name, webhook_url=webhook_url)           #object to send report to slack
+        # html_msg_obj = HTML_MSG()
 
-        print(html_obj)
         html, resource_info, total_savings, inventory_info = resource.get_report(html_obj, slack_obj)
         print("Total savings: $" + str(round(total_savings, 2)))
         current_datetime=datetime.utcnow().isoformat("T","minutes").replace(":", "-")
@@ -78,6 +82,21 @@ def lambda_handler(event=None, context=None):
         html_path = dir_path+ '/pennypincher_findings.html'
         header = '<h3><b>Cost Optimization Report |  ' + account_name + ' | Total Savings: $'+ str(round(total_savings, 2)) + '</h3></b>'
         html = header + html
+        date_obj = date.today()
+        date_obj_format = date_obj.strftime("%d %b %Y")
+        s3_signature ={
+                    'v4':'s3v4',
+                    'v2':'s3'
+                    }
+        session = boto3.Session()  
+        s3Client = session.client("s3",
+                                    config=Config(signature_version=s3_signature['v4'])
+                                    )
+            
+        response = s3Client.generate_presigned_url('get_object',
+                                                    Params={'Bucket': report_bucket,
+                                                            'Key': current_datetime+"/pennypincher_findings.html"},
+                                                    ExpiresIn=604800)
         with FileManager(html_path, 'w') as f:
             f.write(html)
         print("Findings File is at: pennypincher_findings.html")
@@ -92,7 +111,7 @@ def lambda_handler(event=None, context=None):
         if 'email' in  reporting_platform.lower().split(','):
             ses_obj.ses_sendmail(
                 sub='Cost Optimization Report | ' + account_name + ' | Total Savings: $'+ str(round(total_savings, 2)), dir_path=dir_path,
-                html=html)
+                tl_saving = str(round(total_savings, 2)), resource_info = resource_info, platform= reporting_platform, current_date = date_obj_format, url=response, bucket_name = report_bucket)
         ## Sending report in s3   
         if 's3' in  reporting_platform.lower().split(','):
             uploadDirectory(dir_path,report_bucket,current_datetime)
