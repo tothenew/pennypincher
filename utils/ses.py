@@ -84,16 +84,16 @@ class SES:
             file = f"{dir_path}/pennypincher_summary_report.csv"
             part = MIMEApplication(open(file, 'rb').read())
             part.add_header('Content-Disposition', 'attachment', filename=file)
-            content = message.attach(part)
+            message.attach(part)
 
-            response = ses.send_raw_email(
+            ses.send_raw_email(
             Source=message['From'],
             Destinations=[self.to_address],
             RawMessage={
                 'Data': message.as_string()
             }
             )
-    
+        
             print("Sending the Cost Optimization report to "+ self.to_address)
         except ses.meta.client.exceptions.MessageRejected as ex:
             if ex.response['Error']['Message'] == 'MessageRejected':
