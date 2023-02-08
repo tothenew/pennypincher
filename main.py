@@ -84,23 +84,13 @@ def lambda_handler(event=None, context=None):
         html = header + html
         date_obj = date.today()
         date_obj_format = date_obj.strftime("%d %b %Y")
-        s3_signature ={
-                    'v4':'s3v4',
-                    'v2':'s3'
-                    }
-        session = boto3.Session()  
-        s3Client = session.client("s3",
-                                    config=Config(signature_version=s3_signature['v4'])
-                                    )
-            
-        response = s3Client.generate_presigned_url('get_object',
-                                                    Params={'Bucket': report_bucket,
-                                                            'Key': current_datetime+"/pennypincher_findings.html"},
-                                                    ExpiresIn=604800)
+        
         with FileManager(html_path, 'w') as f:
             f.write(html)
         print("Findings File is at: pennypincher_findings.html")
         file_name = "/tmp/pennypincher_reports"
+        
+        pre_url = ''
         if len(resource_info) > 0:
             csv_obj = GENCSV(resource_info, total_savings, dir_path, current_datetime)
             csv_obj.generate_csv()
@@ -108,10 +98,25 @@ def lambda_handler(event=None, context=None):
         if len(inventory_info) > 0 :
             inv_obj = GENINV(inventory_info, dir_path, current_datetime)
             inv_obj.generate_inv()
+        if 's3' in  reporting_platform.lower().split(','):
+            uploadDirectory(dir_path,report_bucket,current_datetime)
+            s3_signature ={
+                    'v4':'s3v4',
+                    'v2':'s3'
+                    }
+            session = boto3.Session()  
+            s3Client = session.client("s3",
+                                    config=Config(signature_version=s3_signature['v4'])
+                                    )
+            pre_url = s3Client.generate_presigned_url('get_object',
+                                                    Params={'Bucket': report_bucket,
+                                                            'Key': current_datetime+"/pennypincher_findings.html"},
+                                                    ExpiresIn=604800)
+            
         if 'email' in  reporting_platform.lower().split(','):
             ses_obj.ses_sendmail(
                 sub='Cost Optimization Report | ' + account_name + ' | Total Savings: $'+ str(round(total_savings, 2)), dir_path=dir_path,
-                tl_saving = str(round(total_savings, 2)), resource_info = resource_info, platform= reporting_platform, current_date = date_obj_format, url=response, bucket_name = report_bucket)
+                tl_saving = str(round(total_savings, 2)), resource_info = resource_info, platform= reporting_platform, current_date = date_obj_format, url=pre_url, bucket_name = report_bucket)
         ## Sending report in s3   
         if 's3' in  reporting_platform.lower().split(','):
             uploadDirectory(dir_path,report_bucket,current_datetime)

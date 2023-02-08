@@ -6,6 +6,7 @@ import sys
 from email.mime.text import MIMEText
 from email.mime.application import MIMEApplication
 from email.mime.multipart import MIMEMultipart
+import os
 
 
 class SES:
@@ -77,14 +78,17 @@ class SES:
             message['To'] = ', '.join([self.to_address])
         
             html = self.generate_summary_html(tl_saving, resource_info, platform, current_date, url, bucket_name)
-            # message body
+            
             part = MIMEText(html, 'html')
             message.attach(part)
+        
+            files = [f'{dir_path}/pennypincher_summary_report.csv', f'{dir_path}/pennypincher_inventory.csv']
             
-            file = f"{dir_path}/pennypincher_summary_report.csv"
-            part = MIMEApplication(open(file, 'rb').read())
-            part.add_header('Content-Disposition', 'attachment', filename=file)
-            message.attach(part)
+            for file in files:
+                with open(file, 'rb') as f:
+                    part = MIMEApplication(f.read())
+                    part.add_header('Content-Disposition', 'attachment', filename=os.path.basename(file))
+                    message.attach(part)
 
             ses.send_raw_email(
             Source=message['From'],
