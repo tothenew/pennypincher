@@ -89,22 +89,3 @@ Resources:
     DependsOn: LambdaFunction
     Properties:
       ServiceToken: !GetAtt LambdaFunction.Arn
-
-  CronToTriggerLambda:
-    Type: AWS::Events::Rule
-    Properties: 
-      Description: "ScheduledRule"
-      Name: LambdaTrigger
-      ScheduleExpression: cron(0 0 ? * 2/2 *)
-      State: ENABLED
-      Targets: 
-        - Id: PennypincherLambdafunction
-          Arn: !GetAtt LambdaFunction.Arn
-
-  PermissionForEventsToInvokeLambda: 
-    Type: AWS::Lambda::Permission
-    Properties: 
-      FunctionName: !Ref "LambdaFunction"
-      Action: "lambda:InvokeFunction"
-      Principal: "events.amazonaws.com"
-      SourceArn: !GetAtt CronToTriggerLambda.Arn
