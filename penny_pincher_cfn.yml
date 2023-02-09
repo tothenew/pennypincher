@@ -34,9 +34,6 @@ Parameters:
     Type: "String"
 
 Conditions:
-  CreateReportBucket: !Equals
-    - !Ref ReportBucket
-    - ""
   VerifyToEmail: !Equals
     - !Ref RecipientEmailAddress
     - ""
@@ -49,23 +46,6 @@ Conditions:
     - Condition: VerifyFromEmail
 
 Resources:
-  ManagedReportBucket:
-    Type: AWS::S3::Bucket
-    Condition: CreateReportBucket
-    Properties:
-      BucketName:  !Join
-      - "-"
-      - - "pennypincher-managedbucket"
-        - !Select
-          - 0
-          - !Split
-            - "-"
-            - !Select
-              - 2
-              - !Split
-                - "/"
-                - !Ref "AWS::StackId"
-
   LambdaFunction:
     Type: 'AWS::Lambda::Function'
     Description: 'Generates Cost report with all the idle resources information and sends it to email or slack or both'
