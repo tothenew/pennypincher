@@ -5,13 +5,13 @@ def verify_email_identity(address):
     response = ses_client.verify_email_identity(
         EmailAddress=address
     )
-    print(response)
 
 def verify_identity(emailaddresses):
     response = ses_client.list_identities( IdentityType='EmailAddress')
     identities=response["Identities"]
     for email in emailaddresses:
         if email not in identities:
+            print("Please check email and click the link which you have received in the mail.")
             verify_email_identity(email)
         else:
             print(f"{email} is already verified")
