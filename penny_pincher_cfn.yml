@@ -81,7 +81,7 @@ Resources:
           FROM_ADDRESS: !Ref SenderEmailAddress
           TO_ADDRESS: !Ref RecipientEmailAddress
           SES_REGION: !Ref SESRegion
-          REPORT_BUCKET: !If [ CreateReportBucket, !Ref ManagedReportBucket, !Ref ReportBucket ]
+          REPORT_BUCKET: !Ref ReportBucket 
           WEBHOOK_URL: !Ref WebhookUrl
 
   TriggerPennyPincher:
