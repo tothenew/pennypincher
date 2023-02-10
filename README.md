@@ -41,6 +41,47 @@ The tool is created by considering three types of user
 1. To scan the entire account, the IAM user or keys should have ReadOnlyAccess.
 2. Supported Python version v3 and above.
 3. Supported Boto3 version v1.17.66 and above
+4. S3 bucket - to store reports (If you want s3 as reporting platform)
+5. User should create IAM role with policies which are listed below 
+   > Note - Replace the 'ReportBucket' with name of s3 bucket which you have created already
+```json
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "VisualEditor0",
+      "Effect": "Allow",
+      "Action": [
+        "ec2:DescribeImages",
+        "ec2:DescribeInstances",
+        "ec2:DescribeRegions",
+        "ec2:DescribeVolumes",
+        "ec2:DescribeAddresses",
+        "pricing:GetProducts",
+        "elasticache:DescribeCacheClusters",
+        "es:ListDomainNames",
+        "es:DescribeElasticsearchDomain",
+        "elasticloadbalancing:DescribeLoadBalancers",
+        "rds:DescribeDBInstances",
+        "redshift:DescribeClusters",
+        "ses:SendEmail",
+        "logs:CreateLogStream",
+        "logs:CreateLogGroup",
+        "logs:PutLogEvents",
+        "cloudwatch:GetMetricStatistics",
+        "rds:DescribeOrderableDBInstanceOptions"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Sid": "VisualEditor1",
+      "Effect": "Allow",
+      "Action": "*",
+      "Resource": "arn:aws:s3:::${ReportBucket}/*"
+    }
+  ]
+}
+```
 
 ### Permissions which needs to be give in IAM role
 ```json

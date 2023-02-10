@@ -33,4 +33,8 @@ jobs:
 
     - name: making zip public
       run: aws s3api put-object-acl --acl public-read --bucket '${{secrets.AWS_S3_BUCKET_NAME}}' --key penny.zip
+<<<<<<< HEAD
 
+=======
+        
+>>>>>>> 53eba0596bcdedb36a43727f52a0bc12229ae601

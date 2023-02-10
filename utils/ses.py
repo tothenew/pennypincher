@@ -71,11 +71,11 @@ class SES:
         """Sends email."""
         
         try:
+            self.to_address.split(',')
             ses = boto3.client('ses', region_name='us-east-1')
             message = MIMEMultipart()
             message['Subject'] = sub
             message['From'] = self.from_address
-            message['To'] = ', '.join([self.to_address])
         
             html = self.generate_summary_html(tl_saving, resource_info, platform, current_date, url, bucket_name)
             
@@ -92,7 +92,7 @@ class SES:
 
             ses.send_raw_email(
             Source=message['From'],
-            Destinations=[self.to_address],
+            Destinations= self.to_address.split(','),
             RawMessage={
                 'Data': message.as_string()
             }

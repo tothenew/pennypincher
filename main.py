@@ -123,7 +123,7 @@ def lambda_handler(event=None, context=None):
         if 'slack' in  reporting_platform.lower().split(','):
             print("Sending report to slack .....")
             slack_obj.slack_alert(resource_info, account_name, str(round(total_savings, 2)),report_bucket,current_datetime,reporting_platform)      
-                 
+                
     except Exception as e:
         logger.error("Error on line {} in main.py".format(sys.exc_info()[-1].tb_lineno) +
                      " | Message: " + str(e))
