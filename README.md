@@ -46,41 +46,41 @@ The tool is created by considering three types of user
    > Note - Replace the 'ReportBucket' with name of s3 bucket which you have created already
 ```json
 {
-                   "Version": "2012-10-17",
-                   "Statement": [
-                       {
-                           "Sid": "VisualEditor0",
-                           "Effect": "Allow",
-                           "Action": [
-                               "ec2:DescribeImages",
-                               "ec2:DescribeInstances",
-                               "ec2:DescribeRegions",
-                               "ec2:DescribeVolumes",
-                               "ec2:DescribeAddresses",
-                               "pricing:GetProducts",
-                               "elasticache:DescribeCacheClusters",
-                               "es:ListDomainNames",
-                               "es:DescribeElasticsearchDomain",
-                               "elasticloadbalancing:DescribeLoadBalancers",
-                               "rds:DescribeDBInstances",
-                               "redshift:DescribeClusters",
-                               "ses:SendEmail",
-                               "logs:CreateLogStream",
-                               "logs:CreateLogGroup",
-                               "logs:PutLogEvents",
-                               "cloudwatch:GetMetricStatistics",
-                               "rds:DescribeOrderableDBInstanceOptions"
-                           ],
-                           "Resource": "*"
-                       },
-                       {
-                                  "Sid": "VisualEditor1",
-                                  "Effect": "Allow",
-                                  "Action": "*",
-                                  "Resource":"arn:aws:s3:::${ReportBucket}/*"
-                      }
-                   ]
-               }
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "VisualEditor0",
+      "Effect": "Allow",
+      "Action": [
+        "ec2:DescribeImages",
+        "ec2:DescribeInstances",
+        "ec2:DescribeRegions",
+        "ec2:DescribeVolumes",
+        "ec2:DescribeAddresses",
+        "pricing:GetProducts",
+        "elasticache:DescribeCacheClusters",
+        "es:ListDomainNames",
+        "es:DescribeElasticsearchDomain",
+        "elasticloadbalancing:DescribeLoadBalancers",
+        "rds:DescribeDBInstances",
+        "redshift:DescribeClusters",
+        "ses:SendEmail",
+        "logs:CreateLogStream",
+        "logs:CreateLogGroup",
+        "logs:PutLogEvents",
+        "cloudwatch:GetMetricStatistics",
+        "rds:DescribeOrderableDBInstanceOptions"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Sid": "VisualEditor1",
+      "Effect": "Allow",
+      "Action": "*",
+      "Resource": "arn:aws:s3:::${ReportBucket}/*"
+    }
+  ]
+}
 ```
 
 ### There are three ways to use this tool, which are as follows
