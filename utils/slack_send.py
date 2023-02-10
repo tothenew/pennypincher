@@ -51,7 +51,7 @@ class Slackalert:
             response = s3Client.generate_presigned_url('get_object',
                                                     Params={'Bucket': bucket_name,
                                                             'Key': current_datetime+"/pennypincher_findings.html"},
-                                                    ExpiresIn=86400)
+                                                    ExpiresIn=604800)
             #print(response)
             print("total saving is"+total_savings)
             #list to store fields
