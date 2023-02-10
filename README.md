@@ -42,7 +42,8 @@ The tool is created by considering three types of user
 2. Supported Python version v3 and above.
 3. Supported Boto3 version v1.17.66 and above
 4. S3 bucket - to store reports (If you want s3 as reporting platform)
-5. User should create IAM role with policies which are listed below (Note - Replace the 'ReportBucket' with name of s3 bucket which you have created already)
+5. User should create IAM role with policies which are listed below 
+   > Note - Replace the 'ReportBucket' with name of s3 bucket which you have created already
 ```json
 {
                    "Version": "2012-10-17",
