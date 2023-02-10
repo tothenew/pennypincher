@@ -6,15 +6,15 @@
 ### Click 'Launch stack' button to use tool with cloudformation.
 Launch stack with S3 as a reporting platform
 
-[![Launch Stack](https://s3.amazonaws.com/cloudformation-examples/cloudformation-launch-stack.png)](https://us-east-1.console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/create/review?templateURL=https://for-cfn.s3.amazonaws.com/penny_pincher_cfn.yml&param_ReportingPlatform=s3)
+[![Launch Stack](https://s3.amazonaws.com/cloudformation-examples/cloudformation-launch-stack.png)](https://us-east-1.console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/create/review?templateURL=https://penny-pincher-s3-bucket.s3.amazonaws.com/penny_pincher_cfn.yml&param_ReportingPlatform=s3)
 
 Launch stack with email as a reporting platform
 
-[![Launch Stack](https://s3.amazonaws.com/cloudformation-examples/cloudformation-launch-stack.png)](https://us-east-1.console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/create/review?templateURL=https://for-cfn.s3.amazonaws.com/penny_pincher_cfn.yml&param_ReportingPlatform=email)
+[![Launch Stack](https://s3.amazonaws.com/cloudformation-examples/cloudformation-launch-stack.png)](https://us-east-1.console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/create/review?templateURL=https://penny-pincher-s3-bucket.s3.amazonaws.com/penny_pincher_cfn.yml&param_ReportingPlatform=email)
 
 Launch stack with slack as a reporting platform
 
-[![Launch Stack](https://s3.amazonaws.com/cloudformation-examples/cloudformation-launch-stack.png)](https://us-east-1.console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/create/review?templateURL=https://for-cfn.s3.amazonaws.com/penny_pincher_cfn.yml&param_ReportingPlatform=slack)
+[![Launch Stack](https://s3.amazonaws.com/cloudformation-examples/cloudformation-launch-stack.png)](https://us-east-1.console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/create/review?templateURL=https://penny-pincher-s3-bucket.s3.amazonaws.com/penny_pincher_cfn.yml&param_ReportingPlatform=slack)
 
 ### Overview 
 
