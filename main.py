@@ -17,6 +17,9 @@ from utils.s3_send import uploadDirectory
 from utils.filemanager import FileManager
 from utils.generate_inv import GENINV
 from utils.ses_verification import verify_identity
+from botocore.client import Config
+from datetime import date
+
 log = logging.getLogger(__name__)
 log.setLevel(logging.DEBUG)
 
@@ -80,8 +83,11 @@ def lambda_handler(event=None, context=None):
         html = header + html
         with FileManager(html_path, 'w') as f:
             f.write(html)
+        date_obj = date.today()
+        date_obj_format = date_obj.strftime("%d %b %Y")
         print("Findings File is at: pennypincher_findings.html")
         file_name = "/tmp/pennypincher_reports"
+        pre_url = ''
         if len(resource_info) > 0:
             csv_obj = GENCSV(resource_info, total_savings, dir_path, current_datetime)
             csv_obj.generate_csv()
@@ -89,13 +95,25 @@ def lambda_handler(event=None, context=None):
         if len(inventory_info) > 0 :
             inv_obj = GENINV(inventory_info, dir_path, current_datetime)
             inv_obj.generate_inv()
-        if 'email' in  reporting_platform.lower().split(','):
-            ses_obj.ses_sendmail(
-                sub='Cost Optimization Report | ' + account_name + ' | Total Savings: $'+ str(round(total_savings, 2)),
-                html=html)
-        ## Sending report in s3   
+          ## Sending report in s3   
         if 's3' in  reporting_platform.lower().split(','):
             uploadDirectory(dir_path,report_bucket,current_datetime)
+            s3_signature ={
+                    'v4':'s3v4',
+                    'v2':'s3'
+                    }
+            session = boto3.Session()  
+            s3Client = session.client("s3",
+                                    config=Config(signature_version=s3_signature['v4'])
+                                    )
+            pre_url = s3Client.generate_presigned_url('get_object',
+                                                    Params={'Bucket': report_bucket,
+                                                            'Key': current_datetime+"/pennypincher_findings.html"},
+                                                    ExpiresIn=604800)
+        if 'email' in  reporting_platform.lower().split(','):
+            ses_obj.ses_sendmail(
+                sub='Cost Optimization Report | ' + account_name + ' | Total Savings: $'+ str(round(total_savings, 2)), dir_path=dir_path,
+                tl_saving = str(round(total_savings, 2)), resource_info = resource_info, platform= reporting_platform, current_date = date_obj_format, url=pre_url, bucket_name = report_bucket)
         if 'slack' in  reporting_platform.lower().split(','):
             print("Sending report to slack .....")
             slack_obj.slack_alert(resource_info, account_name, str(round(total_savings, 2)),report_bucket,current_datetime,reporting_platform)      
