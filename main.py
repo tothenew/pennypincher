@@ -80,7 +80,8 @@ def lambda_handler(event=None, context=None):
         os.makedirs(dir_path,exist_ok=True)
         html_path = dir_path+ '/pennypincher_findings.html'
         header = '<h3><b>Cost Optimization Report |  ' + account_name + ' | Total Savings: $'+ str(round(total_savings, 2)) + '</h3></b>'
-        html = header + html
+        logo = '<img src="pennypincher-logo.png" height="200" width="200" >'
+        html = logo + header + html
         with FileManager(html_path, 'w') as f:
             f.write(html)
         date_obj = date.today()
