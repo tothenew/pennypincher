@@ -111,10 +111,10 @@ class Resources:
            html += html_resource
  
            ####LOADBALANCERS####
-           summary, summary_inv = self.lb()
-           html_resource , resource_info, inventory_info = self.get_summary('LOADBALANCERS', summary, summary_inv, html_obj, slack_obj, resource_info, inventory_info)
-           total_savings += summary['savings']
-           html += html_resource
+        #    summary, summary_inv = self.lb()
+        #    html_resource , resource_info, inventory_info = self.get_summary('LOADBALANCERS', summary, summary_inv, html_obj, slack_obj, resource_info, inventory_info)
+        #    total_savings += summary['savings']
+        #    html += html_resource
         
            ####EBS####
            summary, summary_inv = self.ebs()

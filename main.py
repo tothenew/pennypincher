@@ -78,14 +78,15 @@ def lambda_handler(event=None, context=None):
         current_datetime=datetime.utcnow().isoformat("T","minutes").replace(":", "-")
         dir_path=f"/tmp/pennypincher_reports/{current_datetime}"
         os.makedirs(dir_path,exist_ok=True)
+        date_obj = date.today()
+        date_obj_format = date_obj.strftime("%d %b %Y")
         html_path = dir_path+ '/pennypincher_findings.html'
-        header = '<h3><b>Cost Optimization Report |  ' + account_name + ' | Total Savings: $'+ str(round(total_savings, 2)) + '</h3></b>'
+        # header = '<h3><u><b>Cost Optimization Report |  ' + account_name + ' | Total Savings: $'+ str(round(total_savings, 2)) + '</b></u></h3>'
+        header = '<h3><u><b>' + date_obj_format + ' | Total Savings: $'+ str(round(total_savings, 2)) + '</b></u></h3>'
         logo = '<img src="pennypincher-logo.png" height="200" width="200" >'
         html = logo + header + html
         with FileManager(html_path, 'w') as f:
             f.write(html)
-        date_obj = date.today()
-        date_obj_format = date_obj.strftime("%d %b %Y")
         print("Findings File is at: pennypincher_findings.html")
         file_name = "/tmp/pennypincher_reports"
         pre_url = ''
