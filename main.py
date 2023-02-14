@@ -64,7 +64,8 @@ def lambda_handler(event=None, context=None):
     #Initilizaing logger for error logging
     logging.basicConfig(level=logging.WARNING)
     logger = logging.getLogger()
-    
+    current_dir = os.getcwd()
+
     try:
         print(reporting_platform.lower().split(','))
         resource = Resources(resource_config, headers, headers_inventory)    #Object for generating report
@@ -81,8 +82,8 @@ def lambda_handler(event=None, context=None):
         date_obj = date.today()
         date_obj_format = date_obj.strftime("%d %b %Y")
         html_path = dir_path+ '/pennypincher_findings.html'
-        header = '<h3><u><b>' + date_obj_format + ' | Total Savings: $'+ str(round(total_savings, 2)) + '</b></u></h3>'
-        logo = '<img src="pennypincher-logo.png" height="200" width="200" >'
+        header = '<h3><u><b>' + date_obj_format + ' Savings Report | Total Savings: $'+ str(round(total_savings, 2)) + '</b></u></h3>'
+        logo = f'<img src="{current_dir}/docs/images/pennypincher-logo.png" height="200" width="200" >'
         html = logo + header + html
         with FileManager(html_path, 'w') as f:
             f.write(html)
