@@ -24,10 +24,6 @@ class Loadbalancer:
     def _describe_classic_lb(self, client):   
         """Returns information of classic loadbalancers in json format."""
         classic_lbs = client.describe_load_balancers()
-        print("+++++++++++++details of classic loadbalancer +++++++++++++++++++++++")
-        print(classic_lbs)
-        print("[[[[[[[[[[[[[[[[[[[")
-        print(classic_lbs['LoadBalancerDescriptions'])
         return classic_lbs['LoadBalancerDescriptions']
 
     def _describe_lb(self, elbv2_client):     
@@ -60,18 +56,6 @@ class Loadbalancer:
 
     def _get_clb_parameters(self, elb, reg, cloudwatch, elb_price, alb_price, lb_list, lb_inv_list):
         """Returns list containing idle loadbalancers information."""
-        print("============lb_list==========")
-        print(lb_list)
-        print("============lb_inv_lis==========")
-        print(lb_inv_list)
-        print("============elb===========")
-        print(elb)
-        print("==================reg===========")
-        print(reg)
-        print("============elb_price===============")
-        print(elb_price)
-        print("==================alb_price=============")
-        print(alb_price)
         classic_lb = []        
         connection_count = cloudwatch.get_sum_metric('AWS/ELB', 'RequestCount',
                                                         'LoadBalancerName', elb['LoadBalancerName'],
