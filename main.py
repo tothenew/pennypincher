@@ -81,7 +81,6 @@ def lambda_handler(event=None, context=None):
         date_obj = date.today()
         date_obj_format = date_obj.strftime("%d %b %Y")
         html_path = dir_path+ '/pennypincher_findings.html'
-        # header = '<h3><u><b>Cost Optimization Report |  ' + account_name + ' | Total Savings: $'+ str(round(total_savings, 2)) + '</b></u></h3>'
         header = '<h3><u><b>' + date_obj_format + ' | Total Savings: $'+ str(round(total_savings, 2)) + '</b></u></h3>'
         logo = '<img src="pennypincher-logo.png" height="200" width="200" >'
         html = logo + header + html
