@@ -125,7 +125,7 @@ class HTML:
             ebs_table = self.body_to_html(ebs_list, savings)  # Table Values
             msg_list.append([ebs_table, resource_name])  # Append value to final result list
             html_infix = self.get_HTML_infix()
-            criteria = "<br><h4>"+headers[9]+" : "+ebs_list[0][9]+"</h4>"
+            criteria = "<h4>"+headers[9]+" : "+ebs_list[0][9]+"</h4>"
             for resource in msg_list:
                 html = html_infix + resource[1] + " : </h4>" + criteria + html + resource[0]
             return html
