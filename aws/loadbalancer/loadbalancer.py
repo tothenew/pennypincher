@@ -56,7 +56,6 @@ class Loadbalancer:
 
     def _get_clb_parameters(self, elb, reg, cloudwatch, elb_price, alb_price, lb_list, lb_inv_list):
         """Returns list containing idle loadbalancers information."""
-        
         classic_lb = []        
         connection_count = cloudwatch.get_sum_metric('AWS/ELB', 'RequestCount',
                                                         'LoadBalancerName', elb['LoadBalancerName'],

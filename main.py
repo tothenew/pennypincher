@@ -64,7 +64,8 @@ def lambda_handler(event=None, context=None):
     #Initilizaing logger for error logging
     logging.basicConfig(level=logging.WARNING)
     logger = logging.getLogger()
-    
+    current_dir = os.getcwd()
+
     try:
         print(reporting_platform.lower().split(','))
         resource = Resources(resource_config, headers, headers_inventory)    #Object for generating report
@@ -78,13 +79,14 @@ def lambda_handler(event=None, context=None):
         current_datetime=datetime.utcnow().isoformat("T","minutes").replace(":", "-")
         dir_path=f"/tmp/pennypincher_reports/{current_datetime}"
         os.makedirs(dir_path,exist_ok=True)
-        html_path = dir_path+ '/pennypincher_findings.html'
-        header = '<h3><b>Cost Optimization Report |  ' + account_name + ' | Total Savings: $'+ str(round(total_savings, 2)) + '</h3></b>'
-        html = header + html
-        with FileManager(html_path, 'w') as f:
-            f.write(html)
         date_obj = date.today()
         date_obj_format = date_obj.strftime("%d %b %Y")
+        html_path = dir_path+ '/pennypincher_findings.html'
+        header = '<h3><u><b>' + date_obj_format + ' Savings Report | Total Savings: $'+ str(round(total_savings, 2)) + '</b></u></h3>'
+        logo = f'<img src="{current_dir}/docs/images/pennypincher-logo.png" height="200" width="200" >'
+        html = logo + header + html
+        with FileManager(html_path, 'w') as f:
+            f.write(html)
         print("Findings File is at: pennypincher_findings.html")
         file_name = "/tmp/pennypincher_reports"
         pre_url = ''
