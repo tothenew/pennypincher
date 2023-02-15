@@ -119,28 +119,36 @@ def lambda_handler(event=None, context=None):
         if 'slack' in  reporting_platform.lower().split(','):
             print("Sending report to slack .....")
             slack_obj.slack_alert(resource_info, account_name, str(round(total_savings, 2)),report_bucket,current_datetime,reporting_platform)      
-                 
+        return "Success"
     except Exception as e:
         logger.error("Error on line {} in main.py".format(sys.exc_info()[-1].tb_lineno) +
                      " | Message: " + str(e))
-        sys.exit(1)
+        return "Failed"
 
 
 def cfnresponsefun(event, context):
-    
     '''Redirect to handler func based on RequestType '''
     physical_resource_id = event.get('PhysicalResourceId', 'ssm-%s' % uuid.uuid4().hex)
-
     try:
         response = None
-        print(event)
-        response = lambda_handler() # Main logic to run, in our case lambda_handler function
-        print(response)
+        print(f"Received event: {event}")
         if 'RequestType' in event:
             if event['RequestType'] == 'Create' or event['RequestType'] == 'Update':
+                response = lambda_handler()
+                print(response)
+                if response == "Success":
+                    cfnresponse.send(event, context, cfnresponse.SUCCESS, response, physical_resource_id)
+                else:
+                    cfnresponse.send(event, context,cfnresponse.FAILED, {'Status': repr(response)}, physical_resource_id)
+            elif event['RequestType'] == 'Delete':
                 cfnresponse.send(event, context, cfnresponse.SUCCESS, response, physical_resource_id)
-        return 'Completed Successfully'
-
+        else:
+            # When triggering lambda from UI or Cron
+            response = lambda_handler()
+            if response != "Success":
+                return 0 #Failed
+            else:
+                return 'Completed Successfully'
     except Exception as ex:
         log.error("Error: Failed to %s trigger the lambda: %s" % (event['RequestType'], str(ex)))
         cfnresponse.send(event, context,
