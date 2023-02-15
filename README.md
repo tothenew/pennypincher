@@ -55,7 +55,7 @@ The tool is created by considering three types of user
 3. Supported Boto3 version v1.17.66 and above
 4. S3 bucket - to store reports (If you want s3 as reporting platform)
 5. User should create IAM role with policies which are listed below 
-   > Note - Replace the 'ReportBucket' with name of s3 bucket which you have created already
+   > Note - Replace the 'REPORTBUCKET' with name of s3 bucket which you have created already
 ```json
 {
   "Version": "2012-10-17",
@@ -78,6 +78,7 @@ The tool is created by considering three types of user
         "redshift:DescribeClusters",
         "ses:SendRawEmail",
         "ses:ListIdentities",
+        "ses:VerifyEmailIdentity",
         "logs:CreateLogStream",
         "logs:CreateLogGroup",
         "logs:PutLogEvents",
@@ -90,7 +91,7 @@ The tool is created by considering three types of user
       "Sid": "VisualEditor1",
       "Effect": "Allow",
       "Action": "*",
-      "Resource": "arn:aws:s3:::${ReportBucket}/*"
+      "Resource": "arn:aws:s3:::REPORTBUCKET/*"
     }
   ]
 }
