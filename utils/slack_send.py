@@ -47,7 +47,7 @@ class Slackalert:
                                     config=Config(signature_version=s3_signature['v4'])
                                     )
             
-            print("b"+bucket_name)
+            print("bucket: "+bucket_name)
             response = s3Client.generate_presigned_url('get_object',
                                                     Params={'Bucket': bucket_name,
                                                             'Key': current_datetime+"/pennypincher_findings.html"},

@@ -137,11 +137,11 @@ def cfnresponsefun(event, context):
                 response = lambda_handler()
                 print(response)
                 if response == "Success":
-                    cfnresponse.send(event, context, cfnresponse.SUCCESS, response, physical_resource_id)
+                    cfnresponse.send(event, context, cfnresponse.SUCCESS, {'Status': repr(response)}, physical_resource_id)
                 else:
                     cfnresponse.send(event, context,cfnresponse.FAILED, {'Status': repr(response)}, physical_resource_id)
             elif event['RequestType'] == 'Delete':
-                cfnresponse.send(event, context, cfnresponse.SUCCESS, response, physical_resource_id)
+                cfnresponse.send(event, context, cfnresponse.SUCCESS, {'Status': repr(response)}, physical_resource_id)
         else:
             # When triggering lambda from UI or Cron
             response = lambda_handler()
