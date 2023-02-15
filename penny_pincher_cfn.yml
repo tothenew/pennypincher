@@ -95,7 +95,7 @@ Resources:
     Properties:
       Description: "ScheduleRule"
       Name: LambdaTrigger
-      ScheduleExpression: cron(0 0 */14 * *)
+      ScheduleExpression: rate(14 days)
       State: ENABLED
       Targets:
         - Id: PennypincherLambdafunction
