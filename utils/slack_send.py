@@ -60,7 +60,7 @@ class Slackalert:
             field.append(total_saving)
             field.append(amount)
             
-            if 'slack' and 's3' in reporting_platform:
+            if 's3' in reporting_platform:
                 reportDetails={
                         "type": "plain_text",
                         "text": "Check detail report here: "
