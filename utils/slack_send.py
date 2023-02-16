@@ -33,7 +33,7 @@ class Slackalert:
         inventory_info[resource_name]['Resources'] = resource_list
         return inventory_info
 
-    def slack_alert(self, resource_info, total_savings,bucket_name, formatted_date,reporting_platform, response):
+    def slack_alert(self, resource_info, total_savings,bucket_name, formatted_date,reporting_platform, pre_signed_url):
         try:   
             print("total saving is"+total_savings)
             #list to store fields
@@ -67,7 +67,7 @@ class Slackalert:
                 }
                 bucket={
                         "type": "mrkdwn",
-                        "text": "<"+response +"|"+ bucket_name +">"
+                        "text": "<"+pre_signed_url +"|"+ bucket_name +">"
                 }
                 note={
                         "type": "plain_text",
