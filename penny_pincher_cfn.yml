@@ -32,6 +32,7 @@ Parameters:
   ReportBucket:
     Description: '(Optional)- Takes existing S3 bucket to store reports'
     Type: "String"
+    Default: '-'
 
 Conditions:
   VerifyToEmail: !Equals
