@@ -147,7 +147,11 @@ class ElasticComputeCloud:
                 client, cloudwatch, pricing = self._get_clients(reg)
                 for r in self._describe_ec2(client):
                         for instance in r['Instances']:
-                            ec2_list,ec2_inv_list = self._get_parameters(instance,reg, client, cloudwatch, pricing, ec2_list,ec2_inv_list)
+                            try:
+                                ec2_list,ec2_inv_list = self._get_parameters(instance,reg, client, cloudwatch, pricing, ec2_list,ec2_inv_list)
+                            except Exception as e:
+                                print("PriceList may be empty")
+                                self.logger.error("Error on line {} in rds.py".format(sys.exc_info()[-1].tb_lineno) + " | Message: " + str(e))
 
             #To fetch top 10 resources with maximum saving.
             ec2_sorted_list = sorted(ec2_list, key=lambda x: x[10], reverse=True)

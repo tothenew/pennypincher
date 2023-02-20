@@ -36,4 +36,4 @@ class Pricing:
 
         except Exception as e:
             print("Error on line {} in eip pricing.py".format(sys.exc_info()[-1].tb_lineno) + " | Message: " + str(e))
-            sys.exit(1)
+            # sys.exit(1)

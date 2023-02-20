@@ -120,8 +120,11 @@ class Elasticache:
                 client, cloudwatch, pricing = self._get_clients(reg)
                 elasticache_clusters = self._describe_elasticache(client)
                 for cache in elasticache_clusters:
-                    ec_list,ec_inv_list = self._get_parameters(cache, reg, cloudwatch, pricing, ec_list, ec_inv_list)
-                    
+                    try:
+                        ec_list,ec_inv_list = self._get_parameters(cache, reg, cloudwatch, pricing, ec_list, ec_inv_list)
+                    except Exception as e:
+                        print("PriceList may be empty")
+                        self.logger.error("Error on line {} in rds.py".format(sys.exc_info()[-1].tb_lineno) + " | Message: " + str(e))
             #To fetch top 10 resources with maximum saving.
             ec_sorted_list = sorted(ec_list, key=lambda x: x[10], reverse=True)
             total_savings = self._get_savings(ec_sorted_list)
