@@ -18,7 +18,7 @@ Launch stack with slack as a reporting platform
 
 Check out the following GIF to see the complete procedure of creating a stack with these “Launch Stack” buttons. (Following GIF shows functionality of ‘Launch Stack button with email platform’ and how the user receives report over email.)
 
-![](/pennypincher/docs/images/pennypincher-email.gif)
+![GIF](/pennypincher/docs/images/pennypincher-email.gif)
 
 ### Overview 
 
