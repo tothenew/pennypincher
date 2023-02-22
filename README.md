@@ -16,6 +16,10 @@ Launch stack with slack as a reporting platform
 
 [![Launch Stack](https://s3.amazonaws.com/cloudformation-examples/cloudformation-launch-stack.png)](https://us-east-1.console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/create/review?templateURL=https://penny-pincher-s3-bucket.s3.amazonaws.com/penny_pincher_cfn.yml&param_ReportingPlatform=slack)
 
+Check out the following GIF to see the complete procedure of creating a stack with these “Launch Stack” buttons. (Following GIF shows functionality of ‘Launch Stack button with email platform’ and how the user receives report over email.)
+
+![GIF](/docs/images/pennypincher-email.gif)
+
 ### Overview 
 
 Penny Pincher is a tool that identifies all the resources which are provisioned but are not being used i.e. are idle and notifies you about the potential savings over email and slack.
