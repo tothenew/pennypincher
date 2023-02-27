@@ -10,9 +10,11 @@ from utils.utils import handle_limit_exceeded_exception
 class Redshift:
     """To fetch information of all idle Redshift instances."""
     
-    def __init__(self, config=None, regions=None):
+    def __init__(self, headers, headers_inventory, config=None, regions=None):
         try:
          self.config = config.get('REDSHIFT')
+         self.headers = headers
+         self.headers_inventory = headers_inventory
         except KeyError as e:
             self.logger.error(
                 "Config for REDSHIFT missing from config.cfg | Message: " + str(e))       
@@ -48,7 +50,7 @@ class Redshift:
         pricing = Pricing(pricing_client, reg)
         return client, cloudwatch, pricing
 
-    def _get_parameters(self,cluster, reg, cloudwatch, pricing, rs_list ):
+    def _get_parameters(self,cluster, reg, cloudwatch, pricing, rs_list, rs_inv_list ):
         """Returns a list containing idle redshift information."""        
         node_price = pricing.get_node_price(cluster['NodeType'])
         db_connection_count = cloudwatch.get_sum_metric('AWS/Redshift', 'DatabaseConnections',
@@ -73,27 +75,44 @@ class Redshift:
             savings
             ]
             rs_list.append(rs)
-        return rs_list
+        
+        rs_inv = [
+            cluster['ClusterIdentifier'],
+            cluster['DBName'],
+            "REDSHIFT",
+            cluster['NodeType'],
+            cluster['VpcId'],
+            "-",
+            reg
+             ]
+        rs_inv_list.append(rs_inv)
+        
+        if finding == 'Idle':
+            rs_inv.append("Yes")
+        else:
+            rs_inv.append("No")
+        
+        return rs_list, rs_inv_list
 
     def get_result(self):   
         """Returns a list of lists which contains headings and idle redshift information."""
         try:
             rs_list = []
-            headers = ['ClusterID', 'DBName', 'NodeType', 'NumberOfNodes', 'CreationDate', 'AWSRegion', 'Finding',
-                       'Savings($)']
-            headers=[   'ResourceID','ResouceName','ServiceName','Type','VPC',
-                        'State','Region','Finding','EvaluationPeriod (seconds)','Criteria','Saving($)'
-                    ]
+            rs_inv_list = []
+            
             for reg in self.regions:
                 client, cloudwatch, pricing = self._get_clients(reg)
                 for cluster in self._describe_redshift_clusters(client):
-                    rs_list = self._get_parameters(cluster, reg, cloudwatch, pricing, rs_list)                    
-                    
+                    try:
+                        rs_list, rs_inv_list = self._get_parameters(cluster, reg, cloudwatch, pricing, rs_list, rs_inv_list)                    
+                    except Exception as e:
+                            print("PriceList may be empty")
+                            self.logger.error("Error on line {} in rds.py".format(sys.exc_info()[-1].tb_lineno) + " | Message: " + str(e))
                     
             #To fetch top 10 resources with maximum saving.
             rs_sorted_list = sorted(rs_list, key=lambda x: x[10], reverse=True)
             total_savings = self._get_savings(rs_sorted_list)
-            return {'resource_list': rs_sorted_list, 'headers': headers, 'savings': total_savings}
+            return {'resource_list': rs_sorted_list, 'headers': self.headers, 'savings': total_savings}, {'headers_inv': self.headers_inventory, 'inv_list': rs_inv_list}
 
         except exceptions.ClientError as error:
             handle_limit_exceeded_exception(error, 'redshift.py')

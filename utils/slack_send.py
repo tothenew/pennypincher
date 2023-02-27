@@ -3,13 +3,18 @@ from slack.errors import SlackApiError
 import sys
 import logging
 import slack
-
+import requests
+import json
+from datetime import date
+import boto3
+from botocore.client import Config
+from botocore.exceptions import ClientError
 
 class Slackalert:
     """To send cost report on slack."""
-    def __init__(self, channel=None, slack_token=None):
+    def __init__(self, channel=None, webhook_url=None):
         self.channel = channel
-        self.slack_token = slack_token
+        self.webhook_url = webhook_url
         logging.basicConfig(level=logging.WARNING)
         self.logger = logging.getLogger()
 
@@ -20,39 +25,99 @@ class Slackalert:
         resource_info[resource_name]['Resources'] = resource_list
         resource_info[resource_name]['Savings'] = resource_savings
         return resource_info
+    
+    def get_resource_inventory(self, resource_name, inventory_info, resource_header, resource_list):
+        """Returns all the used resource information in a dictionary format."""
+        resource_list.insert(0, resource_header)
+        inventory_info[resource_name] = {}
+        inventory_info[resource_name]['Resources'] = resource_list
+        return inventory_info
 
-    def slack_alert(self, resource_info, account_name, total_savings):
-        """Creates a txt file which contains the cost report  and sends to the slack channel."""
-        try:
-            client = slack.WebClient(token=self.slack_token)
-
-            f = open("/tmp/cost_optimization_report.txt", "w+")
-
-            for res in resource_info.keys():       
-                #Converts resource info dictionary to tabular format.
-                f.write('\n' + 'Resource: ' + res + '\n')
-                resource_table = tabulate(resource_info[res]['Resources'][1:],
-                                          headers=resource_info[res]['Resources'][0], tablefmt="grid",
-                                          disable_numparse=True)
-                f.write('\n' + resource_table + '\n \n' + 'Savings: $' + str(resource_info[res]['Savings']) + '\n')
-            f.close()
-            response = client.files_upload(
-                file='/tmp/cost_optimization_report.txt',
-                initial_comment='Cost Optimization Report | ' + account_name + ' | Total Savings: $' + str(total_savings),
-                channels=self.channel
-            )
+    def slack_alert(self, resource_info, total_savings,bucket_name, formatted_date,reporting_platform, pre_signed_url):
+        try:   
+            print("total saving is"+total_savings)
+            #list to store fields
+            field = []
+            for res in resource_info:
+                key = {
+					"type": "plain_text",
+					"text": res,
+		        }
+                field.append(key)
+                val = {
+                "type": "plain_text",
+                "text": "$"+str(resource_info[res]['Savings']),
+                }
+                field.append(val)
+            total_saving={
+                        "type": "plain_text",
+                        "text": "Total Monthly Savings",
+            }
+            amount ={
+                        "type": "plain_text",
+                        "text": "$"+total_savings,
+            }
+            field.append(total_saving)
+            field.append(amount)
+            
+            if 's3' in reporting_platform:
+                reportDetails={
+                        "type": "plain_text",
+                        "text": "Check detail report here: "
+                }
+                bucket={
+                        "type": "mrkdwn",
+                        "text": "<"+pre_signed_url +"|"+ bucket_name +">"
+                }
+                note={
+                        "type": "plain_text",
+                        "text": "Note: Above URL is valid for 24 hours"
+                }
+                field.append(reportDetails)
+                field.append(bucket)
+                field.append(note)
+            else:
+                s3_note={
+                        "type": "plain_text",
+                        "text": "To check the detailed report enable s3",
+                        }
+                field.append(s3_note)
+            
+            #message to send in slack
+            slack_msg = {
+                            "attachments": [
+                            {
+                                "blocks": [
+                                {
+                                    "type": "section",
+                                    "text": {
+                                                "type": "plain_text",
+                                                "text": "Pennypincher - "+str(formatted_date)+" - Savings Report",
+                                            }
+                                },
+                                {
+                                    "type": "section",
+                                    "fields": field
+                                }
+                                ]
+                            }
+                            ]
+                        }
+            #posting message into slack channel
+            requests.post(self.webhook_url,data=json.dumps(slack_msg))
             print("Sending the Cost Optimization report to slack "+ self.channel)
-
-        except SlackApiError as e:
-            """You will get a SlackApiError if "ok" is False."""
-            assert e.response["ok"] is False
-            assert e.response["error"]  
-            """str like 'invalid_auth', 'channel_not_found'."""
-            self.logger.error("Slack api error: {e.response['error']} | Error in slack_send.py")
-            sys.exit(1)
-
+            
         except Exception as e:
             self.logger.error(
                 "Error on line {} in slack_send.py".format(sys.exc_info()[-1].tb_lineno) + " | Message: " +
                 str(e))
             sys.exit(1)
+            
+            
+#"2022-11-21T07-44/pennypincher_findings.html"
+
+
+        
+            
+        
+        

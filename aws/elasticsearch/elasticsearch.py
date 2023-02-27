@@ -10,9 +10,11 @@ from utils.utils import handle_limit_exceeded_exception
 class Elasticsearch:
     """To fetch information of all idle elasticsearch instances."""
 
-    def __init__(self, config=None, regions=None):
+    def __init__(self, headers, headers_inventory, config=None, regions=None):
         try:
          self.config = config.get('ELASTICSEARCH')
+         self.headers = headers
+         self.headers_inventory = headers_inventory
         except KeyError as e:
             self.logger.error(
                 "Config for ELASTICSEARCH missing from config.cfg | Message: " + str(e))       
@@ -54,11 +56,12 @@ class Elasticsearch:
         pricing = Pricing(pricing_client, reg)
         return client, cloudwatch, pricing
 
-    def _get_parameters(self, es, reg, cloudwatch, pricing, es_list):    
+    def _get_parameters(self, es, reg, cloudwatch, pricing, es_list, elasticsearch_inv_list):    
         """Returns list containing idle Elasticsearch instance information."""               
         elasticsearch = []
         monthly_cost_master = 0                 
         iops = volume_size = 0
+        is_idle = 'No'
         if es['EBSOptions']['EBSEnabled']:
             storage_type = es['EBSOptions']['VolumeType']
             volume_size = es['EBSOptions']['VolumeSize']
@@ -92,6 +95,7 @@ class Elasticsearch:
         finding = self._get_es_finding(idle_instance_count)
         if finding == 'Idle':
             #An elasticsearch instance is considered idle if sum of indexing rate and search rate = 0.
+            is_idle = 'Yes'
             elasticsearch = [
                 es["DomainName"],
                 es["DomainName"],
@@ -106,27 +110,41 @@ class Elasticsearch:
                 round(monthly_cost_master + monthly_cost_data, 2)
             ]
             es_list.append(elasticsearch)
-        return es_list
+        
+        elasticsearch_inv = [
+                es["DomainName"],
+                es["DomainName"],
+                "ELASTICSEARCH",
+                instance_type,
+                es['VPCOptions']['VPCId'],
+                instance_count,
+                reg,
+                is_idle
+                ]
+        elasticsearch_inv_list.append(elasticsearch_inv)
+            
+        return es_list, elasticsearch_inv_list
     
     def get_result(self):  
         """Returns a list of lists which contains headings and idle Elasticsearch instance information."""
         try:
             es_list = []
-            headers=[   'ResourceID','ResouceName','ServiceName','Type','VPC',
-                        'State','Region','Finding','EvaluationPeriod (seconds)','Criteria','Saving($)'
-                    ]
+            elasticsearch_inv_list = []
   
             for reg in self.regions:
                 client, cloudwatch, pricing = self._get_clients(reg)
                 for domainName in self._list_elasticsearch(client):
-                    es = self._describe_elasticsearch(client, domainName["DomainName"])
-                    es_list= self._get_parameters(es, reg, cloudwatch, pricing, es_list)
-                    
+                    try:
+                        es = self._describe_elasticsearch(client, domainName["DomainName"])
+                        es_list, elasticsearch_inv_list = self._get_parameters(es, reg, cloudwatch, pricing, es_list, elasticsearch_inv_list)
+                    except Exception as e:
+                        print("PriceList may be empty")
+                        self.logger.error("Error on line {} in rds.py".format(sys.exc_info()[-1].tb_lineno) + " | Message: " + str(e))
 
             #To fetch top 10 resources with maximum saving.
             es_sorted_list = sorted(es_list, key=lambda x: x[10], reverse=True)
             total_savings = self._get_savings(es_sorted_list)
-            return {'resource_list': es_sorted_list, 'headers': headers, 'savings': total_savings}
+            return {'resource_list': es_sorted_list, 'headers': self.headers, 'savings': total_savings}, {'headers_inv': self.headers_inventory, 'inv_list': elasticsearch_inv_list}
 
         except exceptions.ClientError as error:
             handle_limit_exceeded_exception(error, 'elasticsearch.py')

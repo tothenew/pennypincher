@@ -1,9 +1,5 @@
-FROM python:3.10-alpine 
-RUN apk update && \
-    apk add py-pip
 
-RUN mkdir /code  
-WORKDIR /code  
-COPY . /code
-RUN pip3 install -r requirements.txt
-CMD ["python3", "-u", "main.py"]
+FROM public.ecr.aws/lambda/python:3.9.2022.11.24.17
+COPY . .
+RUN pip3 install -r requirements.txt --target "${LAMBDA_TASK_ROOT}"
+CMD [ "main.cfnresponsefun" ]

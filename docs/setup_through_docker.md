@@ -28,7 +28,7 @@ docker-compose up
 You can update the environment variables in the [docker-compose.yml](../docker-compose.yml) file to provide more configuration details.
 
 For example, if you wish to receive the findings report on slack, update the values of
-channel_name, slack_token and set reporting_platform = slack
+channel_name, webhook_url and set reporting_platform = slack
     
 ```bash
     environment:  
@@ -39,7 +39,7 @@ channel_name, slack_token and set reporting_platform = slack
       - config=Null
       - account_name=account_name
       - channel_name=channel_name
-      - slack_token=slack_token
+      - webhook_url=webhook_url
       - reporting_platform=reporting_platform
       - ses_region=ses_region
       - to_address=to_address

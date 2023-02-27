@@ -9,9 +9,11 @@ from aws.ec2.pricing import Pricing
 class ElasticComputeCloud:
     """To fetch information of all idle EC2's."""
 
-    def __init__(self, config=None, regions=None):
+    def __init__(self, headers, headers_inventory, config=None, regions=None):
         self.config = config['EC2']
         self.regions = regions
+        self.headers = headers
+        self.headers_inventory = headers_inventory
         logging.basicConfig(level=logging.WARNING)
         self.logger = logging.getLogger()
 
@@ -61,12 +63,12 @@ class ElasticComputeCloud:
         pricing = Pricing(pricing_client, reg)
         return client, cloudwatch, pricing
 
-    def _get_parameters(self, instance, reg, client, cloudwatch, pricing, ec2_list):
+    def _get_parameters(self, instance, reg, client, cloudwatch, pricing, ec2_list, ec2_inv_list):
         """Returns a list containing idle EC2 information."""
         if 'SpotInstanceRequestId' not in instance:
             ec2 = []
             instance_name = vpc_id = instance_os_details = ''
-            
+            is_idle = 'No'
             platform_details = self._get_image_info(client, instance['ImageId'])
             if 'Tags' in instance:
                 for tag in instance['Tags']:
@@ -106,6 +108,7 @@ class ElasticComputeCloud:
                 vpc_id = instance['VpcId']
             if finding == 'Idle':
                 #An EC2 is considered idle if it's finding comes out to be 'idle'.
+                is_idle = 'Yes'
                 ec2 = [
                     instance['InstanceId'],
                     instance_name,
@@ -119,26 +122,41 @@ class ElasticComputeCloud:
                     f"Average CPUUtilization < {self.config['avgCpu']} Maximum CPUUtilization < {self.config['maxCpu']} and NetworkIn+NetworkOut < {self.config['netInOut']}",
                     round(savings * 732, 2)
                    ]
-                ec2_list.append(ec2)            
-        return ec2_list
+                ec2_list.append(ec2)
+            ec2_inv = [
+                    instance['InstanceId'],
+                    instance_name,
+                    "EC2",
+                    instance['InstanceType'],
+                    vpc_id,
+                    instance['State']['Name'],
+                    reg,
+                    is_idle
+                ]
+            ec2_inv_list.append(ec2_inv)
+                
+        return ec2_list, ec2_inv_list
 
     def get_result(self):  
         """Returns a list of lists which contains headings and idle EC2 information."""
         try:
             ec2_list = []
-            headers=[   'ResourceID','ResouceName','ServiceName','Type','VPC',
-                        'State','Region','Finding','EvaluationPeriod (seconds)','Criteria','Saving($)'
-                    ]
+            ec2_inv_list = []
+            
             for reg in self.regions:
                 client, cloudwatch, pricing = self._get_clients(reg)
                 for r in self._describe_ec2(client):
                         for instance in r['Instances']:
-                            ec2_list = self._get_parameters(instance,reg, client, cloudwatch, pricing, ec2_list)
+                            try:
+                                ec2_list,ec2_inv_list = self._get_parameters(instance,reg, client, cloudwatch, pricing, ec2_list,ec2_inv_list)
+                            except Exception as e:
+                                print("PriceList may be empty")
+                                self.logger.error("Error on line {} in rds.py".format(sys.exc_info()[-1].tb_lineno) + " | Message: " + str(e))
 
             #To fetch top 10 resources with maximum saving.
             ec2_sorted_list = sorted(ec2_list, key=lambda x: x[10], reverse=True)
             total_savings = self._get_savings(ec2_sorted_list)
-            return {'resource_list': ec2_sorted_list, 'headers': headers, 'savings': total_savings}
+            return {'resource_list': ec2_sorted_list, 'headers': self.headers, 'savings': total_savings}, {'headers_inv': self.headers_inventory, 'inv_list':ec2_inv_list}
 
         except exceptions.ClientError as error:
             if error.response['Error']['Code'] == 'LimitExceededException':

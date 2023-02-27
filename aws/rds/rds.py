@@ -10,9 +10,11 @@ from utils.utils import handle_limit_exceeded_exception
 class RelationalDatabaseService:
     """To fetch information of all idle RDS instances."""
     
-    def __init__(self, config=None, regions=None):
+    def __init__(self, headers, headers_inventory, config=None, regions=None):
         try:
          self.config = config.get('RDS')
+         self.headers = headers
+         self.headers_inventory = headers_inventory
         except KeyError as e:
             self.logger.error(
                 "Config for RDS missing from config.cfg | Message: " + str(e))       
@@ -29,6 +31,11 @@ class RelationalDatabaseService:
         """Returns RDS instance information in json format."""
         response = client.describe_db_instances()
         return response['DBInstances']
+
+    def get_orderable_options(self, client, rds_instance):
+        # print(rds_instance)
+        data = client.describe_orderable_db_instance_options(Engine=rds_instance['Engine'],DBInstanceClass=rds_instance['DBInstanceClass'],LicenseModel=rds_instance['LicenseModel'])
+        return data["OrderableDBInstanceOptions"][0]
 
     def _get_rds_finding(self, connection_count):  
         """Returns finding if RDS instance is idle or not."""
@@ -53,9 +60,10 @@ class RelationalDatabaseService:
         pricing = Pricing(pricing_client, reg)
         return client, cloudwatch, pricing
    
-    def _get_parameters(self, rds_instance, reg, cloudwatch, pricing, rds_list):
+    def _get_parameters(self, rds_instance, reg, cloudwatch, pricing, rds_list, rds_inv_list,oderable_data):
         """Returns a list containing idle RDS information."""    
         rds = []
+        is_idle = 'No'
         iops = 0
         if 'iops' in rds_instance.keys():
             iops = rds_instance['Iops']
@@ -65,7 +73,7 @@ class RelationalDatabaseService:
                                                         rds_instance['MultiAZ'], rds_instance['LicenseModel'],
                                                         rds_instance['StorageType'],
                                                         rds_instance['AllocatedStorage'],
-                                                        iops)
+                                                        iops,oderable_data)
 
         avg_cpu, avg_cpu = cloudwatch.get_avg_max_metric('AWS/RDS', 'CPUUtilization',
                                                             'DBInstanceIdentifier',
@@ -83,6 +91,7 @@ class RelationalDatabaseService:
 
         if finding == 'Idle':
             #An RDS instance is classified as idle if the connection count = 0.
+            is_idle = 'Yes'
             savings = round(db_cost + storage_cost, 2)
             rds =[
                 rds_instance["DBInstanceIdentifier"],
@@ -98,31 +107,46 @@ class RelationalDatabaseService:
                 savings
                ]
             rds_list.append(rds)
-        return rds_list
+        rds_inv =[
+                rds_instance["DBInstanceIdentifier"],
+                rds_instance["DBInstanceIdentifier"],
+                "RDS",
+                rds_instance["DBInstanceClass"],
+                rds_instance['DBSubnetGroup']['VpcId'],
+                rds_instance["DBInstanceStatus"],
+                reg,
+                is_idle
+            ]
+        rds_inv_list.append(rds_inv)
+        
+        return rds_list, rds_inv_list
 
 
     def get_result(self):     
-        """Returns a list of lists which contains headings and idle RDS information."""
-        try:
+        # """Returns a list of lists which contains headings and idle RDS information."""
+        # try:
             rds_list = []
-            headers=[   'ResourceID','ResouceName','ServiceName','Type','VPC',
-                        'State','Region','Finding','EvaluationPeriod (seconds)','Criteria','Saving($)'
-                    ]
+            rds_inv_list = []
 
             for reg in self.regions:
                 client, cloudwatch, pricing = self._get_clients(reg)
                 for rds_instance in self._describe_rds(client):
-                        rds_list = self._get_parameters(rds_instance, reg, cloudwatch, pricing, rds_list)
-                        
+                        try:
+                            oderable_data=self.get_orderable_options(client, rds_instance)
+                            rds_list,rds_inv_list = self._get_parameters(rds_instance, reg, cloudwatch, pricing, rds_list, rds_inv_list,oderable_data)
+                        except Exception as e:
+                            print("PriceList may be empty")
+                            self.logger.error("Error on line {} in rds.py".format(sys.exc_info()[-1].tb_lineno) + " | Message: " + str(e))
             #To fetch top 10 resources with maximum saving.
             rds_sorted_list = sorted(rds_list, key=lambda x: x[10], reverse=True)
             total_savings = self._get_savings(rds_sorted_list)
-            return {'resource_list': rds_sorted_list, 'headers': headers, 'savings': total_savings}
+            return {'resource_list': rds_sorted_list, 'headers': self.headers, 'savings': total_savings}, {'headers_inv': self.headers_inventory, 'inv_list': rds_inv_list}
 
-        except exceptions.ClientError as error:
-            handle_limit_exceeded_exception(error, 'rds.py')
-            sys.exit(1)
+        # except exceptions.ClientError as error:
+        #     handle_limit_exceeded_exception(error, 'rds.py')
+        #     sys.exit(1)
 
-        except Exception as e:
-            self.logger.error("Error on line {} in rds.py".format(sys.exc_info()[-1].tb_lineno) + " | Message: " + str(e))
-            sys.exit(1)
+        # except Exception as e:
+        #     print("test")
+        #     self.logger.error("Error on line {} in rds.py".format(sys.exc_info()[-1].tb_lineno) + " | Message: " + str(e))
+        #     sys.exit(1)

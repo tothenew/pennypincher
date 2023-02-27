@@ -13,7 +13,7 @@ def merges(default, overwrite):
   return(config)
 
 def check_env(config):
-    env_list = ["CHANNEL_NAME","SLACK_TOKEN","CONFIG","FROM_ADDRESS","TO_ADDRESS","SES_REGION","REPORTING_PLATFORM","ACCOUNT_NAME"] 
+    env_list = ["CHANNEL_NAME","CONFIG","FROM_ADDRESS","TO_ADDRESS","SES_REGION","REPORTING_PLATFORM","ACCOUNT_NAME","REPORT_BUCKET","WEBHOOK_URL"] 
     for key in env_list:
         if key.lower() in config:
             config[key.lower()] = os.getenv(key,config[key.lower()])

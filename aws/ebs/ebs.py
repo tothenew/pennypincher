@@ -7,13 +7,14 @@ from aws.ebs.pricing import Pricing
 from utils.client import Client
 from utils.cloudwatch_utils import CloudwatchUtils
 
-
 class ElasticBlockStore:
     """To fetch information of all unused EBS volumes."""
 
-    def __init__(self, config=None, regions=None):
+    def __init__(self, headers, headers_inventory, config=None, regions=None):
         try:
          self.config = config.get('EBS')
+         self.headers = headers
+         self.headers_inventory = headers_inventory
         except KeyError as e:
             self.logger.error(
                 "Config for EBS missing from config.cfg | Message: " + str(e))  
@@ -49,11 +50,12 @@ class ElasticBlockStore:
         pricing = Pricing(pricing_client, reg)
         return client, cloudwatch, pricing
     
-    def _get_parameters(self, vol, reg, cloudwatch, pricing, ebs_list):
+    def _get_parameters(self, vol, reg, cloudwatch, pricing, ebs_list, ebs_inv_list):
         """Returns a list containing idle EBS information."""
         ebs = []
         iops = 0
         finding = ''
+        is_idle = 'No'
         create_time = vol['CreateTime']
         creation_date = datetime.strptime(str(create_time).split(' ')[0], '%Y-%m-%d').date()
         age = get_backup_age(creation_date)
@@ -81,6 +83,7 @@ class ElasticBlockStore:
         savings = storage_price * float(vol["Size"]) + iops_price * iops
         if finding == 'Unused' or finding == 'Available':
             #An EBS is considered idle if it's finding comes out to be 'Unused' or 'Available'.
+            is_idle = 'Yes'
             ebs = [
                 vol["VolumeId"],
                 vol["VolumeId"],
@@ -95,25 +98,40 @@ class ElasticBlockStore:
                 round(savings, 2)
                ]
             ebs_list.append(ebs)
-        return ebs_list
-
+            
+        ebs_inv = [
+                vol["VolumeId"],
+                vol["VolumeId"],
+                "EBS",
+                vol["VolumeType"],
+                "-",
+                vol["State"],
+                vol["AvailabilityZone"][:-1],
+                is_idle
+                ]
+        ebs_inv_list.append(ebs_inv)
+            
+        return ebs_list, ebs_inv_list
 
     def get_result(self):  
         """Returns a list of lists which contains headings and idle EBS information."""
         try:
             ebs_list = []
-            headers=[   'ResourceID','ResouceName','ServiceName','Type','VPC',
-                        'State','Region','Finding','EvaluationPeriod (seconds)','Criteria','Saving($)'
-                    ]
+            ebs_inv_list = []
+            
             for reg in self.regions:
                 client, cloudwatch, pricing = self._get_clients(reg)
                 for vol in self._describe_ebs(client):
-                    ebs_list = self._get_parameters(vol, reg, cloudwatch, pricing, ebs_list)
+                    try:
+                        ebs_list,ebs_inv_list  = self._get_parameters(vol, reg, cloudwatch, pricing, ebs_list, ebs_inv_list)
+                    except Exception as e:
+                        print("PriceList may be empty")
+                        self.logger.error("Error on line {} in rds.py".format(sys.exc_info()[-1].tb_lineno) + " | Message: " + str(e))
             
             #To fetch top 10 resources with maximum saving.
             ebs_sorted_list = sorted(ebs_list, key=lambda x: x[10], reverse=True)
             total_savings = self._get_savings(ebs_sorted_list[:11])
-            return { 'resource_list': ebs_sorted_list[:11], 'headers': headers, 'savings': total_savings }
+            return { 'resource_list': ebs_sorted_list[:11], 'headers': self.headers, 'savings': total_savings }, {'headers_inv': self.headers_inventory, 'inv_list': ebs_inv_list}
 
         except exceptions.ClientError as error:
             handle_limit_exceeded_exception(error, 'ebs.py')

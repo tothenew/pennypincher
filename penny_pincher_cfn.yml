@@ -1,134 +1,111 @@
 AWSTemplateFormatVersion: '2010-09-09'
 
 Parameters:
-  S3BucketName:
-    Description: 'Takes S3 bucket name which contains lambda layer and code zip files'
+  LambdaIAMRoleArn:
+    Description: 'Takes ARN of IAM role which we are attaching to lambda'
     Type: 'String'
   AccountName:
-    Description: 'Takes account name as input'
+    Description: '(Optional)- Takes account name as input'
     Type: 'String'
-  CloudwatchConfig:
-    Description: 'Takes number of days to be considered for calculating cloudwatch metric value. Can be null or given in the format resource=number of days e.g. ebs=20, lb=15, rds=30'
-    Type: 'String'
-    Default: 'Null'
   ReportingPlatform:
-    Description: 'Takes reporting platform as input'
+    Description: 'Takes comma seperated reporting values, allowed values are S3, Slack, Email'
     Type: 'String'
-    AllowedValues:
-      - 'Email'
-      - 'Slack'
-      - 'Email and Slack'
-    Default: 'Email'
+    Default: 's3'
   SlackChannelName:
-    Description: 'Takes slack channel name as input. Keep the defaults in case slack notifications are not required'
+    Description: '(If you have chosen slack as a reporting platform)Takes slack channel name as input. Keep the defaults in case slack notifications are not required'
     Type: 'String'
     Default: '-'
-  SlackToken:
-    Description: 'Takes slack token as input . Keep the defaults in case slack notifications are not required'
+  WebhookUrl:
+    Description: '(If you have chosen slack as a reporting platform)Takes slack webhook url as input . Keep the defaults in case slack notifications are not required'
     Type: 'String'
     Default: '-'
-  SESFromEmailAddress:
+  SenderEmailAddress:
     Type: 'String'
-    Description: 'Takes the email id from which the mail containing cost report will be sent. Keep the defaults in case email notifications are not required'
-    Default: '-'
-  SESToEmailAddress:
-    Description: 'Takes email ids (in comma separated format) to which the mail containing cost report will be sent. Keep the defaults in case email notifications are not required'
+    Description: '(If you have chosen email as a reporting platform) Takes the email id from which the mail containing cost report will be sent. Keep the defaults in case email notifications are not required'
+  RecipientEmailAddress:
+    Description: '(If you have chosen email as a reporting platform) Takes email id to which the mail containing cost report will be sent. Keep the defaults in case email notifications are not required'
     Type: 'String'
-    Default: '-'
   SESRegion:
-    Description: 'Takes the AWS region abbreviation (e.g. ap-south-1 for Mumbai) in which SES is configured'
+    Description: '(Optional) Takes the AWS region abbreviation (e.g. ap-south-1 for Mumbai) in which SES is configured'
     Type: 'String'
     Default: 'us-east-1'
+  ReportBucket:
+    Description: '(Optional)- Takes existing S3 bucket to store reports'
+    Type: "String"
+    Default: '-'
+
+Conditions:
+  VerifyToEmail: !Equals
+    - !Ref RecipientEmailAddress
+    - ""
+  IfToEmailNotNull: !Not
+    - Condition: VerifyToEmail
+  VerifyFromEmail: !Equals
+    - !Ref SenderEmailAddress
+    - ""
+  IfFromEmailNotNull: !Not
+    - Condition: VerifyFromEmail
 
 Resources:
-  ServiceRoleForLambda:
-    Type: 'AWS::IAM::Role'
-    Description: 'IAM role for Penny Pincher'
-    Properties:
-      RoleName: 'Penny-Pincher-Lambda-Role'
-      AssumeRolePolicyDocument:
-        Version: '2012-10-17'
-        Statement:
-          - Effect: 'Allow'
-            Principal:
-              Service:
-                - 'lambda.amazonaws.com'
-            Action:
-              - 'sts:AssumeRole'
-      Policies:
-        - PolicyName: 'Penny-Pincher-Lambda-Inline-Policy'
-          PolicyDocument: !Sub
-            - '{
-                   "Version": "2012-10-17",
-                   "Statement": [
-                       {
-                           "Sid": "VisualEditor0",
-                           "Effect": "Allow",
-                           "Action": [
-                               "ec2:DescribeImages",
-                               "ec2:DescribeInstances",
-                               "ec2:DescribeRegions",
-                               "ec2:DescribeVolumes",
-                               "ec2:DescribeAddresses",
-                               "pricing:GetProducts",
-                               "elasticache:DescribeCacheClusters",
-                               "es:ListDomainNames",
-                               "es:DescribeElasticsearchDomain",
-                               "elasticloadbalancing:DescribeLoadBalancers",
-                               "rds:DescribeDBInstances",
-                               "redshift:DescribeClusters",
-                               "ses:SendEmail",
-                               "logs:CreateLogStream",
-                               "logs:CreateLogGroup",
-                               "logs:PutLogEvents",
-                               "cloudwatch:GetMetricStatistics"
-                           ],
-                           "Resource": "*"
-                       },
-                       {
-                                  "Sid": "VisualEditor1",
-                                  "Effect": "Allow",
-                                  "Action": "s3:GetObject",
-                                  "Resource": "arn:aws:s3:::${S3BucketName}/*"
-                      }
-                   ]
-               }'
-            - { S3BucketName: !Ref S3BucketName }
-
-  LambdaLayer:
-    Type: 'AWS::Lambda::LayerVersion'
-    Description: 'Contains packages used in Penny Pincher Lambda'
-    Properties:
-      CompatibleRuntimes:
-        - 'python3.8'
-      Content:
-        S3Bucket: !Ref S3BucketName
-        S3Key: 'packages.zip'
-      LayerName: 'Penny-Pincher-Lambda-Packages-Layer'
-
   LambdaFunction:
     Type: 'AWS::Lambda::Function'
     Description: 'Generates Cost report with all the idle resources information and sends it to email or slack or both'
     Properties:
-      FunctionName: 'Penny-Pincher'
+      FunctionName: !Join
+      - "-"
+      - - "Penny-Pincher-Lambda"
+        - !Select
+          - 0
+          - !Split
+            - "-"
+            - !Select
+              - 2
+              - !Split
+                - "/"
+                - !Ref "AWS::StackId"
+      Architectures:
+        - x86_64
       Runtime: 'python3.8'
-      Role: !GetAtt ServiceRoleForLambda.Arn
-      Handler: 'main.lambda_handler'
+      Role: !Ref LambdaIAMRoleArn
+      Handler: 'main.cfnresponsefun'
       Code:
-        S3Bucket: !Ref S3BucketName
-        S3Key: 'code.zip'
+        S3Bucket: penny-pincher-s3-bucket
+        S3Key: 'penny.zip'
       PackageType: 'Zip'
       Timeout: 900
       MemorySize: 1024
-      Layers:
-        - !Ref LambdaLayer
       Environment:
         Variables:
           ACCOUNT_NAME: !Ref AccountName
-          CONFIG: !Ref CloudwatchConfig
           REPORTING_PLATFORM: !Ref ReportingPlatform
           CHANNEL_NAME: !Ref SlackChannelName
-          SLACK_TOKEN: !Ref SlackToken
-          FROM_ADDRESS: !Ref SESFromEmailAddress
-          TO_ADDRESS: !Ref SESToEmailAddress
+          FROM_ADDRESS: !Ref SenderEmailAddress
+          TO_ADDRESS: !Ref RecipientEmailAddress
           SES_REGION: !Ref SESRegion
+          REPORT_BUCKET: !Ref ReportBucket 
+          WEBHOOK_URL: !Ref WebhookUrl
+
+  TriggerPennyPincher:
+    Type: Custom::TriggerPennyPincher
+    DependsOn: LambdaFunction
+    Properties:
+      ServiceToken: !GetAtt LambdaFunction.Arn
+
+  CronToTriggerLambda:
+    Type: AWS::Events::Rule
+    Properties:
+      Description: "ScheduleRule"
+      Name: LambdaTrigger
+      ScheduleExpression: rate(14 days)
+      State: ENABLED
+      Targets:
+        - Id: PennypincherLambdafunction
+          Arn: !GetAtt LambdaFunction.Arn
+
+  PermissionForEventsToInvokeLambda:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref LambdaFunction
+      Action: "lambda:InvokeFunction"
+      Principal: "events.amazonaws.com"
+      SourceArn: !GetAtt CronToTriggerLambda.Arn

@@ -9,8 +9,10 @@ from utils.utils import handle_limit_exceeded_exception
 class ElasticIP:
     """To fetch information of all unused elastic IP's."""
 
-    def __init__(self, regions=None):   
+    def __init__(self, headers, headers_inventory, regions=None):   
         self.regions = regions
+        self.headers = headers
+        self.headers_inventory = headers_inventory
         logging.basicConfig(level=logging.WARNING)
         self.logger = logging.getLogger()
 
@@ -34,12 +36,13 @@ class ElasticIP:
         pricing = Pricing(pricing_client, reg)
         return client, pricing
 
-    def _get_parameters(self, address, reg, client, pricing, eip_list):
+    def _get_parameters(self, address, reg, client, pricing, eip_list, eip_inv_list):
         """Returns a list containing unused EIP information."""
         
         instance_id = private_ip = association_id = instance_state = ''
         eip = []
         finding = 'Unallocated'
+        is_idle = 'No'
         if 'PrivateIpAddress' in address:
             private_ip = address["PrivateIpAddress"]
         if 'AssociationId' in address:
@@ -58,6 +61,9 @@ class ElasticIP:
         if finding == 'Instance Stopped' or finding == 'Unallocated':
             #An EIP is considered unused if it is attached with a stopped instance or is unallocated.
             price = pricing.get_eip_price()
+            if round(price, 2) != 0:
+                is_idle = 'Yes'
+                
             eip = [
             address["PublicIp"],
             address["PublicIp"],
@@ -71,26 +77,42 @@ class ElasticIP:
             "EIP is Unallocated or Associated to a Stopped Instance",
             round(price, 2)
             ]
+            
             eip_list.append(eip)
-        return eip_list
+        
+        eip_inv = [
+            address["PublicIp"],
+            address["PublicIp"],
+            "EIP",
+            "-",
+            "-",
+            "-",
+            reg,
+            is_idle
+            ]
+        eip_inv_list.append(eip_inv)
+        
+        return eip_list, eip_inv_list
 
     def get_result(self):     
         """Returns a list of lists which contains headings and unused EIP information."""
         try:
             eip_list = []
-            headers=[   'ResourceID','ResouceName','ServiceName','Type','VPC',
-                        'State','Region','Finding','EvaluationPeriod (seconds)','Criteria','Saving($)'
-                    ]
+            eip_inv_list = []
 
             for reg in self.regions:
                 client, pricing = self._get_clients(reg)
                 for address in self._describe_eip(client):
-                        eip_list = self._get_parameters(address, reg, client, pricing, eip_list)
-                        
+                    try:
+                        eip_list,eip_inv_list = self._get_parameters(address, reg, client, pricing, eip_list, eip_inv_list)
+                    except Exception as e:
+                        print("PriceList may be empty")
+                        self.logger.error("Error on line {} in rds.py".format(sys.exc_info()[-1].tb_lineno) + " | Message: " + str(e))
             #To fetch top 10 resources with maximum saving.
             eip_sorted_list = sorted(eip_list, key=lambda x: x[10], reverse=True)
             total_savings = self._get_savings(eip_sorted_list[:11])
-            return {'resource_list': eip_sorted_list[:10], 'headers': headers, 'savings': total_savings}
+            return {'resource_list': eip_sorted_list[:10], 'headers': self.headers, 'savings': total_savings}, {'headers_inv': self.headers_inventory, 'inv_list': eip_inv_list}
+
 
         except exceptions.ClientError as error:
             handle_limit_exceeded_exception(error, 'eip.py')

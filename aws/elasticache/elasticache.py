@@ -9,9 +9,11 @@ from utils.utils import handle_limit_exceeded_exception
 class Elasticache:
     """To fetch information of all idle elasticache instances."""
 
-    def __init__(self, config=None, regions=None):
+    def __init__(self, headers, headers_inventory, config=None, regions=None):
         try:
          self.config = config.get('ELASTICACHE')
+         self.headers = headers
+         self.headers_inventory = headers_inventory
         except KeyError as e:
             self.logger.error(
                 "Config for ELASTICACHE missing from config.cfg | Message: " + str(e))        
@@ -48,9 +50,9 @@ class Elasticache:
         pricing = Pricing(pricing_client, reg)
         return client, cloudwatch, pricing
         
-    def _get_parameters(self, cache, reg, cloudwatch, pricing, ec_list):
+    def _get_parameters(self, cache, reg, cloudwatch, pricing, ec_list, ec_inv_list):
         """Returns a list containing idle Elasticache instance information."""
-
+        is_idle = 'No'
         cache_id = cache["CacheClusterId"]
         cache_node_type = cache["CacheNodeType"]
         cache_engine = cache['Engine']
@@ -78,6 +80,7 @@ class Elasticache:
         savings = round(current_price, 2)
         if finding == 'Idle':
             #An Elasticache is considered idle if its cache hit and miss sum is 0.
+            is_idle = 'Yes'
             ec = [
                 cache_id,
                 cluster_name,
@@ -92,25 +95,40 @@ class Elasticache:
                 savings
             ]
             ec_list.append(ec)
-        return ec_list
+            
+        ec_inv = [
+                cache_id,
+                cluster_name,
+                "ELASTICACHE",
+                cache_node_type,
+                "-",
+                cache_engine,
+                reg,
+                is_idle
+             ]
+        ec_inv_list.append(ec_inv)
+            
+        return ec_list, ec_inv_list
 
     def get_result(self): 
         """Returns a list of lists which contains headings and idle Elasticache instance information."""
         try:
             ec_list = []
-            headers=[   'ResourceID','ResouceName','ServiceName','Type','VPC',
-                        'State','Region','Finding','EvaluationPeriod (seconds)','Criteria','Saving($)'
-                    ]
+            ec_inv_list = []
+            
             for reg in self.regions:
                 client, cloudwatch, pricing = self._get_clients(reg)
                 elasticache_clusters = self._describe_elasticache(client)
                 for cache in elasticache_clusters:
-                    ec_list = self._get_parameters(cache, reg, cloudwatch, pricing, ec_list)
-                    
+                    try:
+                        ec_list,ec_inv_list = self._get_parameters(cache, reg, cloudwatch, pricing, ec_list, ec_inv_list)
+                    except Exception as e:
+                        print("PriceList may be empty")
+                        self.logger.error("Error on line {} in rds.py".format(sys.exc_info()[-1].tb_lineno) + " | Message: " + str(e))
             #To fetch top 10 resources with maximum saving.
             ec_sorted_list = sorted(ec_list, key=lambda x: x[10], reverse=True)
             total_savings = self._get_savings(ec_sorted_list)
-            return {'resource_list': ec_sorted_list, 'headers': headers, 'savings': total_savings}
+            return {'resource_list': ec_sorted_list, 'headers': self.headers, 'savings': total_savings}, {'headers_inv': self.headers_inventory, 'inv_list': ec_inv_list}
 
         except exceptions.ClientError as error:
             handle_limit_exceeded_exception(error, 'elasticache.py')
