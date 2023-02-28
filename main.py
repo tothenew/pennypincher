@@ -1,8 +1,9 @@
 import os
 import logging
-import sys
 import cfnresponse
+import sys
 import boto3
+import argparse
 import uuid
 from datetime import datetime
 from utils.html_functions import HTML
@@ -25,7 +26,6 @@ log.setLevel(logging.DEBUG)
 
 def lambda_handler(event=None, context=None):
     print("Starting PennyPincher")
-    
     default_config = parse_config('./utils/default.yaml') 
     overwrite_config = parse_config('./config.yaml') 
     final_config = merges(default_config,overwrite_config)
@@ -40,6 +40,7 @@ def lambda_handler(event=None, context=None):
     account_name = env_config['account_name'] 
     webhook_url = env_config['webhook_url']
     report_bucket = env_config['report_bucket']
+    
     #Verifying Identities
     if 'email' in  reporting_platform.lower().split(','):
         email_addresses = to_address.split(',')
@@ -72,9 +73,23 @@ def lambda_handler(event=None, context=None):
         html_obj = HTML()               #Object for generating html page
         ses_obj = SES(from_address=from_address, to_address=to_address, ses_region=ses_region)    #Object to send email
         slack_obj = Slackalert(channel=channel_name, webhook_url=webhook_url)           #object to send report to slack
-
         print(html_obj)
-        html, resource_info, total_savings, inventory_info = resource.get_report(html_obj, slack_obj)
+        
+        # options to include and exclude aws resources while scanning the account
+        parser = argparse.ArgumentParser()
+        parser.add_argument("--include", type=str, help="resources which need to be scanned")
+        parser.add_argument("--exclude", type=str, help="resources which need to be exclude from the scanning")
+        args = parser.parse_args()
+        resources_tobe_scanned = ['ec2', 'rds', 'l.b', 'ebs', 'eip', 'ec', 'es', 'redshift']
+        if args.include:
+            res = str(args.include)
+            resources_tobe_scanned = res.lower().split(',')
+        if args.exclude:
+            res = str(args.exclude)
+            excluded_res = res.lower().split(',')
+            resources_tobe_scanned = [i for i in resources_tobe_scanned if i not in excluded_res]
+            
+        html, resource_info, total_savings, inventory_info = resource.get_report(html_obj, slack_obj, resources_tobe_scanned)
         print("Total savings: $" + str(round(total_savings, 2)))
         current_datetime=datetime.utcnow().isoformat("T","minutes").replace(":", "-")
         dir_path=f"/tmp/pennypincher_reports/{current_datetime}"
