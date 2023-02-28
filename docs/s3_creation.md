@@ -2,7 +2,7 @@
 
 ### Aim 
 
-The aim is to setup an S3 bucket and upload the files (code.zip and packages.zip) for penny pincher deployment.
+The aim is to setup an S3 bucket and upload the files (code.zip and packages.zip) for pennypincher deployment.
 
 ### Setup
 
