@@ -96,7 +96,7 @@ def lambda_handler(event=None, context=None):
         if len(inventory_info) > 0 :
             inv_obj = GENINV(inventory_info, dir_path, current_datetime)
             inv_obj.generate_inv()
-            ## Sending report in s3   
+        ## Sending report in s3   
         if 's3' in  reporting_platform.lower().split(','):
             uploadDirectory(dir_path,report_bucket,current_datetime)
             s3_signature ={
@@ -154,7 +154,7 @@ def cfnresponsefun(event, context):
                         cfnresponse.FAILED,
                         {'Exception': repr(ex)})
         return 'Exception: %s' % str(ex)
-
-
+    
+    
 if __name__ == "__main__":
     lambda_handler()
