@@ -55,9 +55,6 @@ class Loadbalancer:
         return client, cloudwatch, elbv2_client, pricing_client
 
     def _get_clb_parameters(self, elb, reg, cloudwatch, elb_price, alb_price, lb_list, lb_inv_list):
-        print("get_clg exe")
-        print("===========+++++++++============")
-        print(elb)
         """Returns list containing idle loadbalancers information."""
         classic_lb = []        
         connection_count = cloudwatch.get_sum_metric('AWS/ELB', 'RequestCount',
@@ -154,44 +151,38 @@ class Loadbalancer:
         return lb_list, lb_inv_list
 
     def get_result(self):  
-        print("get_result executed")
         """Returns a list of lists which contains headings and idle loadbalancers information."""
-        # try:
-        lb_list = []
-        lb_inv_list = []
+        try:
+            lb_list = []
+            lb_inv_list = []
 
-        for reg in self.regions:
-            client, cloudwatch, elbv2_client, pricing_client = self._get_clients(reg)
-            elb_price, alb_price, nlb_price = self._get_lb_price(pricing_client, reg)
+            for reg in self.regions:
+                client, cloudwatch, elbv2_client, pricing_client = self._get_clients(reg)
+                elb_price, alb_price, nlb_price = self._get_lb_price(pricing_client, reg)
 
-            for elb in self._describe_classic_lb(client):
-                # try:
-                lb_list, lb_inv_list = self._get_clb_parameters(elb, reg, cloudwatch, elb_price, alb_price, lb_list, lb_inv_list)
-                print(lb_list)
-                print("-------")
-                print(lb_inv_list)
-                print("|||||||||||||||||||||||||||||||||||||||||||||||||")
-                print(elb)
-                # except Exception as e:
-                #     print("PriceList may be empty")
-                #     self.logger.error("Error on line {} in rds.py".format(sys.exc_info()[-1].tb_lineno) + " | Message: " + str(e))
-            for lb in self._describe_lb(elbv2_client):
-                # try:
-                lb_list, lb_inv_list = self._get_lb_parameters(lb, reg, cloudwatch, alb_price, nlb_price, lb_list, lb_inv_list)
-                # except Exception as e:
-                #     print("PriceList may be empty")
-                #     self.logger.error("Error on line {} in rds.py".format(sys.exc_info()[-1].tb_lineno) + " | Message: " + str(e))
-        #To fetch top 10 resources with maximum saving.
-        lb_sorted_list = sorted(lb_list, key=lambda x: x[10], reverse=True)
-        total_savings = self._get_savings(lb_sorted_list)
-        return {'resource_list': lb_sorted_list, 'headers': self.headers, 'savings': total_savings}, {'headers_inv': self.headers_inventory, 'inv_list': lb_inv_list}
+                for elb in self._describe_classic_lb(client):
+                    try:
+                        lb_list, lb_inv_list = self._get_clb_parameters(elb, reg, cloudwatch, elb_price, alb_price, lb_list, lb_inv_list)
+                    except Exception as e:
+                        print("PriceList may be empty")
+                        self.logger.error("Error on line {} in rds.py".format(sys.exc_info()[-1].tb_lineno) + " | Message: " + str(e))
+                for lb in self._describe_lb(elbv2_client):
+                    try:
+                        lb_list, lb_inv_list = self._get_lb_parameters(lb, reg, cloudwatch, alb_price, nlb_price, lb_list, lb_inv_list)
+                    except Exception as e:
+                        print("PriceList may be empty")
+                        self.logger.error("Error on line {} in rds.py".format(sys.exc_info()[-1].tb_lineno) + " | Message: " + str(e))
+            #To fetch top 10 resources with maximum saving.
+            lb_sorted_list = sorted(lb_list, key=lambda x: x[10], reverse=True)
+            total_savings = self._get_savings(lb_sorted_list)
+            return {'resource_list': lb_sorted_list, 'headers': self.headers, 'savings': total_savings}, {'headers_inv': self.headers_inventory, 'inv_list': lb_inv_list}
         
-        # except exceptions.ClientError as error:
-        #     handle_limit_exceeded_exception(error, 'loadbalancer.py')
-        #     sys.exit(1)
+        except exceptions.ClientError as error:
+            handle_limit_exceeded_exception(error, 'loadbalancer.py')
+            sys.exit(1)
 
-        # except Exception as e:
-        #     self.logger.error(
-        #         "Error on line {} in loadbalancer.py".format(sys.exc_info()[-1].tb_lineno) + " | Message: " +
-        #         str(e))
-        #     sys.exit(1)
+        except Exception as e:
+            self.logger.error(
+                "Error on line {} in loadbalancer.py".format(sys.exc_info()[-1].tb_lineno) + " | Message: " +
+                str(e))
+            sys.exit(1)
