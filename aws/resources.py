@@ -32,7 +32,7 @@ class Resources:
  
    def lb(self): 
        """Function which fetches information resource : Loadbalancers."""
-       print("Fetching idle resources for LOABALANCERS")
+       print("Fetching idle resources for LOADBALANCERS")
        lb_obj = Loadbalancer(config=self.config, regions=self.region_list, headers = self.headers, headers_inventory = self.headers_inventory)
        summary, summary_inv = lb_obj.get_result()
        return summary, summary_inv
@@ -96,7 +96,7 @@ class Resources:
            total_savings = 0
            resource_info = {} #Dictionary which will contain all the information of resources.
            inventory_info = {} #Dictionary which will contain all the information of used resources. 
-          
+                
            ###EC2####  
         #    dictionary- resource_list, headers, savings
            summary, summary_inv = self.ec2()    

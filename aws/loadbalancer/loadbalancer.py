@@ -70,7 +70,7 @@ class Loadbalancer:
             elb['LoadBalancerName'],
             "LOADBALANCER",
             'Classic',
-            elb['VpcId'],
+            elb['VPCId'],
             "-",
             reg,
             finding,
@@ -89,7 +89,7 @@ class Loadbalancer:
             elb['LoadBalancerName'],
             "LOADBALANCER",
             'Classic',
-            elb['VpcId'],
+            elb['VPCId'],
             '-',
             reg,
             'Yes'
@@ -176,7 +176,7 @@ class Loadbalancer:
             lb_sorted_list = sorted(lb_list, key=lambda x: x[10], reverse=True)
             total_savings = self._get_savings(lb_sorted_list)
             return {'resource_list': lb_sorted_list, 'headers': self.headers, 'savings': total_savings}, {'headers_inv': self.headers_inventory, 'inv_list': lb_inv_list}
-            
+        
         except exceptions.ClientError as error:
             handle_limit_exceeded_exception(error, 'loadbalancer.py')
             sys.exit(1)
