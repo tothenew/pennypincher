@@ -55,6 +55,9 @@ class Loadbalancer:
         return client, cloudwatch, elbv2_client, pricing_client
 
     def _get_clb_parameters(self, elb, reg, cloudwatch, elb_price, alb_price, lb_list, lb_inv_list):
+        print("get_clg exe")
+        print("===========+++++++++============")
+        print(elb)
         """Returns list containing idle loadbalancers information."""
         classic_lb = []        
         connection_count = cloudwatch.get_sum_metric('AWS/ELB', 'RequestCount',
@@ -70,7 +73,7 @@ class Loadbalancer:
             elb['LoadBalancerName'],
             "LOADBALANCER",
             'Classic',
-            elb['VpcId'],
+            elb['VPCId'],
             "-",
             reg,
             finding,
@@ -89,7 +92,7 @@ class Loadbalancer:
             elb['LoadBalancerName'],
             "LOADBALANCER",
             'Classic',
-            elb['VpcId'],
+            elb['VPCId'],
             '-',
             reg,
             'Yes'
@@ -151,6 +154,7 @@ class Loadbalancer:
         return lb_list, lb_inv_list
 
     def get_result(self):  
+        print("get_result executed")
         """Returns a list of lists which contains headings and idle loadbalancers information."""
         # try:
         lb_list = []
@@ -163,6 +167,11 @@ class Loadbalancer:
             for elb in self._describe_classic_lb(client):
                 # try:
                 lb_list, lb_inv_list = self._get_clb_parameters(elb, reg, cloudwatch, elb_price, alb_price, lb_list, lb_inv_list)
+                print(lb_list)
+                print("-------")
+                print(lb_inv_list)
+                print("|||||||||||||||||||||||||||||||||||||||||||||||||")
+                print(elb)
                 # except Exception as e:
                 #     print("PriceList may be empty")
                 #     self.logger.error("Error on line {} in rds.py".format(sys.exc_info()[-1].tb_lineno) + " | Message: " + str(e))
