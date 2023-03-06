@@ -82,8 +82,7 @@ def lambda_handler(event=None, context=None):
         date_obj_format = date_obj.strftime("%d %b %Y")
         html_path = dir_path+ '/pennypincher_findings.html'
         header = '<h3><u><b>' + date_obj_format + ' Savings Report | Total Savings: $'+ str(round(total_savings, 2)) + '</b></u></h3>'
-        logo = f'<img src="https://penny-pincher-s3-bucket.s3.amazonaws.com/pennypincher-logo.png" height="200" width="200" >'
-        html = logo + header + html
+        html = header + html
         with FileManager(html_path, 'w') as f:
             f.write(html)
         print("Findings File is at: pennypincher_findings.html")
