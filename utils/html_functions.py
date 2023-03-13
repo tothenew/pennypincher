@@ -119,19 +119,19 @@ class HTML:
 
     def get_html_page(self, resource_name, headers, ebs_list, savings): 
         """Generates html page."""
-        try:
-            msg_list = []
-            html = self.header_to_html(headers)  # Table Header
-            ebs_table = self.body_to_html(ebs_list, savings)  # Table Values
-            msg_list.append([ebs_table, resource_name])  # Append value to final result list
-            html_infix = self.get_HTML_infix()
-            criteria = "<h4>"+headers[9]+" : "+ebs_list[0][9]+"</h4>"
-            for resource in msg_list:
-                html = html_infix + resource[1] + " : </h4>" + criteria + html + resource[0]
-            return html
-        except Exception as e:
-            self.logger.error(
-                "Error on line {} in html_functions.py".format(sys.exc_info()[-1].tb_lineno) + " | Message: " +
-                str(e))
-            sys.exit(1)
+        # try:
+        msg_list = []
+        html = self.header_to_html(headers)  # Table Header
+        ebs_table = self.body_to_html(ebs_list, savings)  # Table Values
+        msg_list.append([ebs_table, resource_name])  # Append value to final result list
+        html_infix = self.get_HTML_infix()
+        criteria = "<h4>"+headers[9]+" : "+ebs_list[0][9]+"</h4>"
+        for resource in msg_list:
+            html = html_infix + resource[1] + " : </h4>" + criteria + html + resource[0]
+        return html
+        # except Exception as e:
+        #     self.logger.error(
+        #         "Error on line {} in html_functions.py".format(sys.exc_info()[-1].tb_lineno) + " | Message: " +
+        #         str(e))
+        #     sys.exit(1)
 

@@ -28,49 +28,49 @@ def convert_size(size_in_bytes):
 
 def get_region_name(region_code):  
     """Returns region name corresponding to the region abbreviation."""
-    try:
-        region_mapping = {'us-east-1': 'US East (N. Virginia)', 'us-east-2': 'US East (Ohio)',
-                          'us-west-1': 'US West (N. California)', 'us-west-2': 'US West (Oregon)',
-                          'af-south-1': 'Africa (Cape Town)',
-                          'ap-northeast-1': 'Asia Pacific (Tokyo)', 'ap-northeast-2': 'Asia Pacific (Seoul)',
-                          'ap-northeast-3': 'Asia Pacific (Osaka)',
-                          'ap-southeast-1': 'Asia Pacific (Singapore)', 'ap-southeast-2': 'Asia Pacific (Sydney)',
-                          'ap-east-1': 'Asia Pacific (Hong Kong)',
-                          'ap-south-1': 'Asia Pacific (Mumbai)',
-                          'ca-central-1': 'Canada (Central)',
-                          'eu-central-1': 'EU (Frankfurt)',
-                          'eu-west-1': 'EU (Ireland)', 'eu-west-2': 'EU (London)', 'eu-west-3': 'EU (Paris)',
-                          'eu-north-1': 'EU (Stockholm)',
-                          'eu-south-1': 'EU (Milan)',
-                          'me-south-1': 'Middle East (Bahrain)',
-                          'sa-east-1': 'South America (Sao Paulo)',
-                          'af-south-1': 'Africa (Cape Town)',
-                          'ap-east-1': 'Asia Pacific (Hong Kong)',
-                          'ap-south-2' : 'Asia Pacific (Hyderabad)',
-                          'ap-southeast-3': 'Asia Pacific (Jakarta)',
-                          'eu-south-1': 'Europe (Milan)',
-                          'eu-south-2': 'Europe (Spain)',
-                          'eu-central-2': 'Europe (Zurich)',
-                          'me-south-1': 'Middle East (Bahrain)',
-                          'me-central-1': 'Middle East (UAE)'
+    # try:
+    region_mapping = {'us-east-1': 'US East (N. Virginia)', 'us-east-2': 'US East (Ohio)',
+                        'us-west-1': 'US West (N. California)', 'us-west-2': 'US West (Oregon)',
+                        'af-south-1': 'Africa (Cape Town)',
+                        'ap-northeast-1': 'Asia Pacific (Tokyo)', 'ap-northeast-2': 'Asia Pacific (Seoul)',
+                        'ap-northeast-3': 'Asia Pacific (Osaka)',
+                        'ap-southeast-1': 'Asia Pacific (Singapore)', 'ap-southeast-2': 'Asia Pacific (Sydney)',
+                        'ap-east-1': 'Asia Pacific (Hong Kong)',
+                        'ap-south-1': 'Asia Pacific (Mumbai)',
+                        'ca-central-1': 'Canada (Central)',
+                        'eu-central-1': 'EU (Frankfurt)',
+                        'eu-west-1': 'EU (Ireland)', 'eu-west-2': 'EU (London)', 'eu-west-3': 'EU (Paris)',
+                        'eu-north-1': 'EU (Stockholm)',
+                        'eu-south-1': 'EU (Milan)',
+                        'me-south-1': 'Middle East (Bahrain)',
+                        'sa-east-1': 'South America (Sao Paulo)',
+                        'af-south-1': 'Africa (Cape Town)',
+                        'ap-east-1': 'Asia Pacific (Hong Kong)',
+                        'ap-south-2' : 'Asia Pacific (Hyderabad)',
+                        'ap-southeast-3': 'Asia Pacific (Jakarta)',
+                        'eu-south-1': 'Europe (Milan)',
+                        'eu-south-2': 'Europe (Spain)',
+                        'eu-central-2': 'Europe (Zurich)',
+                        'me-south-1': 'Middle East (Bahrain)',
+                        'me-central-1': 'Middle East (UAE)'
 
-                          }
-        return region_mapping.get(region_code)
-    except Exception as e:
-        return 'US East (N. Virginia)'
+                        }
+    return region_mapping.get(region_code)
+    # except Exception as e:
+    #     return 'US East (N. Virginia)'
 
 
 def get_region_list():   
     """Returns a list of valid regions for an AWS account."""
-    try:
-        regions = []
-        ec2 = boto3.client('ec2')
-        response = ec2.describe_regions()
-        for reg in response['Regions']:
-            regions.append(reg['RegionName'])
-        return regions
-    except Exception as e:
-        return 'us-east-1'
+    # try:
+    regions = []
+    ec2 = boto3.client('ec2')
+    response = ec2.describe_regions()
+    for reg in response['Regions']:
+        regions.append(reg['RegionName'])
+    return regions
+    # except Exception as e:
+    #     return 'us-east-1'
 
 
 def get_backup_age(creation_date):   
@@ -82,34 +82,34 @@ def get_backup_age(creation_date):
 
 def get_region_code(region_code):   
     """Returns region code corresponding to an AWS region abbreviation."""
-    try:
-        region_mapping = {'us-east-1': 'USE1', 'us-east-2': 'USE2',
-                          'us-west-1': 'USW1', 'us-west-2': 'USW2',
-                          'af-south-1': 'CPT',
-                          'ap-northeast-1': 'APN1', 'ap-northeast-2': 'APN2',
-                          'ap-northeast-3': 'APN3',
-                          'ap-southeast-1': 'APS1', 'ap-southeast-2': 'APS2',
-                          'ap-east-1': 'APE1',
-                          'ap-south-1': 'APS3',
-                          'ca-central-1': 'CAN1',
-                          'eu-central-1': 'EUC1',
-                          'eu-west-1': 'EU', 'eu-west-2': 'EUW2', 'eu-west-3': 'EUW3',
-                          'eu-north-1': 'EUN1',
-                          'me-south-1': 'MES1',
-                          'sa-east-1': 'SAE1',
-                          'af-south-1': 'AFS1',
-                          'ap-east-1': 'APE1',
-                          'ap-south-2' : 'APS5',
-                          'ap-southeast-3': 'APS4',
-                          'eu-south-1': 'EUS1',
-                          'eu-south-2': 'EUS2',
-                          'eu-central-2': 'EUC2',
-                          'me-south-1': 'MES1',
-                          'me-central-1': 'MEC1'
-                          }
-        return region_mapping.get(region_code)
-    except Exception as e:
-        return 'USE1'
+    # try:
+    region_mapping = {'us-east-1': 'USE1', 'us-east-2': 'USE2',
+                        'us-west-1': 'USW1', 'us-west-2': 'USW2',
+                        'af-south-1': 'CPT',
+                        'ap-northeast-1': 'APN1', 'ap-northeast-2': 'APN2',
+                        'ap-northeast-3': 'APN3',
+                        'ap-southeast-1': 'APS1', 'ap-southeast-2': 'APS2',
+                        'ap-east-1': 'APE1',
+                        'ap-south-1': 'APS3',
+                        'ca-central-1': 'CAN1',
+                        'eu-central-1': 'EUC1',
+                        'eu-west-1': 'EU', 'eu-west-2': 'EUW2', 'eu-west-3': 'EUW3',
+                        'eu-north-1': 'EUN1',
+                        'me-south-1': 'MES1',
+                        'sa-east-1': 'SAE1',
+                        'af-south-1': 'AFS1',
+                        'ap-east-1': 'APE1',
+                        'ap-south-2' : 'APS5',
+                        'ap-southeast-3': 'APS4',
+                        'eu-south-1': 'EUS1',
+                        'eu-south-2': 'EUS2',
+                        'eu-central-2': 'EUC2',
+                        'me-south-1': 'MES1',
+                        'me-central-1': 'MEC1'
+                        }
+    return region_mapping.get(region_code)
+    # except Exception as e:
+    #     return 'USE1'
 
 
 def get_price(data):   

@@ -69,49 +69,49 @@ class SES:
     def ses_sendmail(self, sub, dir_path, tl_saving, resource_info, platform, current_date, url, bucket_name):   
         """Sends email."""
         
-        try:
-            ses = boto3.client('ses', region_name='us-east-1')
-            message = MIMEMultipart()
-            message['Subject'] = sub
-            message['From'] = self.from_address
+        # try:
+        ses = boto3.client('ses', region_name='us-east-1')
+        message = MIMEMultipart()
+        message['Subject'] = sub
+        message['From'] = self.from_address
+    
+        html = self.generate_summary_html(tl_saving, resource_info, platform, current_date, url, bucket_name)
         
-            html = self.generate_summary_html(tl_saving, resource_info, platform, current_date, url, bucket_name)
-            
-            part = MIMEText(html, 'html')
-            message.attach(part)
+        part = MIMEText(html, 'html')
+        message.attach(part)
+    
+        files = [f'{dir_path}/pennypincher_summary_report.csv', f'{dir_path}/pennypincher_inventory.csv']
         
-            files = [f'{dir_path}/pennypincher_summary_report.csv', f'{dir_path}/pennypincher_inventory.csv']
-            
-            for file in files:
-                with open(file, 'rb') as f:
-                    part = MIMEApplication(f.read())
-                    part.add_header('Content-Disposition', 'attachment', filename=os.path.basename(file))
-                    message.attach(part)
+        for file in files:
+            with open(file, 'rb') as f:
+                part = MIMEApplication(f.read())
+                part.add_header('Content-Disposition', 'attachment', filename=os.path.basename(file))
+                message.attach(part)
 
-            ses.send_raw_email(
-            Source=message['From'],
-            Destinations= self.to_address.split(','),
-            RawMessage={
-                'Data': message.as_string()
-            }
-            )
-        
-            print("Sending the Cost Optimization report to "+ self.to_address)        
-        except ses.meta.client.exceptions.MessageRejected as ex:
-            if ex.response['Error']['Message'] == 'MessageRejected':
-                self.logger.warning('email not verified')
-                print(ex.response['Error']['Message'])
+        ses.send_raw_email(
+        Source=message['From'],
+        Destinations= self.to_address.split(','),
+        RawMessage={
+            'Data': message.as_string()
+        }
+        )
+    
+        print("Sending the Cost Optimization report to "+ self.to_address)        
+        # except ses.meta.client.exceptions.MessageRejected as ex:
+        #     if ex.response['Error']['Message'] == 'MessageRejected':
+        #         self.logger.warning('email not verified')
+        #         print(ex.response['Error']['Message'])
             
-        except exceptions.ClientError as error:
-            if error.response['Error']['Code'] == 'LimitExceededException':
-                self.logger.warning('API call limit exceeded; backing off and retrying...')
-            else:
-                self.logger.error(error.response['Error']['Code'] + ': ' + error.response['Error']['Message'] +
-                                  ' | Line {} in ses.py'.format(sys.exc_info()[-1].tb_lineno))
-                sys.exit(1)
+        # except exceptions.ClientError as error:
+        #     if error.response['Error']['Code'] == 'LimitExceededException':
+        #         self.logger.warning('API call limit exceeded; backing off and retrying...')
+        #     else:
+        #         self.logger.error(error.response['Error']['Code'] + ': ' + error.response['Error']['Message'] +
+        #                           ' | Line {} in ses.py'.format(sys.exc_info()[-1].tb_lineno))
+        #         sys.exit(1)
 
-        except Exception as e:
-            self.logger.error("Error on line {} in ses.py".format(sys.exc_info()[-1].tb_lineno) + " | Message: " + str(e))
-            sys.exit(1)
+        # except Exception as e:
+        #     self.logger.error("Error on line {} in ses.py".format(sys.exc_info()[-1].tb_lineno) + " | Message: " + str(e))
+        #     sys.exit(1)
         
         
