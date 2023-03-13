@@ -69,7 +69,7 @@ Resources:
       Role: !Ref LambdaIAMRoleArn
       Handler: 'main.cfnresponsefun'
       Code:
-        S3Bucket: penny-pincher-s3-bucket
+        S3Bucket: testing-cron-job
         S3Key: 'penny.zip'
       PackageType: 'Zip'
       Timeout: 900
