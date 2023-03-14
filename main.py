@@ -45,7 +45,7 @@ def lambda_handler(event=None, context=None):
         email_addresses.append(from_address)
         unique_list = set(email_addresses) 
         email_addresses = (list(unique_list))
-        response= verify_identity(email_addresses)
+        response= verify_identity(email_addresses, ses_region)
         print(response)
     #Report Headerse
     headers_inventory = ['ResourceID','ResouceName','ServiceName','Type','VPC',
@@ -113,7 +113,7 @@ def lambda_handler(event=None, context=None):
         if 'email' in  reporting_platform.lower().split(','):
             ses_obj.ses_sendmail(
                 sub='Cost Optimization Report | ' + account_name + ' | Total Savings: $'+ str(round(total_savings, 2)), dir_path=dir_path,
-                tl_saving = str(round(total_savings, 2)), resource_info = resource_info, platform= reporting_platform, current_date = date_obj_format, url=pre_url, bucket_name = report_bucket)
+                tl_saving = str(round(total_savings, 2)), resource_info = resource_info, platform= reporting_platform, current_date = date_obj_format, url=pre_url, bucket_name = report_bucket, region=ses_region)
         if 'slack' in  reporting_platform.lower().split(','):
             print("Sending report to slack .....")
             slack_obj.slack_alert(resource_info, str(round(total_savings, 2)),report_bucket, date_obj_format, reporting_platform, pre_url)      
