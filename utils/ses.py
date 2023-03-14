@@ -66,11 +66,11 @@ class SES:
         
         return final_msg
 
-    def ses_sendmail(self, sub, dir_path, tl_saving, resource_info, platform, current_date, url, bucket_name):   
+    def ses_sendmail(self, sub, dir_path, tl_saving, resource_info, platform, current_date, url, bucket_name, region):   
         """Sends email."""
         
         try:
-            ses = boto3.client('ses', region_name='us-east-1')
+            ses = boto3.client('ses', region_name=region)
             message = MIMEMultipart()
             message['Subject'] = sub
             message['From'] = self.from_address
