@@ -49,6 +49,6 @@ config:
     to_address: ''         #Email addresses of recipents (Comma Separated)
     ses_region: '-'                    #Region where SES is configured
     reporting_platform: ''    #Email/Slack/Email and Slack
-    account_name: 'AWS Account'
+    account_name: ''
     report_bucket: ''
     

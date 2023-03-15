@@ -31,11 +31,21 @@ class SES:
                                 h7, td {{
                                 padding: 5px 15px 5px 0;
                                 }}
+                                tfoot {{
+                                    font-weight: bold;
+                                    color: black;
+                                }}
                                 </style>
                             </head>
                             <body>
                             <h4>Pennypincher - {date} Savings Report</h4>
-                            <table>"""
+                            <table>
+                             <thead><tr>
+                            <th>Service</th>
+                            <th>Potential Cost Saving</th>
+                            </tr>
+                            </thead><tbody>
+                            """
 
         html_suffix = " "
         res_list = []
@@ -43,16 +53,13 @@ class SES:
         for res in resource_info:
             res_list.append(res)
             saving.append(f"${resource_info[res]['Savings']}")
-        
-        res_list.append("Total Monthly Savings")
-        saving.append(f"${tl_saving}")
 
+        saving_row = f"</tbody><tfoot><tr><td>Total Monthly Savings</td><td>${tl_saving}</td></tr>"
         if "s3" in reporting_platform:
-            res_list.append("Check detail report here:")
-            saving.append(f'<a href = "{presigned_url}">{bucket_name}</a>')
-            html_suffix = "</table><h7><br>Note: Above URL is valid for 1 week</h7></body></html>"
+            findings_file = f'<a href = "{presigned_url}">{bucket_name}</a>'
+            html_suffix = saving_row + f"<tr><td>Check detail report here:</td><td>{findings_file}</td></tr></tfoot></table><h7><br>Note: Above URL is valid for 1 week</h7></body></html>"
         else:
-            html_suffix = "</table><h7><br>Note: To check the detailed report enable s3</h7></body></html>"
+            html_suffix =  saving_row + f"</tfoot></table><h7><br>Note: To check the detailed report enable s3</h7></body></html>"
         msg = {}
         for i,j in zip(res_list,saving):
             msg[i] = j
